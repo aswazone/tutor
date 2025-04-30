@@ -1,14 +1,11 @@
 
+import { RouterProvider } from 'react-router'
 import './App.css'
-
+import { router } from './routes/AppRoutes';
 function App() {
   return (
-    <>
-
-      <h1>Welcome to Tutor E learning app !!</h1>
-
-    </>
+    <RouterProvider router={router} />
   )
 }
 
-export default App
+export default App;
