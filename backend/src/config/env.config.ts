@@ -25,7 +25,13 @@ export const {
     NODE_ENV,
     SERVER_URL,
     CLIENT_URL,
-    MONGO_URI
+    MONGO_URI,
+    SENDER_EMAIL,
+    SENDER_PASSKEY,
+    RESET_PASS_URL,
+    REDIS_URL,
+    JWT_ACCESS_SECRET_KEY,
+    JWT_REFRESH_SECRET_KEY,
 
 } = process.env
 

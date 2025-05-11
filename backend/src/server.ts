@@ -1,11 +1,13 @@
 import { PORT, SERVER_URL } from '@/config/env.config'; 
 import Database from '@/config/mongo.config';
 import app from '@/app';
+import { connectRedis } from './config/redis.config';
 
 
 const startServer = async () => {
     try {
         await Database.getInstance();
+        connectRedis(); 
         const server = app.listen(PORT, () => {
             console.log(`🚀 Tutor App running on ${SERVER_URL} !`);
         });

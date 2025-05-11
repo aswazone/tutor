@@ -1,23 +1,35 @@
 import { Button } from '@/components/ui/button'
-import {FC} from 'react'
 import FormControls from './form-controls';
 import { IFormControl } from '@/config';
-import { SignInFormData, SignUpFormData } from '@/types';
-interface CommonFormProps {
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+import { RootState } from '@/store';
+import { useSelector } from 'react-redux';
+import { Loader2 } from 'lucide-react';
+import { UseFormReturn, FieldValues } from 'react-hook-form';
+import { Form } from '@/components/ui/form';
+
+interface CommonFormProps<T extends FieldValues> {
+  form: UseFormReturn<T>;
+  onSubmit: (data: T) => void;
   buttonText?: string;
-  isBtnDisabled: boolean
   formControls?: IFormControl[];
-  formData: SignInFormData | SignUpFormData;
-  setFormData: React.Dispatch<React.SetStateAction<SignInFormData>> | React.Dispatch<React.SetStateAction<SignUpFormData>>
 }
 
-const CommonForm:FC<CommonFormProps> = ({handleSubmit, buttonText = "Submit" ,formControls = [] , formData, setFormData, isBtnDisabled}) => {
+const CommonForm = <T extends FieldValues>({ form, onSubmit, buttonText = "Submit", formControls = [] }: CommonFormProps<T>) => {
+  const { isLoading } = useSelector((state: RootState) => state.auth);
+
   return (
-    <form onSubmit={handleSubmit}>
-        <FormControls formControls={formControls} formData={formData} setFormData={setFormData}/>
-        <Button disabled={isBtnDisabled} type='submit' className='bg-radial-[at_0%_0%] from-black via-sky-900  to-blue-950 to-90% text-sky-300 mt-5 w-full hover:shadow-black/20 transform hover:scale-101'>{buttonText}</Button>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormControls form={form} formControls={formControls} />
+        <Button 
+          disabled={isLoading} 
+          type='submit' 
+          className='bg-gradient-to-br from-black via-sky-900 to-blue-950 text-sky-100 mt-5 w-full hover:shadow-black/20 transform hover:scale-101'
+        >
+          {isLoading ? <Loader2 className='animate-spin' /> : buttonText}
+        </Button>
+      </form>
+    </Form>
   )
 }
 

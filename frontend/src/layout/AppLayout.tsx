@@ -1,12 +1,16 @@
-import { Link, Outlet } from "react-router-dom";
+import { Navbar } from "@/components/landing/Navbar";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
+import { Outlet } from "react-router-dom";
 
 const AppLayout = () => {
+
+  const auth = useSelector((state:RootState) => state.auth);
+  console.log(auth.isAuthenticated);
   return (
-    <div className="flex flex-col min-h-screen">
-    <header className="px-4 lg:px-6 h-14 flex items-center border-b">
-      <Link to={"/"} className="flex items-center justify-center"><span className="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-sky-900 text-2xl">Tutor</span></Link>
-    </header>
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex flex-col items-center min-h-screen">
+    <Navbar />
+    <div className="w-full">
       <Outlet />
     </div>
   </div>

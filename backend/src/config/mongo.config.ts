@@ -11,7 +11,7 @@ export default class Database {
       try {
         const connection = await mongoose.connect(MONGO_URI as string, {});
         Database.instance = connection.connection;
-        console.log(`🔌 MongoDB connected !!`);
+        console.log(`🌿 MongoDB connected !!`);
       } catch (err) {
         if (err instanceof Error) {
           throw new Error(`❌ MongoDB Connection Error: ${err.message}`);

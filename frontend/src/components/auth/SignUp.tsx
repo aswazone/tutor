@@ -1,23 +1,25 @@
-import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import CommonForm from '../common/form'
 import { SignUpFormData } from '@/types'
 import { IFormControl } from '@/config'
-
-
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { signUpSchema } from '@/schemas/auth'
 
 export interface SignUpProps {
-    handleSignUpSubmit: (e: React.FormEvent<HTMLFormElement>) => void
-    signUpFormControl: IFormControl[]
-    signUpFormData: SignUpFormData
-    setSignUpFormData: React.Dispatch<React.SetStateAction<SignUpFormData>>
+    handleSignUpSubmit: (data: SignUpFormData) => void;
+    signUpFormControl: IFormControl[];
 }
 
-const SignUp = ({ handleSignUpSubmit, signUpFormControl, signUpFormData, setSignUpFormData }: SignUpProps) => {
-    
-    function checkIsSignUpValid() {
-        return !signUpFormData.userName || !signUpFormData.userEmail || !signUpFormData.password
-    }
+const SignUp = ({ handleSignUpSubmit, signUpFormControl }: SignUpProps) => {
+    const form = useForm<SignUpFormData>({
+        resolver: zodResolver(signUpSchema),
+        defaultValues: {
+            userName: "",
+            userEmail: "",
+            password: "",
+        },
+    });
     
     return (
         <Card className="py-7 space-y-4 bg-radial-[at_20%_80%] from-sky-900/40 to-black/50 bg-gray-100 dark:bg-gray-800 bg-opacity-10 dark:bg-opacity-50 backdrop-blur-lg border-sky-600/40 border-b-4">
@@ -28,11 +30,15 @@ const SignUp = ({ handleSignUpSubmit, signUpFormControl, signUpFormData, setSign
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-                <CommonForm isBtnDisabled={checkIsSignUpValid()} handleSubmit={handleSignUpSubmit} formControls={signUpFormControl} buttonText="SignUp" formData={signUpFormData} setFormData={setSignUpFormData} />
+                <CommonForm 
+                    form={form}
+                    onSubmit={handleSignUpSubmit}
+                    formControls={signUpFormControl} 
+                    buttonText="SignUp"
+                />
             </CardContent>
         </Card>
     )
 }
-
 
 export default SignUp;

@@ -3,10 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: #bb6969;
   }
   a:hover {
     color: #747bff;
@@ -95,4 +95,4 @@
   body {
     @apply bg-background text-foreground;
   }
-} */
+}

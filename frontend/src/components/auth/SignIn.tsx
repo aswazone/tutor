@@ -2,19 +2,24 @@ import { IFormControl } from "@/config"
 import { SignInFormData } from "@/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import CommonForm from "../common/form"
+import { Link } from "react-router-dom"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { signInSchema } from "@/schemas/auth"
 
 export interface SignInProps {
-    handleSignInSubmit: (e: React.FormEvent<HTMLFormElement>) => void
-    signInFormControl: IFormControl[]
-    signInFormData: SignInFormData
-    setSignInFormData: React.Dispatch<React.SetStateAction<SignInFormData>>
+    handleSignInSubmit: (data: SignInFormData) => void;
+    signInFormControl: IFormControl[];
 }
 
-const SignIn: React.FC<SignInProps> = ({ handleSignInSubmit, signInFormControl, signInFormData, setSignInFormData }) => {
-
-    function checkIsSignInValid() {
-        return !signInFormData.userEmail || !signInFormData.password
-    }
+const SignIn: React.FC<SignInProps> = ({ handleSignInSubmit, signInFormControl }) => {
+    const form = useForm<SignInFormData>({
+        resolver: zodResolver(signInSchema),
+        defaultValues: {
+            userEmail: "",
+            password: "",
+        },
+    });
 
     return (
         <Card className="py-7 space-y-4 bg-radial-[at_80%_20%] from-sky-900/50 to-black/40 bg-gray-100 dark:bg-gray-800 bg-opacity-10 dark:bg-opacity-50 backdrop-blur-lg border-sky-600/40 border-b-4">
@@ -25,7 +30,18 @@ const SignIn: React.FC<SignInProps> = ({ handleSignInSubmit, signInFormControl, 
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-                <CommonForm isBtnDisabled={checkIsSignInValid()} handleSubmit={handleSignInSubmit} formControls={signInFormControl} buttonText="SignIn" formData={signInFormData} setFormData={setSignInFormData} />
+                <CommonForm 
+                    form={form}
+                    onSubmit={handleSignInSubmit}
+                    formControls={signInFormControl} 
+                    buttonText="SignIn"
+                />
+                <Link to="/forgot-password" className="text-xs font-bold text-sky-600 hover:text-sky-400 hover:underline">Forgot your password?</Link>
+                <div className="mt-4">
+                    <Link to="/auth/google" className="w-full border-1 rounded-md flex justify-center hover:bg-gradient-to-r hover:from-sky-900/10 hover:via-sky-950 hover:to-sky-900/10">
+                        <img className="w-7 h-7 my-1" src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google" />
+                    </Link>
+                </div>
             </CardContent>
         </Card>
     )
