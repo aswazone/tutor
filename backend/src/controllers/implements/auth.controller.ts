@@ -22,6 +22,7 @@ export class AuthController implements AuthControllerIF {
             const user = await this._authService.signup(req.body);
             res.status(HttpStatus.OK).json(user);
         } catch (err) {
+            console.log(err);
             next(err);
         }
     }
@@ -38,6 +39,8 @@ export class AuthController implements AuthControllerIF {
 
     refreshAccessToken = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{
         try {
+            console.log('reached- refresh');
+            console.log(req.cookies);
             const {accessToken,refreshToken} = await this._authService.refreshAccessToken(req.cookies?.refreshToken);
             setCookie(res,refreshToken);
             res.status(HttpStatus.OK).json({accessToken});

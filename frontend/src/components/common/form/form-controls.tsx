@@ -3,22 +3,27 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { IFormControl } from '@/config';
-import { UseFormReturn, FieldValues, Path } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 
-interface FormControlsProps<T extends FieldValues> {
-  form: UseFormReturn<T>;
+interface FormControlsProps {
   formControls: IFormControl[];
 }
 
-const FormControls = <T extends FieldValues>({ formControls = [], form }: FormControlsProps<T>) => {
+const FormControls = ({ formControls = [] }: FormControlsProps) => {
+  const form = useFormContext();
+
+  if (!form) {
+    throw new Error('FormControls must be used within a FormProvider');
+  }
+
   return (
     <div className="flex flex-col gap-3">
       {formControls.map(controlItem => (
         <FormField
           key={controlItem.name}
           control={form.control}
-          name={controlItem.name as Path<T>}
+          name={controlItem.name}
           render={({ field }) => (
             <FormItem>
               <Label className='text-sky-900 mb-2' htmlFor={controlItem.name}>{controlItem.label}</Label>
@@ -36,9 +41,9 @@ const FormControls = <T extends FieldValues>({ formControls = [], form }: FormCo
                           {...field}
                         />
                       );
-                    case 'select':
+                    case 'select':                      
                       return (
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ""}>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder={controlItem.label} />
                           </SelectTrigger>

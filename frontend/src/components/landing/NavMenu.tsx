@@ -22,6 +22,7 @@ export function NavMenu() {
     const dispatch = useDispatch<AppDispatch>();
   
     const handleLogout = () =>{
+      localStorage.removeItem('accessToken');
       dispatch(logout());
       toast.success("See you !!", {
         position: "top-right",
@@ -33,10 +34,10 @@ export function NavMenu() {
     return (
         
       <div className='flex items-center lg:flex-row gap-4'>
-        <Button variant='outline' size='icon'>
+        {user?.role !== 'admin' && <Button variant='outline' size='icon'>
           <ShoppingCart className='h-6 w-6'/>
           <span className="sr-only">User cart</span>
-        </Button>
+        </Button>}
         {isAuthenticated && (<DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className=' bg-black hover:opacity-90 transition-all duration-200 cursor-pointer ring-[0.5px] ring-transparent dark:ring-gray-600'>
@@ -46,14 +47,18 @@ export function NavMenu() {
           <DropdownMenuContent className='w-40 mt-4 p-2 bg-background dark:bg-background/90' align='end'>
             <DropdownMenuLabel className='px-2 py-1.5'>
               <span className='text-xs text-muted-foreground'>Logged in as</span>
-              <p className='font-medium'>{user?.userName.slice(0,1).toUpperCase() + user?.userName.slice(1)}</p>
+              <p className='font-medium'>{(user?.userName as string).slice(0,1).toUpperCase() + user?.userName.slice(1)}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className='my-1.5'/>
+            {user?.role !== 'admin' && 
+            <>
             <DropdownMenuItem className='px-2 py-1.5 cursor-pointer' onClick={()=> navigate('/Profile')}>
               <User className='mr-2 h-4 w-4'/>
               Profile
             </DropdownMenuItem>
             <DropdownMenuSeparator className='my-1.5'/>
+            </>
+            }
             <DropdownMenuItem className='px-2 py-1.5 cursor-pointer hover:text-red-600 focus:text-red-600' onClick={handleLogout}>
               <LogOut className='mr-2 h-4 w-4'/>
               Logout

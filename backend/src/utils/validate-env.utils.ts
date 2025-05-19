@@ -1,16 +1,24 @@
 import { PORT, NODE_ENV, SERVER_URL, CLIENT_URL } from "@/config/env.config";
 
-export const validateEnv = ():void => {
-    if (!PORT) {
-        throw new Error("PORT is not found in ENV !");
-    }
-    if (!NODE_ENV) {
-        throw new Error("NODE_ENV is not found in ENV !");
-    }
-    if (!SERVER_URL) {
-        throw new Error("SERVER_URL is not found in ENV !");
-    }
-    if (!CLIENT_URL) {
-        throw new Error("CLIENT_URL is not found in ENV !");
-    }
+export const validateEnv = (requiredVars: string[] = []): void => {
+    const defaultVars = {
+        PORT,
+        NODE_ENV,
+        SERVER_URL,
+        CLIENT_URL
+    };
+
+    // Validate default environment variables
+    Object.entries(defaultVars).forEach(([key, value]) => {
+        if (!value) {
+            throw new Error(`${key} is not found in ENV !`);
+        }
+    });
+
+    // Validate additional required variables
+    requiredVars.forEach(variable => {
+        if (!process.env[variable]) {
+            throw new Error(`${variable} is not found in ENV !`);
+        }
+    });
 };

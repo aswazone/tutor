@@ -8,6 +8,8 @@ const errorMiddleware = (
   next: NextFunction
 ): void => {
   try {
+
+    console.log('!!!');
     let statusCode = err.statusCode || 500;
     let message = err.message || 'Server Error';
 

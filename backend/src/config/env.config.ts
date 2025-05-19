@@ -32,6 +32,10 @@ export const {
     REDIS_URL,
     JWT_ACCESS_SECRET_KEY,
     JWT_REFRESH_SECRET_KEY,
+    AWS_REGION,
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
+    AWS_S3_BUCKET
 
 } = process.env
 

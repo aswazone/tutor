@@ -13,16 +13,16 @@ const ProtectedRoutes = ({ children }: ProtectedRoutesProps): JSX.Element => {
 
   const location = useLocation();
   if(!isAuthenticated && !(location.pathname.includes('/auth'))){
-    return <Navigate to="/auth" />
+    return <Navigate to="/" />
   }
 
   if(isAuthenticated && (location.pathname.includes('/auth'))){
     if(user?.role === 'admin'){
-        return <Navigate to='/admin/dashboard'/>
+        return <Navigate to='/admin'/>
     }else if(user?.role === 'tutor'){
-        return <Navigate to='/tutor/dashboard'/>
+        return <Navigate to='/profile'/>
     }else if(user?.role === 'student'){
-        return <Navigate to='/student/dashboard'/>
+        return <Navigate to='/profile'/>
     }
   }
 

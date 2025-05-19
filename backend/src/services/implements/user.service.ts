@@ -24,7 +24,7 @@ export class AuthService implements AuthServiceIF {
         if (user.role !== role) {
             throw createHttpError(
                 HttpStatus.UNAUTHORIZED, 
-                `This email is registered as a ${user.role}. Please login with correct role.`
+                `This email is registered as a '${(user.role).toUpperCase()}'. Please login with correct role.`
             );
         }
 
@@ -47,6 +47,7 @@ export class AuthService implements AuthServiceIF {
         
         const otp = generateOtp();
         await sendOtpEmail(user.userEmail,otp);
+        console.log(otp);
 
 
         const response = await redisClient.setEx(
@@ -57,6 +58,8 @@ export class AuthService implements AuthServiceIF {
                 otp,
             })
         );
+
+        
         if(!response) throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, HttpResponse.SERVER_ERROR);
 
 

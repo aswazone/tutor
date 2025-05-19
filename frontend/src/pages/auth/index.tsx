@@ -41,6 +41,7 @@ const AuthPage: React.FC = () => {
         const resultAction = await dispatch(signinUser({ role, ...data }));
         if (signinUser.fulfilled.match(resultAction)) {
           console.log(resultAction.payload);
+          localStorage.setItem("accessToken", resultAction.payload?.accessToken);
           toast.success("Successfully Logged In !!");
           localStorage.removeItem("userRole");
           navigate("/home");

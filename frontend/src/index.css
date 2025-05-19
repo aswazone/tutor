@@ -3,6 +3,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -87,6 +89,8 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+
 
 @layer base {
   * {

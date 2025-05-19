@@ -6,6 +6,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState: IAuthState = {
     accessToken: "",
+    activeTab: "overview",
     user: null, 
     isAuthenticated: false,
     isLoading: false,
@@ -42,7 +43,7 @@ export const signinUser = createAsyncThunk<
 
 
 export const verifyOtp = createAsyncThunk<
-    { accessToken: string; user: Record<string, unknown> },
+    { accessToken: string; user: Record<string, string> },
     { otp: string; email: string },
     { rejectValue: string }
 >('/auth/verify-otp', async ({ otp, email }, { rejectWithValue }) => {
@@ -59,7 +60,7 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setUser: (state, action: { payload: Record<string, unknown> }) => {
+        setUser: (state, action: { payload: Record<string, string> }) => {
             state.user = action.payload;
             state.isAuthenticated = true;
         },
@@ -70,14 +71,18 @@ const authSlice = createSlice({
             state.accessToken = "";
             state.user = null;
             state.isAuthenticated = false;
-        }
+        },
+        setActiveTab: (state, action: { payload: string }) => {
+            state.activeTab = action.payload;
+        },
+        
     },
     extraReducers: (builder) => {
         builder
             .addCase(signinUser.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(signinUser.fulfilled, (state, action: { payload: { accessToken: string; user: Record<string, unknown> } }) => {
+            .addCase(signinUser.fulfilled, (state, action: { payload: { accessToken: string; user: Record<string, string> } }) => {
                 state.isLoading = false;
                 state.accessToken = action.payload.accessToken;
                 state.user = action.payload.user;
@@ -100,7 +105,7 @@ const authSlice = createSlice({
             .addCase(verifyOtp.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(verifyOtp.fulfilled, (state, action: { payload: { accessToken: string; user: Record<string, unknown> } }) => {
+            .addCase(verifyOtp.fulfilled, (state, action: { payload: { accessToken: string; user: Record<string, string> } }) => {
                 state.isLoading = false;
                 state.accessToken = action.payload.accessToken;
                 state.user = action.payload.user;
@@ -114,5 +119,5 @@ const authSlice = createSlice({
 });
 
 
-export const { setUser, logout, setAccessToken } = authSlice.actions;
+export const { setUser, logout, setAccessToken, setActiveTab } = authSlice.actions;
 export default authSlice.reducer;

@@ -69,6 +69,7 @@ const OtpForm = () => {
         const resultAction = await dispatch(verifyOtp({ otp: data.pin, email }));
         if(resultAction){
           if (verifyOtp.fulfilled.match(resultAction)) {
+            localStorage.setItem("accessToken", (resultAction.payload.accessToken));
             toast.success("Successfully verified !!");
             localStorage.removeItem("pendingEmail");
             navigate("/home");

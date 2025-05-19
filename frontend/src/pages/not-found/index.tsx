@@ -4,6 +4,9 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Stars, OrbitControls, Text, Center, Environment, Html } from '@react-three/drei'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/landing/Navbar'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store'
+import { AdminNavbar } from '@/components/admin/Navbar'
 
 function Letter({ children, position, isDarkMode }) {
   const [hovered, setHovered] = useState(false)
@@ -51,6 +54,10 @@ function Letter({ children, position, isDarkMode }) {
 }
 
 export default function NotFound() {
+
+
+  const {user} = useSelector((state:RootState) => state.auth);
+
   const [isDarkMode, setIsDarkMode] = useState(() => 
     window.matchMedia('(prefers-color-scheme: dark)').matches
   )
@@ -58,7 +65,7 @@ export default function NotFound() {
   return (
     
     <div className="relative h-screen w-screen">
-      <Navbar />
+      {user?.role === 'admin' ?<AdminNavbar /> : <Navbar />}
       <Canvas camera={{ position: [0, 1, 15] }}>
         <color attach="background" args={['#050816']} />
         <fog attach="fog" args={['#050816', 5, 30]} />
@@ -82,6 +89,17 @@ export default function NotFound() {
               anchorY="middle"
             >
               You have reached the edge of the universe...
+            </Text>
+            <Text
+              position={[0, -9, 0]}
+              fontStyle='italic'
+              fontWeight={'bold'}
+              fontSize={0.6}
+              color={isDarkMode ? '#87ceec' : '#aaaaaa'}
+              anchorX="center"
+              anchorY="middle"
+            >
+             ' You can't drag my - ZERO '
             </Text>
           </group>
 

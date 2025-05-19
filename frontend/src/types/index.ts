@@ -2,6 +2,7 @@
 export enum UserRole {
   TUTOR = 'tutor',
   STUDENT = 'student',
+  ADMIN = 'admin'
 }
 
 export type SignInFormData = {
@@ -26,7 +27,7 @@ export interface SignUpResponse {
 
 export interface SignInResponse {
   accessToken: string;
-  user: Record<string, unknown>;
+  user: Record<string, string>;
 }
 
 export interface SignInRequest {
@@ -37,8 +38,9 @@ export interface SignInRequest {
 
 
 export interface IAuthState {
-  accessToken: string,
-  user: Record<string, unknown> | null,
+  accessToken: string | null,
+  activeTab: string,
+  user: Record<string, string> | null,
   isAuthenticated: boolean,
   isLoading: boolean,
   error: string | null

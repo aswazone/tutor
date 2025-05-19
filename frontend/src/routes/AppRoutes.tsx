@@ -10,6 +10,12 @@ import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoutes from "./ProtectedRoutes";
 import UnProtectedRoutes from "./UnProtectedRoutes";
 import ErrorPage from "@/pages/error";
+import AdminLayout from "@/layout/AdminLayout";
+import AdminDashboard from "@/pages/admin/Dashboard";
+import AdminAuthPage from "@/pages/admin/AdminAuthPage";
+import Courses from "@/pages/admin/Courses";
+import Tutors from "@/pages/admin/Tutors";
+import Students from "@/pages/admin/Students";
 
 
 export const router = createBrowserRouter([
@@ -40,6 +46,26 @@ export const router = createBrowserRouter([
                 path: "otp-verification", element: <OtpForm />
             }
         ]
+    },
+    {
+        path:"/admin", element: <ProtectedRoutes><AdminLayout /></ProtectedRoutes>,
+        children: [
+            {
+                path: "", element: <AdminDashboard />
+            },
+            {
+                path: "courses", element: <Courses />
+            },
+            {
+                path: "tutors", element: <Tutors />
+            },
+            {
+                path: "students", element: <Students />
+            }
+        ]
+    },
+    {
+        path: "/admin/auth", element: <UnProtectedRoutes><AdminAuthPage /></UnProtectedRoutes>,
     },
 
 ])
