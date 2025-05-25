@@ -6,6 +6,7 @@ import {
   BookOpen,
   Settings,
   BarChart3,
+  ListTree,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -57,8 +58,14 @@ export function Sidebar({ className, isCollapsed, setIsCollapsed }: SidebarProps
     {
       label: "Students",
       icon: Users,
-      color: "text-orange-700",
+      color: "text-amber-300",
       href: "/admin/students",
+    },
+    {
+      label: "Categories",
+      icon: ListTree,
+      color: "text-rose-400",
+      href: "/admin/categories",
     },
     {
       label: "Analytics",

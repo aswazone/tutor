@@ -1,11 +1,10 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
-import { buttonVariants } from "../ui/button";
 import { HeroCards } from "./HeroCards";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
 
 export const Hero = () => {
+  const navigate = useNavigate();
   const letterAnimation = {
     whileHover: { y: -10 },
     transition: { type: "spring", stiffness: 300, damping: 10 },
@@ -57,24 +56,16 @@ export const Hero = () => {
             whileTap={{ scale: 0.95 }}
             className="w-full md:w-1/3"
           >
-            <Button className="w-full">
-              <Link to="/pre-auth">Get Started</Link>
+            <Button 
+            className="w-full cursor-pointer" 
+            variant={"outline"}
+            onClick={() => navigate('/profile')}
+            >
+
+              Get Started !
             </Button>
           </motion.div>
 
-          <motion.a
-            whileHover={{ scale: 1.1, rotate: -2 }}
-            whileTap={{ scale: 0.95 }}
-            rel="noreferrer noopener"
-            href="https://github.com/aswazone"
-            target="_blank"
-            className={`w-full md:w-1/3 ${buttonVariants({
-              variant: "outline",
-            })}`}
-          >
-            Github Repository
-            <GitHubLogoIcon className="ml-2 w-5 h-5" />
-          </motion.a>
         </div>
       </motion.div>
 

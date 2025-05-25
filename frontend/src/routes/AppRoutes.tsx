@@ -16,6 +16,10 @@ import AdminAuthPage from "@/pages/admin/AdminAuthPage";
 import Courses from "@/pages/admin/Courses";
 import Tutors from "@/pages/admin/Tutors";
 import Students from "@/pages/admin/Students";
+import Categories from "@/pages/admin/Categories";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { env } from "@/config/env.config";
+import ResetPassword from "@/pages/reset-password";
 
 
 export const router = createBrowserRouter([
@@ -40,7 +44,7 @@ export const router = createBrowserRouter([
                 path: "pre-auth", element: <UnProtectedRoutes><PreAuth /></UnProtectedRoutes>,
             },
             {
-                path: "auth", element: <AuthPage />,
+                path: "auth", element: <GoogleOAuthProvider clientId={env.GOOGLE_CLIENT_ID}><AuthPage /></GoogleOAuthProvider>,
             },
             {
                 path: "otp-verification", element: <OtpForm />
@@ -61,11 +65,17 @@ export const router = createBrowserRouter([
             },
             {
                 path: "students", element: <Students />
+            },
+            {
+                path: "categories", element: <Categories />
             }
         ]
     },
     {
         path: "/admin/auth", element: <UnProtectedRoutes><AdminAuthPage /></UnProtectedRoutes>,
     },
+    {
+        path: "reset-password", element: <ResetPassword /> 
+    }
 
 ])

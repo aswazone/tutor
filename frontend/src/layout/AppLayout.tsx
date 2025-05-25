@@ -1,3 +1,4 @@
+
 import { Navbar } from "@/components/landing/Navbar";
 import { RootState } from "@/store";
 import { useSelector } from "react-redux";
@@ -10,7 +11,7 @@ const AppLayout = () => {
   return (
     <div className="flex flex-col items-center min-h-screen">
     <Navbar />
-    <div className="w-full">
+    <div className="w-full ">
       <Outlet />
     </div>
   </div>

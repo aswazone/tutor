@@ -37,6 +37,36 @@ export class AuthController implements AuthControllerIF {
         }
     }
 
+    forgotPassword = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const {email} = req.body;
+            const {message} = await this._authService.forgotPassword(email);
+            res.status(HttpStatus.OK).json({message});
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    resetPassword = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const {token,password} = req.body;
+            const {message} = await this._authService.resetPassword(token,password);
+            res.status(HttpStatus.OK).json({message});
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    googleSignin = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const {token} = req.body;
+            const {user,accessToken,refreshToken} = await this._authService.googleSignin(token);
+            setCookie(res,refreshToken);
+            res.status(HttpStatus.OK).json({user,accessToken});
+        } catch (err) {
+            next(err);
+        }
+    }
     refreshAccessToken = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{
         try {
             console.log('reached- refresh');

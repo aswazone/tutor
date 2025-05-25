@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { StarIcon, Clock, Users, GraduationCap } from 'lucide-react'
+import { StarIcon, Clock, Users, Loader, Heart } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { Badge } from '@/components/ui/badge'
@@ -11,185 +11,90 @@ import { useEffect, useState } from 'react'
 import axiosInstance from '@/config/axios.config'
 import { setActiveTab } from '@/store/auth/authSlice'
 import CardSkeleton from '@/components/common/CardSkeleton'
-import Loader from '@/components/ui/loader'
-
-// const mockCourses: ICourse[] = [
-//   {
-//     _id: "6829ec1838254c892a477604",
-//     title: "Javascript - Beginner to Advance",
-//     category: "web-development",
-//     level: "advanced",
-//     primaryLanguage: "japanese",
-//     subtitle: "Master Modern JavaScript",
-//     description: "Master Modern JavaScript — the most essential language for web development!",
-//     pricing: "2000",
-//     objectives: "Understand the basics of Frontend using Javascript.",
-//     welcomeMessage: "Welcome to All Feature Developer !!",
-//     thumbnailKey: "course-thumbnails/1747577879983-Gemini_Generated_Image_6uxkjz6uxkjz6uxk.png",
-//     modules: [],
-//     tutor: "6829dba238254c892a477602",
-//     isPublished: false,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString()
-//   },
-//   {
-//     _id: "6829ec1838254c892a477605",
-//     title: "React & Next.js Masterclass",
-//     category: "web-development",
-//     level: "intermediate",
-//     primaryLanguage: "english",
-//     subtitle: "Build Modern Web Apps",
-//     description: "Learn to build modern web applications with React and Next.js",
-//     pricing: "2500",
-//     objectives: "Master React and Next.js fundamentals",
-//     welcomeMessage: "Welcome to React Journey!",
-//     thumbnailKey: "course-thumbnails/1747577879983-Gemini_Generated_Image_6uxkjz6uxkjz6uxk.png",
-//     modules: [],
-//     tutor: "6829dba238254c892a477602",
-//     isPublished: true,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString()
-//   },
-//   {
-//     _id: "6829ec1838254c892a477606",
-//     title: "Python for Data Science",
-//     category: "data-science",
-//     level: "beginner",
-//     primaryLanguage: "japanese",
-//     subtitle: "Data Analysis with Python",
-//     description: "Learn Python for Data Science from scratch",
-//     pricing: "1800",
-//     objectives: "Learn Python basics and data analysis",
-//     welcomeMessage: "Welcome to Data Science!",
-//     thumbnailKey: "course-thumbnails/1747577879983-Gemini_Generated_Image_6uxkjz6uxkjz6uxk.png",
-//     modules: [],
-//     tutor: "6829dba238254c892a477602",
-//     isPublished: true,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString()
-//   },
-//   {
-//     _id: "6829ec1838254c892a477607",
-//     title: "TypeScript Deep Dive",
-//     category: "programming",
-//     level: "advanced",
-//     primaryLanguage: "english",
-//     subtitle: "Advanced TypeScript Concepts",
-//     description: "Master TypeScript for large-scale applications",
-//     pricing: "2200",
-//     objectives: "Advanced TypeScript features and patterns",
-//     welcomeMessage: "Welcome to TypeScript Journey!",
-//     thumbnailKey: "course-thumbnails/1747577879983-Gemini_Generated_Image_6uxkjz6uxkjz6uxk.png",
-//     modules: [],
-//     tutor: "6829dba238254c892a477602",
-//     isPublished: true,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString()
-//   },
-//   {
-//     _id: "6829ec1838254c892a477608",
-//     title: "Machine Learning Fundamentals",
-//     category: "machine-learning",
-//     level: "intermediate",
-//     primaryLanguage: "english",
-//     subtitle: "Practical ML with Python",
-//     description: "Build real-world machine learning models from scratch",
-//     pricing: "2800",
-//     objectives: "Understanding ML algorithms and implementation",
-//     welcomeMessage: "Welcome to the world of Machine Learning!",
-//     thumbnailKey: "course-thumbnails/1747577879983-Gemini_Generated_Image_6uxkjz6uxkjz6uxk.png",
-//     modules: [],
-//     tutor: "6829dba238254c892a477602",
-//     isPublished: true,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString()
-//   },
-//   {
-//     _id: "6829ec1838254c892a477609",
-//     title: "Cloud Architecture on AWS",
-//     category: "cloud-computing",
-//     level: "advanced",
-//     primaryLanguage: "japanese",
-//     subtitle: "Enterprise Cloud Solutions",
-//     description: "Design and implement scalable cloud architectures on AWS",
-//     pricing: "3000",
-//     objectives: "Master AWS services and cloud architecture patterns",
-//     welcomeMessage: "Welcome to Cloud Architecture Mastery!",
-//     thumbnailKey: "course-thumbnails/1747577879983-Gemini_Generated_Image_6uxkjz6uxkjz6uxk.png",
-//     modules: [],
-//     tutor: "6829dba238254c892a477602",
-//     isPublished: true,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString()
-//   },
-//   {
-//     _id: "6829ec1838254c892a477610",
-//     title: "Mobile Development with Flutter",
-//     category: "mobile-development",
-//     level: "beginner",
-//     primaryLanguage: "english",
-//     subtitle: "Cross-platform Mobile Apps",
-//     description: "Create beautiful mobile applications with Flutter",
-//     pricing: "2100",
-//     objectives: "Learn Flutter and Dart programming for mobile development",
-//     welcomeMessage: "Welcome to Flutter Development!",
-//     thumbnailKey: "course-thumbnails/1747577879983-Gemini_Generated_Image_6uxkjz6uxkjz6uxk.png",
-//     modules: [],
-//     tutor: "6829dba238254c892a477602",
-//     isPublished: false,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString()
-//   }
-// ];
+import { fetchWishlist, addToWishlist, removeFromWishlist } from '@/store/wishlist'
+import { toast } from 'sonner'
+import { env } from '@/config/env.config';
 
 export const StudentsCoursesTab = () => {
-
   const dispatch = useDispatch<AppDispatch>();
-  const [mockCourses, setMockCourses] = useState<ICourse[]>([]);
-
-  useEffect(() => {
-    const reponse = axiosInstance.get('/api/v1/courses/public');
-
-    reponse.then((res) => {
-      console.log(res.data);
-      setMockCourses(res.data);
-    });
-
-  }, []);
-
-
-
   const navigate = useNavigate();
-  const { isLoading } = useSelector((state: RootState) => ({
+  const [courses, setCourses] = useState<ICourse[]>([]);
+  const { isLoading: coursesLoading } = useSelector((state: RootState) => ({
     isLoading: state.course.courseEditor.uploadStatus === 'uploading'
   }));
 
+  const { items: wishlistItems, isLoading: wishlistLoading } = useSelector(
+    (state: RootState) => state.wishlist
+  );
+
+  useEffect(() => {
+    // Fetch all public courses
+    const fetchCourses = async () => {
+      try {        
+        const response = await axiosInstance.get<ICourse[]>('/api/v1/courses');
+        setCourses(response.data);    
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Failed to fetch courses:', error);
+        toast.error(error.message);
+      } else {
+        console.error('Failed to fetch courses:', error);
+        toast.error('Failed to fetch courses');
+      }
+      }
+    };
+
+    fetchCourses();
+    dispatch(fetchWishlist());
+  }, [dispatch]);
+  const handleWishlistToggle = async (courseId: string, isInWishlist: boolean) => {
+    try {
+      if (isInWishlist) {
+        await dispatch(removeFromWishlist(courseId)).unwrap();
+        toast.success('Removed from wishlist');
+      } else {
+        await dispatch(addToWishlist(courseId)).unwrap();
+        toast.success('Added to wishlist');
+      }
+      // Refresh wishlist after toggle
+      void dispatch(fetchWishlist());
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to update wishlist');
+      }
+    }
+  };
+
+  const isLoading = coursesLoading || wishlistLoading;
+
   if (isLoading) {
     return (
-      <>
-      <div className='grid grid-cols-3 gap-4'>
-        <CardSkeleton/>
-        <CardSkeleton/>
-        <CardSkeleton/>
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </div>
+        <div className="flex items-center mt-2 animate-caret-blink text-sky-400/30">
+          <Loader className="mr-2 text-sky-400/50"/>
+          Loading courses...
+        </div>
       </div>
-      <div className='flex items-center mt-2 animate-caret-blink text-sky-400/30'>
-        <Loader className='mr-2 text-sky-400/50'/>
-        Loading..
-      </div>
-      </>
     );
   }
 
-  if (!mockCourses?.length) {
+  if (!courses?.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[200px] text-muted-foreground">
         <p>No courses found</p>
         <Button 
           variant="link" 
-          onClick={() => dispatch(setActiveTab("public-course"))}
+          onClick={() => dispatch(setActiveTab("courses"))}
           className="mt-2"
         >
-          Go and Explore !!
+          Comming soon !!
         </Button>
       </div>
     );
@@ -202,72 +107,94 @@ export const StudentsCoursesTab = () => {
       className="space-y-6"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {mockCourses.map((course: ICourse) => (
-          <motion.div
-            whileHover={{ y: -6 }}
-            key={course._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{  type: "spring", stiffness: 300, damping: 10 }}
-            className="group cursor-pointer"
-            onClick={() => navigate(`/course/${course._id}`)}
-          >
-            <Card className="pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-500/20 transition-all duration-300">
-              <div className="relative aspect-video overflow-hidden">
-                <img
-                  src={`https://lms-upload-s3-bucket.s3.eu-north-1.amazonaws.com/${course.thumbnailKey}`}
-                  alt={course.title}
-                  className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-background/20" />
-                <Badge 
-                  className="absolute top-2 right-2 uppercase"
-                  variant={course.level === 'beginner' ? 'default' : 
-                          course.level === 'intermediate' ? 'secondary' : 'destructive'}
+        {courses.map((course) => {
+          const isInWishlist = wishlistItems.some(item => item._id === course._id);
+          
+          return (
+            <motion.div
+              whileHover={{ y: -6 }}
+              key={course._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 10 }}              
+              className="group relative"
+            >
+                <motion.div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleWishlistToggle(course._id, isInWishlist);
+                    }}
+                    whileHover={{ y: [0, -5, 0] }}
+                    transition={{ repeat: Infinity, duration: 0.6 }}
+                    className={`absolute z-30 -top-2 -left-2 shadow-xl bg-gradient-to-br from-rose-500/70 border-rose-500/50 to-rose-800/40 border-r-2 border-b-1 rounded-b-2xl rounded-tr-2xl p-2`}
                 >
-                  {course.level}
-                </Badge>
-              </div>
-              
-              <div className="px-4 space-y-4">
-                <h3 className="font-bold text-lg line-clamp-2">{course.title}</h3>
-                
-                <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>{course.modules.length} Modules</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span>42 Students</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <StarIcon className="h-4 w-4 text-yellow-500" />
-                    <span>4.5 Rating</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <GraduationCap className="h-4 w-4" />
-                    <span>{course.primaryLanguage}</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold">₹ {course.pricing}</span>
-                  </div>
-                  <Button 
-                    variant="outline"
-                    size="sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    {isInWishlist ? <Heart fill='white' size={15} /> : <Heart size={15} />}
+                </motion.div>   
+              <Card className="pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-500/20 transition-all duration-300">
+                <div className="relative aspect-video overflow-hidden">
+                               
+                  <img
+                    src={`${env.AMZ_BUCKET_NAME}/${course.thumbnailKey}`}
+                    alt={course.title}
+                    loading="lazy"
+                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-background/20" />
+                  <Badge 
+                    className="absolute top-2 right-2 uppercase text-[9px] py-0.4 px-2"
+                    variant={course.level === 'beginner' ? 'default' : 
+                            course.level === 'intermediate' ? 'secondary' : 'destructive'}
                   >
-                    View Course
-                  </Button>
+                    {course.level}
+                  </Badge>
                 </div>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
+                
+                <div className="px-4 space-y-4 py-4">
+                  <h3 className="font-bold text-lg line-clamp-2">{course.title}</h3>
+                  
+                  <div className="grid grid-cols-2 gap-3 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      <span>{course.modules.length} Modules</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      <span>42 Students</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <StarIcon
+                          key={i}
+                          className={`h-2.5 w-2.5 ${
+                            i < Math.floor(Number(course.rating || 0))
+                              ? 'text-yellow-500 fill-yellow-500'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {/* <GraduationCap className="h-4 w-4" /> */}
+                      <Badge variant="secondary" className="rounded-sm w-full text-[10px]">
+                        {course.category}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">                    
+                    <span className="font-semibold">₹ {course.pricing}</span>
+                    <Button size='sm' className="opacity-0 group-hover:opacity-100 transition-opacity" variant={'outline'} onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/course/${course._id}`);
+                    }}>
+                      View Course
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );
-}
+};

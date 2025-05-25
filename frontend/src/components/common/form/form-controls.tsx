@@ -1,88 +1,83 @@
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { IFormControl } from '@/config';
-import { useFormContext } from 'react-hook-form';
-import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { type IFormControl } from "@/config";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useFormContext } from "react-hook-form";
+import { CategorySelector } from "./category-selector";
 
-interface FormControlsProps {
-  formControls: IFormControl[];
-}
+const FormControls = ({ formControls }: { formControls: IFormControl[] }) => {
+  const { control } = useFormContext();
 
-const FormControls = ({ formControls = [] }: FormControlsProps) => {
-  const form = useFormContext();
+  const renderFormControl = (formControl: IFormControl) => {
+    const { name, label, type, componentType, options, placeholder } = formControl;
 
-  if (!form) {
-    throw new Error('FormControls must be used within a FormProvider');
-  }
-
-  return (
-    <div className="flex flex-col gap-3">
-      {formControls.map(controlItem => (
-        <FormField
-          key={controlItem.name}
-          control={form.control}
-          name={controlItem.name}
-          render={({ field }) => (
-            <FormItem>
-              <Label className='text-sky-900 mb-2' htmlFor={controlItem.name}>{controlItem.label}</Label>
-              <FormControl>
-                {(() => {
-                  switch (controlItem.componentType) {
-                    case 'input':
+    return (
+      <FormField
+        key={name}
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{label}</FormLabel>            
+            <FormControl>
+              {(() => {
+                switch (componentType) {
+                  case "input":
+                    return <Input type={type} placeholder={placeholder} {...field} />;
+                  case "textarea":
+                    return <Textarea placeholder={placeholder} {...field} />;
+                  case "select":
+                    if (name === "category" && options) {
                       return (
-                        <Input
-                          className="focus-visible:border-1 border-sky-600 focus-visible:ring-1 focus:bg-sky-700/10 focus:border-sky-400 text-cyan-400/50"
-                          id={controlItem.name}
-                          placeholder={controlItem.placeholder}
-                          type={controlItem.type}
-                          autoComplete={controlItem.type === 'password' ? 'off' : undefined}
-                          {...field}
+                        <CategorySelector
+                          categories={options}
+                          value={field.value}
+                          onChange={field.onChange}
                         />
                       );
-                    case 'select':                      
+                    } else if (options) {
                       return (
-                        <Select onValueChange={field.onChange} value={field.value || ""}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder={controlItem.label} />
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder={placeholder || `Select ${label}`} />
                           </SelectTrigger>
                           <SelectContent>
-                            {controlItem.options?.map(optionItem => (
-                              <SelectItem key={optionItem.id} value={optionItem.id}>
-                                {optionItem.label}
+                            {options.map((option) => (
+                              <SelectItem key={option.id} value={option.id}>
+                                {option.label}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       );
-                    case 'textarea':
-                      return (
-                        <Textarea
-                          id={controlItem.name}
-                          placeholder={controlItem.placeholder}
-                          {...field}
-                        />
-                      );
-                    default:
-                      return (
-                        <Input
-                          id={controlItem.name}
-                          placeholder={controlItem.placeholder}
-                          type={controlItem.type}
-                          {...field}
-                        />
-                      );
-                  }
-                })()}
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      ))}
-    </div>
-  );
+                    }
+                    return null;
+                  default:
+                    return null;
+                }
+              })()}
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    );
+  };
+
+  return <div className="space-y-6">{formControls.map(renderFormControl)}</div>;
 };
 
 export default FormControls;

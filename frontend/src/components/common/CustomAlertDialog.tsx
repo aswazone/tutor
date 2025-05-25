@@ -17,7 +17,7 @@ export function CustomAlertDialog({buttonText,handleSubmit,isDisabled}:{buttonTe
   return (
     <AlertDialog>
         <AlertDialogTrigger asChild>
-        <Button disabled={isDisabled} className="font-semibold me-3 border rounded-tl-none rounded-br-none bg-sky-950/10 text-sky-500/50 hover:text-sky-400/60 hover:bg-sky-950/30">{buttonText === "Submitting..." ? <Loader2 className="animate-spin" /> : "SUBMIT"}</Button>
+        <Button disabled={isDisabled} className="font-semibold me-3 border rounded-tl-none rounded-br-none bg-sky-950/10 text-sky-500/50 hover:text-sky-400/60 hover:bg-sky-950/30">{buttonText === "Submitting..." ? <Loader2 className="animate-spin" /> : buttonText}</Button>
         </AlertDialogTrigger>
         <AlertDialogContent className="border border-sky-600/40">
         <AlertDialogHeader>

@@ -49,6 +49,16 @@ export class CourseService implements CourseServiceIF {
 
   }
 
+
+  getAllCourses = async (): Promise<ICourse[]> => {
+    const courses = await this._courseRepository.findAll({isDeleted: false, isActive: true ,isVerified: true});
+    return courses;
+  }
+
+  toggleCourseStatus = async (courseId: string, status: boolean): Promise<void> => {
+    await this._courseRepository.findByIdAndUpdate(courseId, {isPublished: status});
+  }
+
   updateCourse = async (courseId: string, courseData: Partial<ICreateCourseDTO>): Promise<ICourse> => {
 
       const course = await this._courseRepository.findById(courseId);
@@ -72,11 +82,26 @@ export class CourseService implements CourseServiceIF {
   }
 
   deleteCourse = async (courseId: string): Promise<void> => {
+    const result = await this._courseRepository.findByIdAndUpdate(courseId, { isDeleted: true });
+    if (!result) {
+      throw new HttpError(HttpStatus.NOT_FOUND, 'Course not found');
+    }
+  }
 
-      const result = await this._courseRepository.findByIdAndDelete(courseId);
-      if (!result) {
-        throw new HttpError(HttpStatus.NOT_FOUND, 'Course not found');
-      }
+  verifyCourse = async (courseId: string, isVerified: boolean): Promise<void> => {
+    if (!Types.ObjectId.isValid(courseId)) {
+      throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course ID');
+    }
 
+    const course = await this._courseRepository.findById(courseId);
+    if (!course) {
+      throw new HttpError(HttpStatus.NOT_FOUND, 'Course not found');
+    }
+
+    await this._courseRepository.findByIdAndUpdate(
+      courseId,
+      { isVerified },
+      { new: true }
+    );
   }
 }

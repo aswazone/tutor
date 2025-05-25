@@ -5,13 +5,15 @@ import { createHttpError } from "@/utils/http-error.utils";
 import { HttpStatus } from "@/constants/status.constant";
 import { HttpResponse } from "@/constants/response.constant";
 import { generateOtp } from "@/utils/otp-generate.utils";
-import { sendOtpEmail } from "@/utils/send-email.utils";
+import { sendOtpEmail, sendResetPasswordEmail } from "@/utils/send-email.utils";
 import { redisClient } from "@/config/redis.config";
 import { generateUniqueUsername } from "@/utils/generate-unique-username.utils";
 import {generateAccessToken,generateRefreshToken, verifyRefreshToken} from "@/utils";
 import { comparePassword, hashPassword } from "@/utils/bcrypt.utils";
 import { JwtPayload } from "jsonwebtoken";
 import { UserRole } from "@/types/user.type";
+import fetchGoogleUser from "@/utils/google-auth";
+import { generateNanoId } from "@/utils/generate-nanoid";
 
 export class AuthService implements AuthServiceIF {
     constructor(private readonly _userRepository:UserRepositoryIF) {}
@@ -24,7 +26,7 @@ export class AuthService implements AuthServiceIF {
         if (user.role !== role) {
             throw createHttpError(
                 HttpStatus.UNAUTHORIZED, 
-                `This email is registered as a '${(user.role).toUpperCase()}'. Please login with correct role.`
+                `This email is registered as a ${(user.role).toUpperCase()}. Please login with correct role.`
             );
         }
 
@@ -101,6 +103,39 @@ export class AuthService implements AuthServiceIF {
         return {user:payload,accessToken,refreshToken};
     }
 
+    forgotPassword = async (email:string)=> {
+
+        const userExist = await this._userRepository.findByEmail(email);
+        if(!userExist) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+        
+        const token = generateNanoId();
+        const storedData = await redisClient.setEx(token, 300, userExist.userEmail);
+
+        if(!storedData) throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, HttpResponse.SERVER_ERROR);
+        await sendResetPasswordEmail(userExist.userEmail,token);
+
+
+        return {status:HttpStatus.OK,message:HttpResponse.RESET_PASS_LINK};
+    }
+
+    resetPassword = async (token:string,password:string)=> {
+
+        const storedEmail = await redisClient.get(token);
+        if(!storedEmail) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.TOKEN_EXPIRED);
+        
+        const hashedPassword = await hashPassword(password);
+
+        const userExist = await this._userRepository.findByEmail(storedEmail);
+        if(!userExist) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+
+        const updatedUser = await this._userRepository.updatePassword(storedEmail,hashedPassword);
+        if(!updatedUser) throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, HttpResponse.SERVER_ERROR);
+
+        await redisClient.del(token);
+
+        return {status:HttpStatus.OK,message:HttpResponse.PASSWORD_CHANGE_SUCCESS};
+    }
+
     refreshAccessToken = async (token:string): Promise<{accessToken:string, refreshToken:string}> => {
 
         if(!token) throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.NO_TOKEN); 
@@ -112,6 +147,43 @@ export class AuthService implements AuthServiceIF {
         const refreshToken = generateRefreshToken(payload);
         
         return {accessToken,refreshToken};
+    }
+
+    googleSignin = async (token:string) => {
+
+        const  googleUser = await fetchGoogleUser(token);
+        if(!googleUser) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.INVALID_CREDENTIALS);
+
+        console.log('googleUser details:',JSON.stringify(googleUser));
+
+        const userExist = await this._userRepository.findByEmail(googleUser.email);
+        if(userExist) {
+
+            const payload = { id: userExist._id, role: userExist.role, userName: userExist.userName, userEmail: userExist.userEmail };
+            const accessToken = generateAccessToken(payload);
+            const refreshToken = generateRefreshToken(payload);
+        
+            return {user:payload,accessToken,refreshToken};
+        }
+
+        const uniqueUsername = await generateUniqueUsername(googleUser.name);
+        
+        const user = {
+            userName:uniqueUsername,
+            name:googleUser.given_name,
+            userEmail:googleUser.email,
+            role:UserRole.STUDENT,
+            password: 'itsdummypassword',
+        }
+
+        const createdUser = await this._userRepository.create(user as UserModelIF);
+        if(!createdUser) throw createHttpError(HttpStatus.CONFLICT, HttpResponse.USER_CREATION_FAILED);
+
+        const payload = { id: createdUser._id, role: createdUser.role, userName: createdUser.userName, userEmail: createdUser.userEmail };
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+        
+        return {user:payload,accessToken,refreshToken};
     }
 
 }

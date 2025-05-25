@@ -2,10 +2,13 @@ import { IFormControl } from "@/config"
 import { SignInFormData } from "@/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import CommonForm from "../common/form"
-import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signInSchema } from "@/schemas/auth"
+import GoogleAuth from "./GoogleAuth"
+import { Credenza, CredenzaTrigger } from "../ui/credenza"
+import ForgetPassword from "./ForgotPassword"
+import { Button } from "../ui/button"
 
 export interface SignInProps {
     handleSignInSubmit: (data: SignInFormData) => void;
@@ -36,12 +39,15 @@ const SignIn: React.FC<SignInProps> = ({ handleSignInSubmit, signInFormControl }
                     formControls={signInFormControl} 
                     buttonText="SignIn"
                 />
-                <Link to="/forgot-password" className="text-xs font-bold text-sky-600 hover:text-sky-400 hover:underline">Forgot your password?</Link>
-                <div className="mt-4">
-                    <Link to="/auth/google" className="w-full border-1 rounded-md flex justify-center hover:bg-gradient-to-r hover:from-sky-900/10 hover:via-sky-950 hover:to-sky-900/10">
-                        <img className="w-7 h-7 my-1" src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google" />
-                    </Link>
-                </div>
+
+                <Credenza>
+                    <CredenzaTrigger asChild>
+                        <Button variant={"link"} className="text-xs font-bold text-sky-600 hover:text-sky-400 hover:underline">Forgot your password?</Button>
+                    </CredenzaTrigger>
+                    <ForgetPassword/>
+                </Credenza>
+                
+                <GoogleAuth />
             </CardContent>
         </Card>
     )

@@ -1,7 +1,6 @@
+import { CustomCursor } from "@/components/common/CustomCursor";
 import { About } from "@/components/landing/About";
-import { Cta } from "@/components/landing/Cta";
 import { FAQ } from "@/components/landing/FAQ";
-import { Features } from "@/components/landing/Features";
 import { Footer } from "@/components/landing/Footer";
 import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/landing/HowItWorks";
@@ -15,7 +14,8 @@ import { Testimonials } from "@/components/landing/Testimonials";
 
 const LandingPage = () => {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex cursor-none flex-col items-center">
+      <CustomCursor/>
       <Hero />
       <Sponsors />
       <About />

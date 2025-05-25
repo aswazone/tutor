@@ -5,6 +5,7 @@ import { IFormControl } from '@/config'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signUpSchema } from '@/schemas/auth'
+import GoogleAuth from './GoogleAuth'
 
 export interface SignUpProps {
     handleSignUpSubmit: (data: SignUpFormData) => void;
@@ -36,6 +37,7 @@ const SignUp = ({ handleSignUpSubmit, signUpFormControl }: SignUpProps) => {
                     formControls={signUpFormControl} 
                     buttonText="SignUp"
                 />
+                <GoogleAuth />
             </CardContent>
         </Card>
     )

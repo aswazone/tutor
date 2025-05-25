@@ -4,7 +4,8 @@ import { CourseServiceIF } from '@/services/interface/course.service.interface';
 import { AuthenticatedRequest } from '@/types/auth.type';
 
 export class CourseController implements CourseControllerIF {
-  constructor(private readonly _courseService: CourseServiceIF) {}  createCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  constructor(private readonly _courseService: CourseServiceIF) {}  
+  createCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       console.log('----------------------- course controller ------');
     
@@ -38,6 +39,63 @@ export class CourseController implements CourseControllerIF {
     try {
       const { courseId } = req.params;
       const course = await this._courseService.getCourseById(courseId);
+      res.json(course);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAllCourses = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const courses = await this._courseService.getAllCourses();
+      res.json(courses);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  toggleCourseStatus = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { courseId, status } = req.params;
+      const isPublished = status === 'true';
+      const course = await this._courseService.toggleCourseStatus(courseId, isPublished);
+      res.json(course);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { courseId } = req.params;
+      const course = await this._courseService.deleteCourse(courseId);
+      res.json(course);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  verifyCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { courseId, status } = req.params;
+      const isVerified = status === 'true';
+      
+      await this._courseService.verifyCourse(courseId, isVerified);
+      res.json({ message: `Course ${isVerified ? 'approved' : 'unapproved'} successfully` });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+  updateCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { courseId } = req.params;
+      if (!req.user?.id) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
+
+      const course = await this._courseService.updateCourse(courseId, req.body);
       res.json(course);
     } catch (error) {
       next(error);

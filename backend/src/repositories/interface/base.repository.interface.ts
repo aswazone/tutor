@@ -5,6 +5,7 @@ export interface BaseRepositoryIF<T extends Document> {
     findById(id: string): Promise<T | null>;
     findOne(filter: FilterQuery<T>): Promise<T | null>;
     find(filter: FilterQuery<T>): Promise<T[]>;
+    findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>): Promise<T | null>;
     findByIdAndUpdate(id: string, update: UpdateQuery<T>, options?: { new: boolean }): Promise<T | null>;
     findByIdAndDelete(id: string): Promise<T | null>;
     deleteMany(filter: FilterQuery<T>): Promise<boolean>;

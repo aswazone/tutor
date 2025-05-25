@@ -2,9 +2,9 @@ import { BaseRepository } from '@/repositories/base.repository';
 import { CourseModelIF } from '@/models/interface/course.model.interface';
 import { CourseRepositoryIF } from '../interface/course.repository.interface';
 import { CourseModel } from '@/models/implements/course.model';
-import { Types } from 'mongoose';
 import { HttpError } from '@/utils/http-error.utils';
 import { HttpStatus } from '@/constants/status.constant';
+import { Types } from 'mongoose';
 
 export class CourseRepository extends BaseRepository<CourseModelIF> implements CourseRepositoryIF {
   constructor() {
@@ -16,7 +16,7 @@ export class CourseRepository extends BaseRepository<CourseModelIF> implements C
       if (!Types.ObjectId.isValid(instructorId)) {
         throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid instructor ID');
       }
-      return await this.find({ tutor: new Types.ObjectId(instructorId) });
+      return await this.find({ tutor: new Types.ObjectId(instructorId) , isDeleted: false});
     } catch (error) {
       if (error instanceof HttpError) throw error;
       throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch instructor courses');
@@ -45,6 +45,18 @@ export class CourseRepository extends BaseRepository<CourseModelIF> implements C
     } catch (error) {
       if (error instanceof HttpError) throw error;
       throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to create course');
+    }
+  }
+
+  async findAll(options: {isDeleted?: boolean, isActive?: boolean, isVerified?: boolean}): Promise<CourseModelIF[]> {
+    console.log(options);
+    try {
+      const result = await super.find(options);
+      console.log(result);
+      return result;
+    } catch (error) {
+      if (error instanceof HttpError) throw error;
+      throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');
     }
   }
 }

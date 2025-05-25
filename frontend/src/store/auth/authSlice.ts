@@ -56,6 +56,48 @@ export const verifyOtp = createAsyncThunk<
     }
 });
 
+export const googleSignin = createAsyncThunk<
+    { accessToken: string; user: Record<string, string> },
+    { token: string },
+    { rejectValue: string }
+>('/auth/google-signin', async ({ token }, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.post('api/v1/auth/google-signin', { token });
+        return response.data;
+    } catch (err: unknown) {
+        const message = axiosErrorMessage(err);
+        return rejectWithValue(message);
+    }
+});
+
+export const forgotPassword = createAsyncThunk<
+    { message: string },
+    { email: string },
+    { rejectValue: string }
+>('/auth/forgot-password', async ({ email }, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.post('api/v1/auth/forgot-password', { email });
+        return response.data;
+    } catch (err: unknown) {
+        const message = axiosErrorMessage(err);
+        return rejectWithValue(message);
+    }
+})
+
+export const resetPassword = createAsyncThunk<
+    { message: string },
+    { token: string; password: string },
+    { rejectValue: string }
+>('/auth/reset-password', async ({ token, password }, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.post('api/v1/auth/reset-password', { token, password });
+        return response.data;
+    } catch (err: unknown) {
+        const message = axiosErrorMessage(err);
+        return rejectWithValue(message);
+    }
+})
+
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -112,6 +154,39 @@ const authSlice = createSlice({
                 state.isAuthenticated = true;
             })
             .addCase(verifyOtp.rejected, (state, action: { payload: string | undefined }) => {
+                state.isLoading = false;
+                state.error = action.payload ?? null;
+            })
+            .addCase(googleSignin.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(googleSignin.fulfilled, (state, action: { payload: { accessToken: string; user: Record<string, string> } }) => {
+                state.isLoading = false;
+                state.accessToken = action.payload.accessToken;
+                state.user = action.payload.user;
+                state.isAuthenticated = true;
+            })
+            .addCase(googleSignin.rejected, (state, action: { payload: string | undefined }) => {
+                state.isLoading = false;
+                state.error = action.payload ?? null;
+            })
+            .addCase(forgotPassword.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(forgotPassword.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(forgotPassword.rejected, (state, action: { payload: string | undefined }) => {
+                state.isLoading = false;
+                state.error = action.payload ?? null;
+            })
+            .addCase(resetPassword.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(resetPassword.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(resetPassword.rejected, (state, action: { payload: string | undefined }) => {
                 state.isLoading = false;
                 state.error = action.payload ?? null;
             });

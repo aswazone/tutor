@@ -3,7 +3,8 @@ import * as z from "zod"
 export const courseLandingSchema = z.object({
   title: z.string()
     .min(5, "Title must be at least 5 characters")
-    .max(100, "Title must be less than 100 characters"),  category: z.string({
+    .max(100, "Title must be less than 100 characters"),  
+  category: z.string({
     required_error: "Please select a category",
   }).min(1, "Category is required"),
   level: z.string({
@@ -23,8 +24,8 @@ export const courseLandingSchema = z.object({
     .regex(/^\d+(\.\d{1,2})?$/, "Price must be a valid number with up to 2 decimal places")
     .refine((value) => {
       const numValue = Number(value);
-      return numValue >= 100 && numValue <= 6000;
-    }, "Price must be in the range of 100 to 6000"),
+      return (numValue >= 500 && numValue <= 6000);
+    }, "Price must be in the range of 500 to 6000"),
   objectives: z.string()
     .min(10, "Objectives must be at least 10 characters")
     .max(1000, "Objectives must be less than 1000 characters"),

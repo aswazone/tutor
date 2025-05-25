@@ -81,8 +81,9 @@
   }
 
   .mesh-bg {
-    background: radial-gradient(at 86% 41%, #074173 0%, transparent 60%), radial-gradient(at 46% 83%, #1679ab 0%, transparent 50%), radial-gradient(at 38% 78%, #5debd7 0%, transparent 40%), radial-gradient(at 82% 55%, #c5ff95 0%, transparent 30%);
+    background: radial-gradient(at 86% 41%, #0c1738b8 0%, transparent 60%), radial-gradient(at 46% 83%, #08415dad 0%, transparent 50%), radial-gradient(at 38% 78%, #10234ad8 0%, transparent 40%), radial-gradient(at 82% 55%, #076199b9 0%, transparent 30%);
   }
+
 
   body {
     background: var(--background);
@@ -95,6 +96,7 @@
 
 html {
     scroll-behavior: smooth;
+    scrollbar-width: none;
     overflow-x: hidden;
   }
   

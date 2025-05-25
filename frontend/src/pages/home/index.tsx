@@ -1,3 +1,4 @@
+import { CustomCursor } from "@/components/common/CustomCursor";
 import { About } from "@/components/home/About";
 import { Cards } from "@/components/home/Cards";
 import { Features } from "@/components/home/Features";
@@ -9,20 +10,14 @@ import { Team } from "@/components/home/Team";
 
 const Home = () => {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col cursor-none items-center">
+      <CustomCursor/>
       <Hero />
       <Cards />
       <About />
       <Team />
       <HowItWorks />
       <Features />
-      {/* <Sponsors /> */}
-      {/* <Services /> */}
-      {/* <Cta /> */}
-      {/* <Testimonials /> */}
-      {/* <Pricing /> */}
-      {/* <Newsletter /> */}
-      {/* <FAQ /> */}
       <Footer />
       <ScrollToTop />
     </div>

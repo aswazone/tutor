@@ -54,9 +54,13 @@ const toolsAndTopics: string[] = [
   "Python", "Machine Learning", "Web Development", "Mobile Development"
 ];
 
+
+
 export const Cards = () => {
   return (
-    <section className="container py-24 md:px-20 sm:px-3 sm:py-32 space-y-8">
+    <section id="courses" className="container py-24 md:px-20 sm:px-3 sm:py-32 space-y-8">
+      {/* Example usage of the loading animation */}
+
       <motion.h2 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -89,6 +93,8 @@ export const Cards = () => {
           </motion.div>
         ))}
       </motion.div>
+
+      
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {courses.map(({ title, description, image, price, category, rating, students }: CourseProps, index) => (

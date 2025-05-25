@@ -9,3 +9,12 @@ export interface AuthenticatedRequest extends Request {
         userEmail: string;
     };
 }
+
+export interface Tutor {
+  id: string
+  name: string
+  email: string
+  isActive: boolean
+  rating: number
+  coursesCount: number
+}

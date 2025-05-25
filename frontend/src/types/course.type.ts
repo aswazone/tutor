@@ -32,7 +32,9 @@ export interface ICourse {
   thumbnailKey: string;
   modules: IModule[];
   tutor: string;
-  rating:string
+  rating?:string;
+  isVerified?: boolean; 
+  isActive?: boolean;
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;

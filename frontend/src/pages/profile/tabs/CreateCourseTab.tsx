@@ -29,6 +29,7 @@ export const CreateCourseTab = () => {
   const handleCourseLandingSubmit = (data: CourseLandingFormData) => {
     try {
       setCourseLandingData(data)
+      console.log("Course landing data:", data)
       toast.success("Course details saved successfully!")
     } catch (error) {
       toast.error("Failed to save course details")

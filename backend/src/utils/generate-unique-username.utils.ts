@@ -2,7 +2,7 @@ import { UserRepository } from "@/repositories/implements/user.repository";
 
 const userReposiory = new UserRepository();
 
-export const generateUniqueUsername = async (userName: string): string => {
+export const generateUniqueUsername = async (userName: string): Promise<string> => {
     const baseUserName = userName.trim().toLowerCase().replace(/\s+/g, '_');
 
     let newUserName = baseUserName;

@@ -1,5 +1,6 @@
 import {model, Schema } from "mongoose";
 import { UserModelIF } from "../interface/user.model.interface";
+import { string } from "zod";
 
 
 const UserSchema = new Schema<UserModelIF>({
@@ -31,6 +32,19 @@ const UserSchema = new Schema<UserModelIF>({
         enum: ['tutor', 'student'],
         required: true
     },
-})
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    wishlist:[{
+        type:Schema.Types.ObjectId,
+        ref:'Course'
+    }],
+
+},{timestamps:true});
 
 export const User = model<UserModelIF>('User', UserSchema);

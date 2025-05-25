@@ -5,5 +5,8 @@ export interface AuthServiceIF {
     signin(data:{role:UserRole,userEmail:string,password:string}): Promise<{user:Partial<UserModelIF>,accessToken:string,refreshToken:string}>;
     signup(data: Partial<UserModelIF>): Promise<{userEmail:string}>;
     verifyOtp(data:{otp:string,email:string}): Promise<{user:Partial<UserModelIF>,accessToken:string,refreshToken:string}>;
+    forgotPassword(email:string): Promise<{message:string}>;
+    resetPassword(token:string,password:string): Promise<{message:string}>;
+    googleSignin(token:string): Promise<{user:Partial<UserModelIF>,accessToken:string,refreshToken:string}>;
     refreshAccessToken(token:string): Promise<{accessToken:string,refreshToken:string}>
 }

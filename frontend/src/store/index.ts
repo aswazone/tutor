@@ -1,6 +1,9 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import authReducer from './auth/authSlice';
 import courseReducer from './course';
+import fetchReducer from './fetch';
+import wishlistReducer from './wishlist';
+import adminReducer from './admin/adminSlice';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 
@@ -13,7 +16,10 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
     auth: authReducer,
-    course: courseReducer
+    course: courseReducer,
+    fetch: fetchReducer,
+    wishlist: wishlistReducer,
+    admin: adminReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

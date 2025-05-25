@@ -6,7 +6,7 @@ import { Outlet } from "react-router-dom";
 import { useState } from "react";
 
 const AdminLayout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const auth = useSelector((state: RootState) => state.auth);
   console.log(auth.isAuthenticated);
 
@@ -18,7 +18,7 @@ const AdminLayout = () => {
       {/* Main Content Area */}
       <div className="flex flex-col flex-1">
         <AdminNavbar />
-        <main className="p-4 fixed top-14">
+        <main className="p-4">
           <Outlet />
         </main>
       </div>

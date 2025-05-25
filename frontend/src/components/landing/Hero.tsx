@@ -2,9 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { buttonVariants } from "../ui/button";
 import { HeroCards } from "./HeroCards";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
-
 export const Hero = () => {
   const letterAnimation = {
     whileHover: { y: -10 },

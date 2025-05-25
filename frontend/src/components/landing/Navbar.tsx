@@ -14,10 +14,16 @@ import {
 
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { buttonVariants } from "../ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Power } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { LogoIcon } from "./Icons";
 import { NavMenu } from "./NavMenu";
+import HoldToConfirmButton from "../common/HoldToSubmit";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { logout } from "@/store/auth/authSlice";
 
 interface RouteProps {
   href: string;
@@ -25,6 +31,10 @@ interface RouteProps {
 }
 
 const routeList: RouteProps[] = [
+  {
+    href: "#courses",
+    label: "Courses",
+  },
   {
     href: "#features",
     label: "Features",
@@ -34,10 +44,6 @@ const routeList: RouteProps[] = [
     label: "Testimonials",
   },
   {
-    href: "#pricing",
-    label: "Pricing",
-  },
-  {
     href: "#faq",
     label: "FAQ",
   },
@@ -45,8 +51,21 @@ const routeList: RouteProps[] = [
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const {user, isAuthenticated} = useSelector((state:RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+  
+    const handleLogout = () =>{
+      localStorage.removeItem('accessToken');
+      dispatch(logout());
+      toast.success("See you !!", {
+        position: "top-right",
+        closeButton: true,
+        className: "mt-10",
+      });
+    }
+ 
   return (
-    <header className="sticky border-b-[1px] top-0 z-40 w-full bg-white dark:border-b-slate-700 dark:bg-background">
+    <header className="sticky z-50 border-b-[1px] top-0  w-full bg-white dark:border-b-slate-700 dark:bg-background">
       <NavigationMenu className="mx-auto">
         <NavigationMenuList className="container h-14 px-5 md:px-20 w-screen flex justify-between ">
           <NavigationMenuItem className="font-bold flex items-center">
@@ -133,7 +152,7 @@ export const Navbar = () => {
             ))}
           </nav>
 
-          <div className="hidden md:flex gap-2">
+          <div className="relative hidden md:flex gap-2">
             <a
               rel="noreferrer noopener"
               href="https://github.com/aswazone"
@@ -145,6 +164,7 @@ export const Navbar = () => {
 
             <ModeToggle />
             <NavMenu />
+            {isAuthenticated && user?.role !== 'admin' && <HoldToConfirmButton onConfirm={handleLogout}><Power className="text-red-500" size={18}/></HoldToConfirmButton>}
           </div>
         </NavigationMenuList>
       </NavigationMenu>

@@ -61,7 +61,7 @@ const CourseSettings = ({ handleInputChange, courseImage }: CourseSettingsProps)
             <FormField
               control={form.control}
               name="image"
-              render={({ field: { onChange }, fieldState: { error } }) => (
+              render={({ field: { onChange } }) => (
                 <FormItem>
                   <FormLabel>Upload Course Image</FormLabel>
                   <FormControl>                    

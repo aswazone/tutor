@@ -64,7 +64,7 @@ export default function NotFound() {
   
   return (
     
-    <div className="relative h-screen w-screen">
+    <div className="relative h-screen w-screen overflow-y-hidden">
       {user?.role === 'admin' ?<AdminNavbar /> : <Navbar />}
       <Canvas camera={{ position: [0, 1, 15] }}>
         <color attach="background" args={['#050816']} />

@@ -12,6 +12,7 @@ export type SignInFormData = {
 
 export type SignUpFormData = SignInFormData & {
   userName: string;
+  confirmPassword: string;
 };
 
 export type SignUpRequest = {

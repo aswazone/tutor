@@ -6,5 +6,12 @@ export interface UserModelIF extends Document {
     userEmail: string;
     name: string;
     password: string;
+    isActive: boolean;
+    isDeleted: boolean;
+    specialization?: string;
+    rating?: number;
     role: UserRole;
+    createdAt: Date;
+    updatedAt: Date;
+    wishlist: string[];
 }

@@ -1,3 +1,5 @@
+import { flattenCategories } from "@/lib/utils";
+import { CategoryDTO } from "@/types/category.type";
 
 export interface IFormControl {
     name: string;
@@ -11,6 +13,10 @@ export interface IFormControl {
 export interface ICommonOptions {
     id: string;
     label: string;
+}
+
+export interface ICategoryOption extends ICommonOptions {
+    subcategories?: ICommonOptions[];
 }
 
 export interface ICourseLandingPageFormControls {
@@ -78,6 +84,13 @@ export const signUpFormControl: IFormControl[] = [
         placeholder: 'Enter your password',
         type: 'password',
         componentType: 'input'
+    },
+    {
+        name: 'confirmPassword',
+        label: 'Confirm Password',
+        placeholder: 'Confirm your password',
+        type: 'password',
+        componentType: 'input'
     }
 ];
 
@@ -115,18 +128,7 @@ export const courseLevelOptions: ICommonOptions[] = [
   { id: "advanced", label: "Advanced" },
 ];
 
-export const courseCategories: ICommonOptions[] = [
-  { id: "web-development", label: "Web Development" },
-  { id: "backend-development", label: "Backend Development" },
-  { id: "data-science", label: "Data Science" },
-  { id: "machine-learning", label: "Machine Learning" },
-  { id: "artificial-intelligence", label: "Artificial Intelligence" },
-  { id: "cloud-computing", label: "Cloud Computing" },
-  { id: "cyber-security", label: "Cyber Security" },
-  { id: "mobile-development", label: "Mobile Development" },
-  { id: "game-development", label: "Game Development" },
-  { id: "software-engineering", label: "Software Engineering" },
-];
+const courseCategories = await flattenCategories();
 
 export const courseLandingPageFormControls: ICourseLandingPageFormControls[] = [
   {
@@ -220,11 +222,11 @@ export const sortOptions: ICommonOptions[] = [
 ];
 
 export const filterOptions:{
-    category: ICommonOptions[], 
+    category: CategoryDTO[] | undefined, 
     level: ICommonOptions[], 
     primaryLanguage: ICommonOptions[]
 } = {
-  category: courseCategories,
-  level: courseLevelOptions,
-  primaryLanguage: languageOptions,
+    category: courseCategories,
+    level: courseLevelOptions,
+    primaryLanguage: languageOptions,
 };

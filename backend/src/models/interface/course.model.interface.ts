@@ -30,8 +30,12 @@ export interface CourseModelIF extends Document {
             videoUploadError?: string;
         }>;
     }>;
+    isDeleted: boolean;
     tutor: Types.ObjectId;
     isPublished: boolean;
+    rating: number;
+    isActive: boolean;
+    isVerified: boolean;
     createdAt: Date;
     updatedAt: Date;
 }

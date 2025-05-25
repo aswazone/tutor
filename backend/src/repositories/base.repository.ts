@@ -17,11 +17,16 @@ export abstract class BaseRepository<T extends Document> implements BaseReposito
         return this.model.findOne(filter);
     }
 
+    async findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>): Promise<T | null> {
+        return this.model.findOneAndUpdate(filter, update, { new: true });
+    }
+
     async find(filter: FilterQuery<T>): Promise<T[]> {
         return this.model.find(filter);
     }
 
-    async findByIdAndUpdate(id: string, update: UpdateQuery<T>, options: { new: boolean } = { new: true }): Promise<T | null> {
+    async findByIdAndUpdate(id: string,update: UpdateQuery<T>,
+        options: { new?: boolean; arrayFilters?: Array<{ [key: string]: unknown }>; } = { new: true }): Promise<T | null> {
         return this.model.findByIdAndUpdate(id, update, options);
     }
 

@@ -16,7 +16,6 @@ import { AppDispatch, RootState } from '@/store'
 import { UserRole } from '@/types'
 
 import { TutorCoursesTab } from './tabs/TutorCoursesTab'
-import { StudentsCoursesTab } from './tabs/StudentsCoursesTab'
 import { StudentsTab } from './tabs/StudentsTab'
 import { ReviewsTab } from './tabs/ReviewsTab'
 import { TeachersTab } from './tabs/TeachersTab'
@@ -26,6 +25,11 @@ import { TeachersSettingsTab } from './tabs/TeachersSettingsTab'
 import { StudentsSettingsTab } from './tabs/StudentsSettingsTab'
 import { CreateCourseTab } from './tabs/CreateCourseTab'
 import { setActiveTab } from '@/store/auth/authSlice'
+import { WishlistTab } from './tabs/WishlistTab'
+import { StudentsCoursesTab } from './tabs/StudentsCoursesTab'
+import { EnrolledCoursesTab } from './tabs/EnrolledCoursesTab'
+import { Sparkles } from '@/components/common/Sparkles'
+import { Link } from 'react-router-dom'
 
 interface User {
   userName: string
@@ -49,7 +53,9 @@ const getTabs = (role: UserRole) => {
     case UserRole.STUDENT:
       return [
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: StudentsOverviewTab },
-        { id: 'courses', name: 'Enrolled Courses', icon: <BookOpenIcon className="h-5 w-5 md:hidden" />, component: StudentsCoursesTab },
+        { id: 'enrolled-courses', name: 'Enrolled Courses', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: EnrolledCoursesTab },
+        { id: 'courses', name: 'All Courses', icon: <BookOpenIcon className="h-5 w-5 md:hidden" />, component: StudentsCoursesTab },
+        { id: 'wishlist', name: 'Wishlist', icon: <AcademicCapIcon className="h-5 w-5 md:hidden" />, component: WishlistTab },
         { id: 'teachers', name: 'Teachers', icon: <UserIcon className="h-5 w-5 md:hidden" />, component: TeachersTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: StudentsSettingsTab },
       ]
@@ -101,6 +107,10 @@ const Profile = () => {
                 <h1 className="text-4xl font-mono font-bold text-foreground truncate">{userData?.userName?.slice(0,1).toUpperCase().concat(userData?.userName?.slice(1)) || userData?.userName}</h1>
                 <p className="text-gray-500 dark:text-gray-400">@{userData?.userName.toLowerCase()}</p>
               </div>
+              {userData?.role === UserRole.STUDENT && <div className='flex items-center hover:scale-105 gap-1'>
+                <span className="text-sm font-bold cursor-pointer font-mono text-sky-500/55 ">Become a Tutor</span>
+                <Link to='/become-a-tutor'><Sparkles stroke='#38bdf8' className='hover:scale-110' /></Link>
+              </div>}
             </div>
           </div>
         </div>
@@ -112,7 +122,7 @@ const Profile = () => {
           {/* Left Sidebar */}
           <div className="w-full lg:w-1/3 space-y-6">
             <ProfileCard />
-            <StatsCard />
+            {userData?.role === UserRole.TUTOR ? <TeachersCard /> : <StudentsCard />}
           </div>
 
           {/* Right Content */}
@@ -123,9 +133,9 @@ const Profile = () => {
                   <button
                     key={tab.id}
                     onClick={() => dispatch(setActiveTab(tab.id))}
-                    className={` px-3 py-2 rounded-lg transition-colors ${
+                    className={` px-3 py-1  rounded-bl-lg rounded-tr-lg transition-colors ${
                       activeTab === tab.id
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-gradient-to-br border-2 border-sky-800/30 from-sky-900/30 to-sky-9from-sky-900/60 text-primary-background'
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -167,14 +177,14 @@ const ProfileCard = () => (
   </motion.div>
 )
 
-const StatsCard = () => (
+const TeachersCard = () => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.1 }}
     className="bg-card rounded-lg p-6 shadow-sm"
   >
-    <h2 className="text-xl font-semibold mb-4">Stats</h2>
+    <h2 className="text-xl font-semibold mb-4">My Stats</h2>
     <div className="grid grid-cols-2 gap-4">
       <div className="text-center">
         <div className="text-2xl font-bold">15</div>
@@ -190,6 +200,35 @@ const StatsCard = () => (
       </div>
       <div className="text-center">
         <div className="text-2xl font-bold">24</div>
+        <div className="text-sm text-muted-foreground">Reviews</div>
+      </div>
+    </div>
+  </motion.div>
+)
+
+const StudentsCard = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.15 }}
+    className="bg-card rounded-lg p-6 shadow-sm"
+  >
+    <h2 className="text-xl font-semibold mb-4">My Stats</h2>
+    <div className="grid grid-cols-2 gap-4">
+      <div className="text-center">
+        <div className="text-2xl font-bold">8</div>
+        <div className="text-sm text-muted-foreground">Enrolled</div>
+      </div>
+      <div className="text-center">
+        <div className="text-2xl font-bold">3</div>
+        <div className="text-sm text-muted-foreground">Wishlist</div>
+      </div>
+      <div className="text-center">
+        <div className="text-2xl font-bold">5</div>
+        <div className="text-sm text-muted-foreground">Completed</div>
+      </div>
+      <div className="text-center">
+        <div className="text-2xl font-bold">2</div>
         <div className="text-sm text-muted-foreground">Reviews</div>
       </div>
     </div>
