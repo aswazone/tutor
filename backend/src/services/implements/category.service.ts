@@ -1,11 +1,11 @@
-import { CategoryServiceIF, ICategoryCreateDTO, ISubCategoryCreateDTO } from '../interface/category.service.interface';
-import { CategoryRepositoryIF } from '@/repositories/interface/category.repository.interface';
+import { ICategoryService, ICategoryCreateDTO, ISubCategoryCreateDTO } from '../interface/category.service.interface';
+import { ICategoryRepository } from '@/repositories/interface/category.repository.interface';
 import { CategoryDocument } from '@/models/interface/category.model.interface';
 import { HttpError } from '@/utils/http-error.utils';
 import { HttpStatus } from '@/constants/status.constant';
 
-export class CategoryService implements CategoryServiceIF {
-  constructor(private readonly _categoryRepository: CategoryRepositoryIF) {}
+export class CategoryService implements ICategoryService {
+  constructor(private readonly _categoryRepository: ICategoryRepository) {}
 
   async createCategory(data: ICategoryCreateDTO): Promise<CategoryDocument> {
     try {

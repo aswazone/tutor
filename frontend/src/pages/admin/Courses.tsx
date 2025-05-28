@@ -14,7 +14,10 @@ interface ApiCourses {
   thumbnailKey: string;
   level: string;
   pricing: string;
-  tutor: string;
+  tutor: {
+    id: string;
+    userName: string;
+  };
   rating: string;
   category: string;
   isDeleted: boolean;
@@ -57,7 +60,7 @@ const Courses = () => {
         isVerified: course.isVerified,
         isActive: course.isActive,
         level: course.level,
-        tutor: course.tutor,
+        tutor: course.tutor?.userName,
         price: course.pricing,
         rating: course.rating,
         thumbnailKey: course.thumbnailKey,

@@ -1,11 +1,11 @@
 import { HttpStatus } from "@/constants/status.constant";
 import { AuthenticatedRequest } from "@/types/auth.type";
 import { Response,NextFunction } from "express";
-import { WishlistControllerIF } from "../interfaces/wishlist.controller.interface";
-import { WishlistServiceIF } from "@/services/interface/wishlist.service.interface";
+import { IWishlistController } from "../interfaces/wishlist.controller.interface";
+import { IWishlistService } from "@/services/interface/wishlist.service.interface";
 
-export class WishlistController implements WishlistControllerIF {
-  constructor(private readonly _wishlistService: WishlistServiceIF) {}
+export class WishlistController implements IWishlistController {
+  constructor(private readonly _wishlistService: IWishlistService) {}
 
   addToWishlist = async (req: AuthenticatedRequest, res: Response ,next:NextFunction):Promise<void> => {
     try {

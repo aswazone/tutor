@@ -1,11 +1,12 @@
-import { AuthServiceIF } from "@/services/interface/user.service.inteface";
-import { AuthControllerIF } from "../interfaces/auth.controller.interface";
+import { IAuthService } from "@/services/interface/user.service.inteface";
+import { IAuthController } from "../interfaces/auth.controller.interface";
 import { Request, Response, NextFunction } from "express";
 import { HttpStatus } from "@/constants/status.constant";
 import { setCookie } from "@/utils/cookies.utils";
+import { AuthenticatedRequest } from "@/types/auth.type";
 
-export class AuthController implements AuthControllerIF {
-    constructor(private readonly _authService:AuthServiceIF) {}
+export class AuthController implements IAuthController{
+    constructor(private readonly _authService:IAuthService) {}
 
     signin = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{
         try {
@@ -74,6 +75,16 @@ export class AuthController implements AuthControllerIF {
             const {accessToken,refreshToken} = await this._authService.refreshAccessToken(req.cookies?.refreshToken);
             setCookie(res,refreshToken);
             res.status(HttpStatus.OK).json({accessToken});
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    checkUserBlocked = async (req:AuthenticatedRequest, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const userId = req.user?.id;
+            const {message} = await this._authService.checkUserBlocked(userId as string);
+            res.status(HttpStatus.OK).json({message});
         } catch (err) {
             next(err);
         }

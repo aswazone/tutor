@@ -1,4 +1,5 @@
 import { authController } from "@/dependencies/auth.di";
+import { authenticateToken } from "@/middlewares/auth.middleware";
 import { Router } from "express";
 
 
@@ -11,14 +12,7 @@ authRouter.post("/google-signin", authController.googleSignin);
 authRouter.post("/forgot-password", authController.forgotPassword);
 authRouter.post("/reset-password", authController.resetPassword);
 authRouter.post("/refresh-token", authController.refreshAccessToken);
-// authRouter.get('/check-auth', authMiddleware, (req:AuthenticatedRequest,res:Response ,next:NextFunction)=>{
-//     try {
-//         const user = req.user;
-//         res.status(200).json({ success : true, message : 'Authenticated user !' , user});
-//     } catch (error) {
-//         next(error);
-//     }
-// })
+authRouter.post("/check-user-blocked", authenticateToken, authController.checkUserBlocked);
 
 
 export default authRouter;

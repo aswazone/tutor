@@ -1,7 +1,7 @@
 import { CategoryDocument } from '@/models/interface/category.model.interface';
-import { BaseRepositoryIF } from './base.repository.interface';
+import { IBaseRepository } from './base.repository.interface';
 
-export interface CategoryRepositoryIF extends BaseRepositoryIF<CategoryDocument> {
+export interface ICategoryRepository extends IBaseRepository<CategoryDocument> {
   findByName(name: string): Promise<CategoryDocument | null>;
   updateCourseCount(categoryId: string, increment: boolean): Promise<CategoryDocument | null>;
   updateSubCategoryCourseCount(categoryId: string, subCategoryId: string, increment: boolean): Promise<CategoryDocument | null>;

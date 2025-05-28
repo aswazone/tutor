@@ -1,6 +1,8 @@
 export const HttpResponse = {
     SERVER_ERROR: "Internal server error",
     USER_EXIST: "User already exist",
+    USER_ACTIVE: "User active",
+    USER_BLOCKED: "User blocked by admin",
     PAGE_NOT_FOUND: "Route not found",
     USER_NOT_FOUND: "User not found",
     PASSWORD_INCORRECT: "Incorrect password, try again",

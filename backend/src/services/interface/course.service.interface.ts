@@ -1,6 +1,6 @@
 import { ICreateCourseDTO, ICourse } from "@/types/course.type";
 
-export interface CourseServiceIF {
+export interface ICourseService {
   createCourse(userId: string, courseData: ICreateCourseDTO): Promise<ICourse>;
   getCoursesByInstructor(userId: string): Promise<ICourse[]>;
   getCourseById(courseId: string): Promise<ICourse>;

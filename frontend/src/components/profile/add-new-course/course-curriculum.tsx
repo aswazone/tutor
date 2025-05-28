@@ -15,8 +15,9 @@ import { ChapterForm } from "./chapter-form"
 import { Chapter, Module } from "@/types/course.type"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/store"
-import { addModule, addChapter, closeChapterModal, closeModuleModal, openChapterModal, openModuleModal, editChapter, editModule, deleteChapter, deleteModule } from "@/store/course"
+import { addModule, addChapter, closeChapterModal, closeModuleModal, openChapterModal, openModuleModal, editChapter, editModule, deleteChapter, deleteModule, uploadSingleVideoFile, setSelectedChapterId, setSelectedModuleId } from "@/store/course"
 import {v4 as uuid} from 'uuid'
+import { toast } from "sonner"
 
 const CourseCurriculum = () => {
   const { isModuleModalOpen, isChapterModalOpen, modules, selectedModuleIndex, selectedChapterIndex } = 
@@ -72,7 +73,7 @@ const CourseCurriculum = () => {
     dispatch(closeModuleModal());
   };
 
-  const handleAddChapter = (data: {
+  const handleAddChapter = async (data: {
     title: string;
     content: string;
     video?: File;
@@ -80,14 +81,26 @@ const CourseCurriculum = () => {
     subtitle?: File;
   }) => {
     if (selectedModuleIndex === null) return;
-
+    const moduleId = modules[selectedModuleIndex].id;
+    const chapterId = uuid();
+   
+    console.log(data.video,'add chapter video',typeof data.video);
+    // return
+    console.log(chapterId, moduleId, 'WHEN EDIT/ADD CHAPTER !!');
+    const uploadedVideo = typeof data.video === 'string' 
+        ? { videoKey: data.video, videoUploadStatus: "success" as const, videoUploadError: "" } 
+        : await dispatch(uploadSingleVideoFile({ video: data.video! , moduleId, chapterId})).unwrap();
+    if(uploadedVideo.videoUploadStatus === "error") {
+      toast.error("Failed to upload video, please try again");
+      return;
+    }
     const newChapter: Chapter = {
-      id: uuid(),
+      id: chapterId,
       title: data.title,
       content: data.content,
-      video: data.video ? data.video : undefined,
-      videoUploadStatus: "idle",
-      videoUploadError: "",
+      videoKey: uploadedVideo.videoKey,
+      videoUploadStatus: uploadedVideo.videoUploadStatus,
+      videoUploadError: uploadedVideo.videoUploadError,
       pdfUrl: data.pdf ? data.pdf: undefined,
       subtitleUrl: data.subtitle ? data.subtitle : undefined,
     };
@@ -109,6 +122,7 @@ const CourseCurriculum = () => {
         chapter: newChapter 
       }));
     }
+    toast.success("Chapter saved successfully!");
     dispatch(closeChapterModal());
   };
 
@@ -131,7 +145,7 @@ const CourseCurriculum = () => {
       return {
         title: chapter.title,
         content: chapter.content,
-        video: chapter.video,
+        video: chapter.videoKey,
         pdfUrl: chapter.pdfUrl,
         subtitleUrl: chapter.subtitleUrl
       };
@@ -181,7 +195,11 @@ const CourseCurriculum = () => {
                   <Edit 
                     className="text-sky-300/50 hover:text-sky-300" 
                     size={15} 
-                    onClick={() => dispatch(openChapterModal({moduleIndex, chapterIndex}))}
+                    onClick={() => {
+                      dispatch(openChapterModal({moduleIndex, chapterIndex}))
+                      dispatch(setSelectedChapterId(chapter.id));
+                      dispatch(setSelectedModuleId(module.id));
+                    }}
                   />
                 </div>
               </div>

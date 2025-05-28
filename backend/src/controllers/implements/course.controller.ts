@@ -1,10 +1,10 @@
 import { Response, NextFunction } from 'express';
-import { CourseControllerIF } from '../interfaces/course.controller.interface';
-import { CourseServiceIF } from '@/services/interface/course.service.interface';
+import { ICourseController } from '../interfaces/course.controller.interface';
+import { ICourseService } from '@/services/interface/course.service.interface';
 import { AuthenticatedRequest } from '@/types/auth.type';
 
-export class CourseController implements CourseControllerIF {
-  constructor(private readonly _courseService: CourseServiceIF) {}  
+export class CourseController implements ICourseController {
+  constructor(private readonly _courseService: ICourseService) {}  
   createCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       console.log('----------------------- course controller ------');

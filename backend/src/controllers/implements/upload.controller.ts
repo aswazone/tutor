@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { UploadServiceIF } from '@/services/interface/upload.service.interface';
-import { UploadControllerIF } from '../interfaces/upload.controller.interface';
+import { IUploadService } from '@/services/interface/upload.service.interface';
+import { IUploadController } from '../interfaces/upload.controller.interface';
 import { HttpError } from '@/utils/http-error.utils';
 import { HttpStatus } from '@/constants/status.constant';
-export class UploadController implements UploadControllerIF {
-    constructor(private readonly _uploadService: UploadServiceIF) {}
+export class UploadController implements IUploadController {
+    constructor(private readonly _uploadService: IUploadService) {}
 
     
     getPresignedUrl = async (req: Request, res: Response, next: NextFunction) => {

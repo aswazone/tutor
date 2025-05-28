@@ -27,6 +27,8 @@ const errorMiddleware = (
       statusCode = 400;
     }
 
+    console.log(message, statusCode);
+
     // Send the error response
     res.status(statusCode).json({
       success: false,

@@ -13,7 +13,6 @@ export interface Chapter {
   pdfUrl?: File
   subtitleUrl?: File
   videoKey?: string // S3 object key after upload
-  video?: File // Temporary field for file upload
   videoUploadStatus: "idle" | "uploading" | "success" | "error";
   videoUploadError?: string
 }

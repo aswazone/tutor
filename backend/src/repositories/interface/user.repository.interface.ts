@@ -1,14 +1,14 @@
-import { UserModelIF } from "@/models/interface/user.model.interface";
+import { IUserModel } from "@/models/interface/user.model.interface";
 import { UpdateQuery } from "mongoose";
 
 
 
-export interface UserRepositoryIF {
-    create(data: Partial<UserModelIF>): Promise<UserModelIF>;
-    findById(id: string): Promise<UserModelIF | null>;
-    findByEmail(email: string): Promise<UserModelIF | null>;
-    updatePassword(email: string, hashedPassword: string): Promise<UserModelIF | null>;
-    findOneByEmailOrUsername(identifier: string): Promise<UserModelIF | null>;
-    findByIdAndUpdate(id: string, update: UpdateQuery<UserModelIF>, options?: { new: boolean; }): Promise<UserModelIF | null>;
-    findByIdAndPopulateWishlist(id: string): Promise<UserModelIF | null>;
+export interface IUserRepository {
+    createUser(data: Partial<IUserModel>): Promise<IUserModel>;
+    findUserById(id: string): Promise<IUserModel | null>;
+    findUserByEmail(email: string): Promise<IUserModel | null>;
+    updatePassword(email: string, hashedPassword: string): Promise<IUserModel | null>;
+    findOneByEmailOrUsername(identifier: string): Promise<IUserModel | null>;
+    findByIdAndUpdate(id: string, update: UpdateQuery<IUserModel>, options?: { new: boolean; }): Promise<IUserModel | null>;
+    findByIdAndPopulateWishlist(id: string): Promise<IUserModel | null>;
 }

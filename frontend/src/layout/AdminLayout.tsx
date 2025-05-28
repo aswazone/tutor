@@ -1,14 +1,10 @@
 import { AdminNavbar } from "@/components/admin/Navbar";
 import { Sidebar } from "@/components/admin/Sidebar";
-import { RootState } from "@/store";
-import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 
 const AdminLayout = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const auth = useSelector((state: RootState) => state.auth);
-  console.log(auth.isAuthenticated);
 
   return (
     <div className="flex relative min-h-screen mesh-bg">

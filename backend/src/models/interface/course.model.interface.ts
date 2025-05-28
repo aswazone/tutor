@@ -4,7 +4,7 @@ import { ICourse } from '@/types/course.type';
 // Remove Document from ICourse since we'll extend it here
 export type CourseDocumentProps = Omit<ICourse, keyof Document>;
 
-export interface CourseModelIF extends Document {
+export interface ICourseModel extends Document {
     title: string;
     category: string;
     level: string;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-export interface CategoryControllerIF {
+export interface ICategoryController {
   createCategory(req: Request, res: Response, next: NextFunction): Promise<void>;
   createSubCategory(req: Request, res: Response, next: NextFunction): Promise<void>;
   getAllCategories(req: Request, res: Response, next: NextFunction): Promise<void>;

@@ -5,26 +5,52 @@ import CourseCurriculum from "@/components/profile/add-new-course/course-curricu
 import CourseLandingPage from "@/components/profile/add-new-course/course-landing-page"
 import CourseSettings from "@/components/profile/add-new-course/course-settings"
 import { toast } from "sonner"
-import { useState } from "react"
-import { Module } from "@/types/course.type"
+import { useEffect, useState } from "react"
 import { CourseLandingFormData } from "@/schemas/course/course-landing.schema"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/store"
-import { uploadCourseFiles, submitCourse, setModules } from "@/store/course"
+import { submitCourse, setModules, updateCourse, setEditMode, setThumbnailKey } from "@/store/course"
 import { CustomAlertDialog } from "@/components/common/CustomAlertDialog"
 import CustomAlert from "@/components/common/CustomAlert"
 import { PublishDraftToggle } from "@/components/profile/add-new-course/publish-draft-toggle"
+import axiosInstance from "@/config/axios.config"
+import { Button } from "@/components/ui/button"
+import { setActiveTab } from "@/store/auth/authSlice"
 
 export const CreateCourseTab = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const {modules, uploadStatus, submitStatus, uploadError, submitError } = useSelector((state: RootState) => state.course.courseEditor);
+  const {modules, thumbnailKey, uploadStatus, editMode, submitStatus } = useSelector((state: RootState) => state.course.courseEditor);
 
   
-  const [courseImage, setCourseImage] = useState<File | null>(null)
+  const [courseImage, setCourseImage] = useState<string | null>(null)
   const [courseLandingData, setCourseLandingData] = useState<CourseLandingFormData | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isPublished, setIsPublished] = useState(false)
+  const [isPublished, setIsPublished] = useState<boolean>(false)
 
+  useEffect(()=>{
+    if (editMode.status && editMode.courseId) {
+      async function fetchSingleCourse() {
+        const response = await axiosInstance.get(`/api/v1/courses/${editMode.courseId}`)
+        console.log(response.data)
+        setIsPublished(response.data.isPublished)
+        await dispatch(setModules(response.data.modules))
+        setCourseLandingData({
+          title: response.data.title,
+          description: response.data.description,
+          category: response.data.category,
+          level: response.data.level,
+          objectives: response.data.objectives,
+          pricing: response.data.pricing,
+          primaryLanguage: response.data.primaryLanguage,
+          subtitle: response.data.subtitle,
+          welcomeMessage: response.data.welcomeMessage,
+        })
+        setCourseImage(response.data.thumbnailKey)
+
+      }
+      fetchSingleCourse();
+    }
+  },[dispatch, editMode.status, editMode.courseId])
 
   const handleCourseLandingSubmit = (data: CourseLandingFormData) => {
     try {
@@ -37,16 +63,31 @@ export const CreateCourseTab = () => {
     }
   }
   
-  const handleInputChange = (file: File | null) => {
-    if (file) {
-      setCourseImage(file)
-      toast.success("File uploaded successfully!")
+  const handleInputChange = (imageKey: string | null) => {
+    if (imageKey) {
+      setCourseImage(imageKey)
     } else {
-      toast.error("Failed to upload file")
+      toast.error("Failed to upload image !")
     }
   }
 
-  const handleMainCourseSubmit = async () => {
+  const resetEditState = () => {
+    dispatch(setEditMode({ status: false, courseId: "" }));
+    dispatch(setModules([]));
+    setCourseImage(null);
+    setCourseLandingData(null);
+    setIsPublished(false);
+    dispatch(setThumbnailKey(''));
+    dispatch(setActiveTab('courses'));
+  };
+
+  const handleCancel = () => {
+    resetEditState();
+  }
+
+
+
+  function validateFullCourseData(){
     // Validate everything before submission
     let isValid = true;
     const errorMessage: string[] = [];
@@ -77,7 +118,7 @@ export const CreateCourseTab = () => {
             isValid = false;
             errorMessage.push(`Chapter "${chapter.title}" in module "${module.title}" has invalid or insufficient content`);
           }
-          if (!chapter.video ) {
+          if (!chapter.videoKey ) {
             isValid = false;
             errorMessage.push(`Chapter "${chapter.title}" in module "${module.title}" is missing a video`);
           }
@@ -85,55 +126,61 @@ export const CreateCourseTab = () => {
       }
     }
 
+
     if (!isValid) {
       toast.error("Validation Failed", {
         description: errorMessage.join(", "),
       });
       return;
     }
+  }
+
+  const handleMainCourseSubmit = async () => {
+    validateFullCourseData();
 
     setIsSubmitting(true);
     
     try {
-      // Step 1: Upload files to S3
-      if (!courseImage) throw new Error("Course image is required");
-      console.log('modules for upload:', modules);
+
+      // // Step 2: Send course data to backend
+      console.log(courseImage, courseLandingData, modules, isPublished,'last checking');
+      // return
+      if (!courseLandingData) throw new Error("Course details are missing");
+      // if(!thumbnailKey) throw new Error('Course image is missing')
       
-      let uploadResult: { thumbnailKey: string, modules: Module[] } = { thumbnailKey: "", modules: [] };
-      const uploadAllFilesAction = await dispatch(uploadCourseFiles({ courseImage, modules }));
-
-
-
-      if (uploadCourseFiles.fulfilled.match(uploadAllFilesAction)) {
-        uploadResult = uploadAllFilesAction.payload;
-        console.log(uploadResult, 'upload result after upload');
-        toast.success("Files uploaded successfully!",{duration: 5000});
-      } else if (uploadCourseFiles.rejected.match(uploadAllFilesAction)) {
-        toast.error(uploadError);
+      if(editMode.status && editMode.courseId){ 
+        const courseUpdateAction = await dispatch(updateCourse({
+          courseDetails:courseLandingData,
+          thumbnailKey: thumbnailKey as string,
+          modules:modules,
+          isPublished,
+          courseId:editMode.courseId
+        })).unwrap()
+        console.log('response course updated !:', courseUpdateAction)
+      }else{
+        const courseSubmitAction = await dispatch(submitCourse({
+          courseDetails: courseLandingData,
+          thumbnailKey: thumbnailKey as string,
+          modules: modules,
+          isPublished
+        })).unwrap();
+        console.log('reponse course submit:', courseSubmitAction);
       }
 
-      // Step 2: Send course data to backend
-      if (!courseLandingData) throw new Error("Course details are missing");
-      if (!uploadResult.thumbnailKey) throw new Error("Thumbnail key is missing");
-      if (uploadResult.modules.length === 0) throw new Error("Modules are missing");
-
-
-      const courseSubmitAction = await dispatch(submitCourse({
-        courseDetails: courseLandingData,
-        thumbnailKey: uploadResult.thumbnailKey,
-        modules: uploadResult.modules,
-        isPublished
-      })).unwrap();
-
-      console.log('reponse course submit:', courseSubmitAction);
 
       if(submitStatus === "success"){
-          toast.success("Course submitted successfully!");
-          setModules([]);
+        if(editMode.status) {
+          toast.success("Course updated successfully!");
+          resetEditState(); // Use the resetEditState function here
+        } else {
+          toast.success("Course created successfully!");
+          // Reset only necessary states for new course
+          dispatch(setModules([]));
           setCourseImage(null);
           setCourseLandingData(null);
-      }else if(submitStatus === "error"){
-        toast.error(submitError);
+          setIsPublished(false);
+          dispatch(setThumbnailKey(''));
+        }
       }
 
       
@@ -152,14 +199,25 @@ export const CreateCourseTab = () => {
     >
       <div className="flex justify-between items-center gap-6">
         <div className="flex-col">
-            <h3 className="text-sm md:text-2xl font-semibold">Create New Course</h3>
+            <h3 className="text-sm md:text-2xl font-semibold">{editMode.status && editMode.courseId ? "Update Course" : "Create New Course"}</h3>
             <p className="text-[11px] md:text-xs text-muted-foreground">
-                Fill in the details below to create a new course.
+                Fill in the details below to {editMode.status && editMode.courseId ? "update an existing course" : "create a new course"}.
             </p>
         </div>
         <div className="flex items-center gap-2">
           <PublishDraftToggle isPublished={isPublished} setIsPublished={setIsPublished}/>
-          <CustomAlertDialog buttonText={isSubmitting ? "Submitting..." : "SUBMIT"} handleSubmit={handleMainCourseSubmit} isDisabled={isSubmitting}/>
+            
+          {editMode.status && editMode.courseId 
+          ? (
+            <>
+              <Button variant="outline"
+                className="text-red-500 rounded-tl-none rounded-br-none border-red-500 hover:text-red-600 hover:border-red-600" 
+                onClick={() => handleCancel()}
+              >Cancel</Button>
+              <CustomAlertDialog buttonText={isSubmitting ? "Submitting..." : "UPDATE"} handleSubmit={handleMainCourseSubmit} isDisabled={isSubmitting}/>
+            </>
+          )
+          : <CustomAlertDialog buttonText={isSubmitting ? "Submitting..." : "SUBMIT"} handleSubmit={handleMainCourseSubmit} isDisabled={isSubmitting}/>}
         </div>
       </div>
       {submitStatus === 'submitting' || uploadStatus === 'uploading' ? (
@@ -180,7 +238,7 @@ export const CreateCourseTab = () => {
                 <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
               </TabsList>
               <TabsContent value="curriculum">
-                <CourseCurriculum/>
+                <CourseCurriculum />
               </TabsContent>              
               <TabsContent value="course-landing-page">
                 <CourseLandingPage 

@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 import {
   Form,
   FormControl,
@@ -11,80 +9,122 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Quill from "quill"
 import 'quill/dist/quill.snow.css'
+import { env } from "@/config/env.config"
 
-const MAX_FILE_SIZE_PDF = 50 * 1024 * 1024 // 50MB
 const MAX_FILE_SIZE_VIDEO = 2 * 1024 * 1024 * 1024 // 2GB
-const MAX_FILE_SIZE_SUBTITLE = 50 * 1024 * 1024 // 50MB
 
-const chapterFormSchema = z.object({
-  title: z.string().min(5, "Title is required, at least 5 characters"),
-  content: z.string()
-      .min(50, "Description must be at least 50 characters")
-      .max(3000, "Description must be less than 3000 characters"),
-  video: z.any()
-    .refine((file) => {
-      if (file === null || file === undefined) return false;
-      return file instanceof File;
-    }, "Must be a file")
-    .refine((file) => {
-      if (!file) return false;
-      return file.size <= MAX_FILE_SIZE_VIDEO;
-    }, "Max file size is 2GB")
-    .refine((file) => {
-      if (!file) return false;
-      return file.type.startsWith("video/");
-    }, "File must be a video"),
-  pdf: z.any()
-    .refine((file) => {
-      if (!file) return true;
-      return file instanceof File;
-    }, "Must be a file")
-    .refine((file) => {
-      if (!file) return true;
-      return file.size <= MAX_FILE_SIZE_PDF;
-    }, "Max file size is 50MB")
-    .optional(),
-  subtitle: z.any()
-    .refine((file) => {
-      if (!file) return true;
-      return file instanceof File;
-    }, "Must be a file")
-    .refine((file) => {
-      if (!file) return true;
-      return file.size <= MAX_FILE_SIZE_SUBTITLE;
-    }, "Max file size is 50MB")
-    .optional(),
-})
-
-type ChapterFormValues = z.infer<typeof chapterFormSchema>
+interface ChapterFormValues {
+  title: string;
+  content: string;
+  video: File | string | null;
+  pdf: File | null;
+  subtitle: File | null;
+}
 
 interface ChapterFormProps {
-  onSubmit: (values: ChapterFormValues) => void
-  onCancel: () => void
+  onSubmit: (values: ChapterFormValues) => void;
+  onCancel: () => void;
   initialData?: {
     title: string;
     content: string;
-    video?: File;
+    video?: string | File;
     pdfUrl?: File;
     subtitleUrl?: File;
   }
 }
 
 export function ChapterForm({ onSubmit, onCancel, initialData }: ChapterFormProps) {
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+
   const form = useForm<ChapterFormValues>({
-    resolver: zodResolver(chapterFormSchema),
     defaultValues: {
       title: initialData?.title || "",
       content: initialData?.content || "",
-      video: null,
+      video: initialData?.video || null,
       pdf: null,
       subtitle: null
     }
-  })
-  
+  });
+
+  // Custom validation functions
+  const validateTitle = (title: string): true | string => {
+    if (!title) {
+      return "Title is required";
+    }
+    if (title.length < 5) {
+      return "Title must be at least 5 characters";
+    }
+    return true;
+  };
+
+  const validateContent = (content: string): true | string => {
+    if (!content) {
+      return "Content is required";
+    }
+    if (content.length < 50) {
+      return "Content must be at least 50 characters";
+    }
+    if (content.length > 3000) {
+      return "Content must be less than 3000 characters";
+    }
+    return true;
+  };
+
+  // Custom validation function for video
+  const validateVideo = (video: File | string | null): true | string => {
+    if (!video) {
+      return "Video is required";
+    }
+
+    if (video instanceof File) {
+      if (video.size > MAX_FILE_SIZE_VIDEO) {
+        return "Video size should be less than 2GB";
+      }
+      if (!video.type.startsWith("video/")) {
+        return "File must be a video";
+      }
+    }
+
+    return true;
+  };
+
+  const handleSubmit = (data: ChapterFormValues) => {
+    // Validate title
+    const titleValidation = validateTitle(data.title);
+    if (titleValidation !== true) {
+      form.setError('title', {
+        type: 'custom',
+        message: titleValidation
+      });
+      return;
+    }
+
+    // Validate content
+    const contentValidation = validateContent(data.content);
+    if (contentValidation !== true) {
+      form.setError('content', {
+        type: 'custom',
+        message: contentValidation
+      });
+      return;
+    }
+
+    // Validate video
+    const videoValidation = validateVideo(data.video);
+    if (videoValidation !== true) {
+      form.setError('video', {
+        type: 'custom',
+        message: videoValidation
+      });
+      return;
+    }
+
+    onSubmit(data);
+  };
+
   const quillRef = useRef<Quill | null>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
 
@@ -146,9 +186,18 @@ export function ChapterForm({ onSubmit, onCancel, initialData }: ChapterFormProp
     };
   }, [form, initialData]);
 
+  // Add cleanup effect for video preview URL
+  useEffect(() => {
+    return () => {
+      if (videoPreviewUrl) {
+        URL.revokeObjectURL(videoPreviewUrl);
+      }
+    };
+  }, [videoPreviewUrl]);
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full px-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 w-full px-4">
         <FormField
           control={form.control}
           name="title"
@@ -156,7 +205,22 @@ export function ChapterForm({ onSubmit, onCancel, initialData }: ChapterFormProp
             <FormItem>
               <FormLabel className="text-sky-400/60">Chapter Title</FormLabel>
               <FormControl>
-                <Input placeholder="Enter chapter title" {...field} />
+                <Input 
+                  placeholder="Enter chapter title" 
+                  {...field} 
+                  onChange={(e) => {
+                    field.onChange(e);
+                    const validation = validateTitle(e.target.value);
+                    if (validation !== true) {
+                      form.setError('title', {
+                        type: 'custom',
+                        message: validation
+                      });
+                    } else {
+                      form.clearErrors('title');
+                    }
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -184,26 +248,50 @@ export function ChapterForm({ onSubmit, onCancel, initialData }: ChapterFormProp
             <FormItem>
               <FormLabel className="text-sky-400/60">Chapter Video</FormLabel>
               <FormControl>
-                <Input
-                  type="file"
-                  accept="video/*"
-                  className="border-sky-800 w-[258px]"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    onChange(file);
-                  }}
-                />
+                <div className="space-y-2">
+                  <Input
+                    type="file"
+                    accept="video/*"
+                    className="border-sky-800 w-[258px]"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const videoUrl = URL.createObjectURL(file);
+                        setVideoPreviewUrl(videoUrl);
+                        onChange(file);
+                      }
+                    }}
+                  />
+                  {/* Video Preview */}
+                  {(videoPreviewUrl || form.watch('video')) && (
+                    <div className="mt-2 relative w-full md:w-[334px] aspect-video rounded-lg overflow-hidden bg-black/20">
+                      <video 
+                        src={
+                          videoPreviewUrl || 
+                          (typeof form.watch('video') === 'string' 
+                            ? `${env.AMZ_BUCKET_NAME}/${form.watch('video')}` 
+                            : form.watch('video') instanceof File 
+                              ? URL.createObjectURL(form.watch('video') as File) 
+                              : undefined)
+                        }
+                        className="w-full h-full"
+                        controls
+                        autoPlay={false}
+                        muted
+                      />
+                    </div>
+                  )}
+                  {/* File name display */}
+                  {form.watch('video') && (
+                    <p className="text-xs text-sky-300/30 truncate mt-1">
+                      {form.watch('video') instanceof File 
+                        ? `New: ${(form.watch('video') as File).name}`
+                        : `Current: ${form.watch('video')}`
+                      }
+                    </p>
+                  )}
+                </div>
               </FormControl>
-              {form.watch('video') && (
-                <p className="text-xs text-sky-300/30 truncate mt-1">
-                  New: {form.watch('video')?.name}
-                </p>
-              )}
-              {!form.watch('video') && existingFiles.video && (
-                <p className="text-xs text-sky-300/30 truncate mt-1">
-                  Current: {existingFiles.video.name}
-                </p>
-              )}
               {error && <FormMessage>{error.message}</FormMessage>}
             </FormItem>
           )}

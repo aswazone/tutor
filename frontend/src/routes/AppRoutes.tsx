@@ -20,6 +20,7 @@ import Categories from "@/pages/admin/Categories";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { env } from "@/config/env.config";
 import ResetPassword from "@/pages/reset-password";
+import { CheckUserStatus } from "./CheckUserStatus";
 
 
 export const router = createBrowserRouter([
@@ -29,7 +30,7 @@ export const router = createBrowserRouter([
         errorElement: <ErrorPage />
     },
     {
-        path: "", element: <AppLayout />,
+        path: "", element: <CheckUserStatus><AppLayout /></CheckUserStatus>,
         children: [
             {
                 path: "/", element: <LandingPage />,

@@ -1,8 +1,16 @@
-import { CourseModelIF } from '@/models/interface/course.model.interface';
-import { BaseRepositoryIF } from './base.repository.interface';
+import { ICourseModel } from '@/models/interface/course.model.interface';
+import { IBaseRepository } from './base.repository.interface';
+import { PopulateOptions } from 'mongoose';
 
-export interface CourseRepositoryIF extends BaseRepositoryIF<CourseModelIF> {
-    getByInstructor(instructorId: string): Promise<CourseModelIF[]>;
-    getById(id: string): Promise<CourseModelIF | null>;
-    findAll(options: {isDeleted?: boolean, isActive?: boolean, isVerified?: boolean}): Promise<CourseModelIF[]>
+export interface ICourseRepository extends IBaseRepository<ICourseModel> {
+    getByInstructor(instructorId: string): Promise<ICourseModel[]>;
+    getById(id: string): Promise<ICourseModel | null>;
+    findAllCourses(
+        options: {
+            isDeleted?: boolean, 
+            isActive?: boolean, 
+            isVerified?: boolean
+        },
+        populate?: PopulateOptions
+    ): Promise<ICourseModel[]>
 }

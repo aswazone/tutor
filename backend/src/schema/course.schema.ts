@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { CourseModelIF } from '@/models/interface/course.model.interface';
+import { ICourseModel } from '@/models/interface/course.model.interface';
 
 const ChapterSchema = new Schema({
   id: String,
@@ -86,4 +86,4 @@ const CourseSchema = new Schema({
   }
 }, { timestamps: true });
 
-export const Course = model<CourseModelIF>('Course', CourseSchema);
+export const Course = model<ICourseModel>('Course', CourseSchema);

@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { CategoryControllerIF } from '../interfaces/category.controller.interface';
-import { CategoryServiceIF } from '@/services/interface/category.service.interface';
+import { ICategoryController } from '../interfaces/category.controller.interface';
+import { ICategoryService } from '@/services/interface/category.service.interface';
 import { HttpStatus } from '@/constants/status.constant';
 
-export class CategoryController implements CategoryControllerIF {
-  constructor(private readonly _categoryService: CategoryServiceIF) {}
+export class CategoryController implements ICategoryController {
+  constructor(private readonly _categoryService: ICategoryService) {}
 
   createCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

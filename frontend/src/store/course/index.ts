@@ -10,7 +10,10 @@ interface CourseEditorState {
   isChapterModalOpen: boolean;
   isModuleModalOpen: boolean;
   selectedModuleIndex: number | null;
+  selectedChapterId: string | null;
+  selectedModuleId: string | null;
   selectedChapterIndex: number | null;
+  editMode: { status:boolean, courseId: string };
   courseId: string;
   courseTitle: string;
   courseCategory: string;
@@ -34,8 +37,11 @@ const initialState: InitialStateTypes = {
     modules: [],
     isChapterModalOpen: false,
     isModuleModalOpen: false,
+    selectedModuleId: null,
+    selectedChapterId: null,
     selectedModuleIndex: null,
     selectedChapterIndex: null,
+    editMode: { status: false, courseId: "" },
     courseId: "",
     courseTitle: "",
     courseCategory: "",
@@ -48,15 +54,53 @@ const initialState: InitialStateTypes = {
 
 
 
-import { UploadCourseResult } from "@/types/store.types";
+import { UploadImageResult, UploadVideoResult } from "@/types/store.types";
 
-export const uploadCourseFiles = createAsyncThunk<UploadCourseResult, { courseImage: File; modules: Module[] }, { rejectValue: string }>(
-  "course/uploadFiles",
-  async ({ courseImage, modules }, { rejectWithValue }) => {
+export const uploadSingleVideoFile = createAsyncThunk<UploadVideoResult, { video: File, moduleId: string, chapterId: string }, { rejectValue: string }>(
+  "course/uploadSingleVideoFile",
+  async ({ video , moduleId, chapterId}, { rejectWithValue }) => {
     try {
-      // 1. Upload course thumbnail
-        //fileName: 'course-videos/mockTest',
-        // fileType: 'video/mp4'
+            const videoResponse = await axiosInstance.get<{ url: string; key: string }>("/api/v1/upload/presigned-url", {
+              params: {
+                fileName: `${moduleId}/${chapterId}/${video.name}`,
+                fileType: video.type
+              }
+            });
+
+            fetch(videoResponse.data.url, {
+              method: 'PUT',
+              body: video,
+              headers: {
+                'Content-Type': 'video/*' 
+              }
+            })
+            .then(response => {
+              if (response.ok) {
+                console.log('Upload successful!');
+              } else {
+                console.error('Upload failed:', response.statusText);
+              }
+            })
+            .catch(error => console.error('Error:', error));
+
+            return {
+              videoKey: videoResponse.data.key,
+              videoUploadStatus: "success" as const,
+              videoUploadError: "",
+            }
+    } catch (err) {
+      console.log(err, 'upload error');
+      const message = axiosErrorMessage(err);
+      return rejectWithValue(message);
+    }
+  
+})
+
+
+export const uploadSingleImageFile = createAsyncThunk<UploadImageResult, { courseImage: File }, { rejectValue: string }>(
+  "course/uploadSingleImageFile",
+  async ({ courseImage }, { rejectWithValue }) => {
+    try {
       const thumbnailResponse = await axiosInstance.get<{ url: string; key: string }>("/api/v1/upload/presigned-url", {
         params: { 
           fileName: courseImage.name,
@@ -85,54 +129,10 @@ export const uploadCourseFiles = createAsyncThunk<UploadCourseResult, { courseIm
 
       console.log('thumbnail uploaded');
 
-      
-      
-      // 2. Upload chapter videos
-      const uploadedModules = await Promise.all(modules.map(async (module) => {
-        const modulesWithUploadedVideos = await Promise.all(module.chapters.map(async (chapter) => {
-          if (chapter.video instanceof File) {
-            const videoResponse = await axiosInstance.get<{ url: string; key: string }>("/api/v1/upload/presigned-url", {
-              params: {
-                fileName: `${module.id}/${chapter.id}/${chapter.video.name}`,
-                fileType: chapter.video.type
-              }
-            });
-
-            fetch(videoResponse.data.url, {
-              method: 'PUT',
-              body: chapter.video,
-              headers: {
-                'Content-Type': 'video/*' 
-              }
-            })
-            .then(response => {
-              if (response.ok) {
-                console.log('Upload successful!');
-              } else {
-                console.error('Upload failed:', response.statusText);
-              }
-            })
-            .catch(error => console.error('Error:', error));
-
-            return {
-              ...chapter,
-              videoKey: videoResponse.data.key,
-              videoUploadStatus: "success" as const,
-              video: undefined // Remove the File object after upload
-            };
-          }
-          return chapter;
-        }));
-        
-        return {
-          ...module,
-          chapters: modulesWithUploadedVideos
-        };
-      }));
-
       return {
         thumbnailKey: thumbnailResponse.data.key,
-        modules: uploadedModules
+        thumbnailUploadStatus: "success" as const,
+        thumbnailUploadError: "",
       };
     } catch (err) {
       console.log(err, 'upload error');
@@ -141,6 +141,7 @@ export const uploadCourseFiles = createAsyncThunk<UploadCourseResult, { courseIm
     }
   }
 );
+
 
 export const submitCourse = createAsyncThunk<string, { courseDetails: CourseLandingFormData, thumbnailKey: string, modules: Module[], isPublished: boolean }, { rejectValue: string }>(
   "course/submit",
@@ -160,12 +161,43 @@ export const submitCourse = createAsyncThunk<string, { courseDetails: CourseLand
   }
 );
 
+export const updateCourse = createAsyncThunk<string, { courseDetails: CourseLandingFormData, thumbnailKey: string, modules: Module[], isPublished: boolean ,courseId:string}, { rejectValue: string }>(
+  "course/update",
+  async ({
+    courseDetails,
+    thumbnailKey,
+    modules,
+    isPublished,
+    courseId
+  }, { rejectWithValue }) => {
+    try {      
+      const response = await axiosInstance.put(`/api/v1/courses/${courseId}`, {courseDetails,thumbnailKey,modules,isPublished});
+      return response.data;
+    } catch (error) {
+      const message = axiosErrorMessage(error);
+      return rejectWithValue(message);
+    }
+  }
+);
+
 const courseSlice = createSlice({
   name: "courseEditor",
   initialState,
   reducers: {
     setModules: (state, action: PayloadAction<Module[]>) => {
       state.courseEditor.modules = action.payload;
+    },
+    setEditMode: (state, action: PayloadAction<{ status: boolean; courseId: string }>) => {
+      state.courseEditor.editMode = action.payload;
+    },
+    setThumbnailKey: (state, action: PayloadAction<string>) => {
+      state.courseEditor.thumbnailKey = action.payload;
+    },
+    setSelectedChapterId: (state, action: PayloadAction<string>) => {
+      state.courseEditor.selectedChapterId = action.payload;
+    },
+    setSelectedModuleId: (state, action: PayloadAction<string>) => {
+      state.courseEditor.selectedModuleId = action.payload;
     },
     setCourseId: (state, action: PayloadAction<string>) => {
       state.courseEditor.courseId = action.payload;
@@ -194,6 +226,8 @@ const courseSlice = createSlice({
       state.courseEditor.isChapterModalOpen = false;
       state.courseEditor.selectedModuleIndex = null;
       state.courseEditor.selectedChapterIndex = null;
+      state.courseEditor.selectedChapterId = null;
+      state.courseEditor.selectedModuleId = null;
     },
     openModuleModal: (
       state,
@@ -250,27 +284,25 @@ const courseSlice = createSlice({
   },
   extraReducers: (builder) => {
   builder
-    .addCase(uploadCourseFiles.pending, (state) => {
-      state.courseEditor.uploadStatus = "uploading";
-      state.courseEditor.uploadError = undefined;
-    })
-    .addCase(uploadCourseFiles.fulfilled, (state, action) => {
-      state.courseEditor.thumbnailKey = action.payload.thumbnailKey;
-      state.courseEditor.modules = action.payload.modules.map((module) => ({
-        ...module,
-        chapters: module.chapters.map((chapter) => ({
-          ...chapter,
-          videoUploadStatus: chapter.videoUploadStatus as "idle" | "uploading" | "success" | "error",
-        })),
-      }));
-      state.courseEditor.uploadStatus = "success";
-    })
-    .addCase(uploadCourseFiles.rejected, (state, action) => {
-      state.courseEditor.uploadStatus = "error";
-      state.courseEditor.uploadError = action.payload as string;
-    })
-
-
+      .addCase(uploadSingleImageFile.pending, (state) => {
+        state.courseEditor.thumbnailUploadStatus = "uploading";
+      })
+      .addCase(uploadSingleImageFile.fulfilled, (state, action) => {
+        state.courseEditor.thumbnailKey = action.payload.thumbnailKey;
+        state.courseEditor.thumbnailUploadStatus = "success";
+      })
+      .addCase(uploadSingleImageFile.rejected, (state) => {
+        state.courseEditor.thumbnailUploadStatus = "error";
+      })
+      .addCase(uploadSingleVideoFile.pending, (state) => {
+        state.courseEditor.uploadStatus = "uploading";
+      })
+      .addCase(uploadSingleVideoFile.fulfilled, (state) => {
+        state.courseEditor.uploadStatus = "success";
+      })
+      .addCase(uploadSingleVideoFile.rejected, (state) => {
+        state.courseEditor.uploadStatus = "error";
+      })
     .addCase(submitCourse.pending, (state) => {
       state.courseEditor.submitStatus = "submitting";
       state.courseEditor.submitError = undefined;
@@ -285,13 +317,34 @@ const courseSlice = createSlice({
     .addCase(submitCourse.rejected, (state, action) => {
       state.courseEditor.submitStatus = "error";
       state.courseEditor.submitError = action.payload as string;
-    });
+    })
+    
+    .addCase(updateCourse.pending, (state) => {
+      state.courseEditor.submitStatus = "submitting";
+      state.courseEditor.submitError = undefined;
+    })
+    .addCase(updateCourse.fulfilled, (state) => {
+      state.courseEditor.submitStatus = "success";
+      state.courseEditor = {
+        ...initialState.courseEditor,
+        submitStatus: "success"
+      };
+    })
+    .addCase(updateCourse.rejected, (state, action) => {
+      state.courseEditor.submitStatus = "error";
+      state.courseEditor.submitError = action.payload as string;
+    })
+    
   }
 });
 
 export const {
   setModules,
   setCourseId,
+  setEditMode,
+  setThumbnailKey,
+  setSelectedModuleId,
+  setSelectedChapterId,
   setCourseTitle,
   setCourseCategory,
   setCourseDescription,

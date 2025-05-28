@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 
-export interface AdminControllerIF {
+export interface IAdminController {
     getAllTutors: (req:Request, res:Response, next:NextFunction) => Promise<void>
     getAllStudents: (req:Request, res:Response, next:NextFunction) => Promise<void>
     toggleUserStatus: (req:Request, res:Response, next:NextFunction) => Promise<void>

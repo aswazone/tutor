@@ -1,7 +1,7 @@
 import { Document, FilterQuery, Model, UpdateQuery } from "mongoose";
-import { BaseRepositoryIF } from "./interface/base.repository.interface";
+import { IBaseRepository } from "./interface/base.repository.interface";
 
-export abstract class BaseRepository<T extends Document> implements BaseRepositoryIF<T> {
+export abstract class BaseRepository<T extends Document> implements IBaseRepository<T> {
     constructor(protected readonly model: Model<T>) {}
 
     async create(data: Partial<T>): Promise<T> {

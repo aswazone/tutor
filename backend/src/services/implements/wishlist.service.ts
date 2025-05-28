@@ -1,18 +1,18 @@
 import { HttpError } from '@/utils/http-error.utils';
 import { HttpStatus } from '@/constants/status.constant';
-import { UserRepositoryIF } from '@/repositories/interface/user.repository.interface';
-import { CourseRepositoryIF } from '@/repositories/interface/course.repository.interface';
-import { WishlistServiceIF } from '../interface/wishlist.service.interface';
+import { IUserRepository } from '@/repositories/interface/user.repository.interface';
+import { ICourseRepository } from '@/repositories/interface/course.repository.interface';
+import { IWishlistService } from '../interface/wishlist.service.interface';
 import { ICourse } from '@/types/course.type';
 
-export class WishlistService implements WishlistServiceIF {
+export class WishlistService implements IWishlistService {
   constructor(
-    private readonly _userRepository: UserRepositoryIF,
-    private readonly _courseRepository: CourseRepositoryIF
+    private readonly _userRepository: IUserRepository,
+    private readonly _courseRepository: ICourseRepository
   ) {}
   addToWishlist = async (userId: string, courseId: string): Promise<void> => {
     const [user, course] = await Promise.all([
-      this._userRepository.findById(userId),
+      this._userRepository.findUserById(userId),
       this._courseRepository.findById(courseId)
     ]);
     
@@ -35,7 +35,7 @@ export class WishlistService implements WishlistServiceIF {
   };
 
   removeFromWishlist = async (userId: string, courseId: string): Promise<void> => {
-    const user = await this._userRepository.findById(userId);
+    const user = await this._userRepository.findUserById(userId);
     if (!user) {
       throw new HttpError(HttpStatus.NOT_FOUND, 'User not found');
     }

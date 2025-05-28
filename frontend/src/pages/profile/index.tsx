@@ -45,7 +45,7 @@ const getTabs = (role: UserRole) => {
       return [
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: TeachersOverviewTab },
         { id: 'courses', name: 'My Courses', icon: <BookOpenIcon className="h-5 w-5 md:hidden" />, component: TutorCoursesTab },
-        { id: 'create-course', name: 'Create Course', icon: <PlusIcon className="h-5 w-5 md:hidden" />, component: CreateCourseTab },
+        { id: 'create-course', name: 'Manage Course', icon: <PlusIcon className="h-5 w-5 md:hidden" />, component: CreateCourseTab },
         { id: 'students', name: 'My Students', icon: <UserGroupIcon className="h-5 w-5 md:hidden" />, component: StudentsTab },
         { id: 'reviews', name: 'Reviews', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: ReviewsTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: TeachersSettingsTab },

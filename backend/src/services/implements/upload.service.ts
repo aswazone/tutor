@@ -3,7 +3,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { HttpError } from '../../utils/http-error.utils';
 import { AWS_S3_BUCKET } from '@/config/env.config';
-import { UploadServiceIF } from '../interface/upload.service.interface';
+import { IUploadService } from '../interface/upload.service.interface';
 import { HttpStatus } from '@/constants/status.constant';
 
 interface FolderConfig {
@@ -11,7 +11,7 @@ interface FolderConfig {
   contentType: string;
 }
 
-export class UploadService implements UploadServiceIF {
+export class UploadService implements IUploadService {
     private readonly folderConfigs: Record<string, FolderConfig> = {
         'image': {
             path: 'course-thumbnails',

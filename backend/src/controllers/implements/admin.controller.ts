@@ -1,11 +1,11 @@
 import { Response, Request, NextFunction } from "express";
-import { AdminControllerIF } from "../interfaces/admin.controller.interface";
-import { AdminServiceIF } from "@/services/interface/admin.service.interface";
+import { IAdminController } from "../interfaces/admin.controller.interface";
+import { IAdminService } from "@/services/interface/admin.service.interface";
 import { HttpStatus } from "@/constants/status.constant";
 
-export class AdminController implements AdminControllerIF {
+export class AdminController implements IAdminController {
 
-    constructor(private readonly _adminService: AdminServiceIF) {}
+    constructor(private readonly _adminService: IAdminService) {}
 
     getAllTutors = async (req: Request, res:Response, next: NextFunction):Promise<void> => {
         try {

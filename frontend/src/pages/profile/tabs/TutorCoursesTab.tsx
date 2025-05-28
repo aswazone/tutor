@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { env } from '@/config/env.config';
 import { deleteCourse, fetchTutorCourses, toggleCourseStatus } from '@/store/fetch';
 import { DeleteConfirmDialog } from '@/components/common/DeleteConfirmDialog';
+import { setEditMode } from '@/store/course';
 
 
 export const TutorCoursesTab = () => {
@@ -64,7 +65,9 @@ export const TutorCoursesTab = () => {
     }
   }, [dispatch]);
   const handleEditCourse = (courseId: string) => {
-    toast(`Editing course with ID: ${courseId}`);
+    // toast(`Editing course with ID: ${courseId}`);
+    dispatch(setActiveTab('create-course'));
+    dispatch(setEditMode({status:true,courseId:courseId}));
   }
 
   const handleMouseEnter = (courseId:string) => {

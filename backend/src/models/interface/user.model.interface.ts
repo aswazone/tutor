@@ -1,7 +1,7 @@
 import { UserRole } from "@/types/user.type";
 import { Document } from "mongoose";
 
-export interface UserModelIF extends Document {
+export interface IUserModel extends Document {
     userName: string;
     userEmail: string;
     name: string;

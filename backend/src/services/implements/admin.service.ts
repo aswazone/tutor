@@ -1,20 +1,29 @@
-import { AdminServiceIF } from "../interface/admin.service.interface";
+import { IAdminService } from "../interface/admin.service.interface";
 import { UserRole } from "@/types/user.type";
-import { AdminRepositoryIF } from "@/repositories/interface/admin.repository.interface";
-import { UserRepositoryIF } from "@/repositories/interface/user.repository.interface";
-import { CourseRepositoryIF } from "@/repositories/interface/course.repository.interface";
+import { IAdminRepository } from "@/repositories/interface/admin.repository.interface";
+import { IUserRepository } from "@/repositories/interface/user.repository.interface";
+import { ICourseRepository } from "@/repositories/interface/course.repository.interface";
 
-export class AdminService implements AdminServiceIF {
+export class AdminService implements IAdminService {
 
     constructor(
-        private readonly _adminRepository:AdminRepositoryIF,
-        private readonly _userRepository:UserRepositoryIF,
-        private readonly _courseRepository:CourseRepositoryIF
+        private readonly _adminRepository:IAdminRepository,
+        private readonly _userRepository:IUserRepository,
+        private readonly _courseRepository:ICourseRepository
     ) {}
 
-    getAllTutors = async () => this._adminRepository.findAll(UserRole.TUTOR);
-    getAllStudents = async () => this._adminRepository.findAll(UserRole.STUDENT);
-    getAllCourses = async () => this._courseRepository.findAll({isDeleted:false});
+    getAllTutors = async () => this._adminRepository.findAllUsers(UserRole.TUTOR);
+    getAllStudents = async () => this._adminRepository.findAllUsers(UserRole.STUDENT)
+    getAllCourses = async () => {
+    const courses = await this._courseRepository.findAllCourses(
+        { isDeleted: false },
+        { 
+            path: 'tutor',
+            select: 'userName'
+        }
+    );
+    return courses;
+}
     
     toggleUserStatus = async (id:string,status:string) => {
         console.log('----------------------------------------------------',status);

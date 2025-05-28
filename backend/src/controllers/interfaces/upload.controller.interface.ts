@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 
-export interface UploadControllerIF {
+export interface IUploadController {
     getPresignedUrl(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

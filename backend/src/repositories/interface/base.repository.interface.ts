@@ -1,6 +1,6 @@
 import { Document, FilterQuery, UpdateQuery } from 'mongoose';
 
-export interface BaseRepositoryIF<T extends Document> {
+export interface IBaseRepository<T extends Document> {
     create(data: Partial<T>): Promise<T>;
     findById(id: string): Promise<T | null>;
     findOne(filter: FilterQuery<T>): Promise<T | null>;

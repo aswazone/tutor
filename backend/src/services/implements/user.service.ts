@@ -1,6 +1,6 @@
-import { UserRepositoryIF } from "@/repositories/interface/user.repository.interface";
-import { AuthServiceIF } from "../interface/user.service.inteface";
-import { UserModelIF } from "@/models/interface/user.model.interface";
+import { IUserRepository } from "@/repositories/interface/user.repository.interface";
+import { IAuthService } from "../interface/user.service.inteface";
+import { IUserModel } from "@/models/interface/user.model.interface";
 import { createHttpError } from "@/utils/http-error.utils";
 import { HttpStatus } from "@/constants/status.constant";
 import { HttpResponse } from "@/constants/response.constant";
@@ -15,13 +15,15 @@ import { UserRole } from "@/types/user.type";
 import fetchGoogleUser from "@/utils/google-auth";
 import { generateNanoId } from "@/utils/generate-nanoid";
 
-export class AuthService implements AuthServiceIF {
-    constructor(private readonly _userRepository:UserRepositoryIF) {}
+export class AuthService implements IAuthService {
+    constructor(private readonly _userRepository:IUserRepository) {}
 
     signin = async ({role,userEmail,password}: {role:UserRole,userEmail:string,password:string})=> {
 
         const user = await this._userRepository.findOneByEmailOrUsername(userEmail);
         if(!user) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+
+        if(!user.isActive) throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.USER_BLOCKED);
 
         if (user.role !== role) {
             throw createHttpError(
@@ -41,9 +43,9 @@ export class AuthService implements AuthServiceIF {
         return {user:payload,accessToken,refreshToken};
     }
 
-    signup = async (user: UserModelIF): Promise<{userEmail:string}> => {
+    signup = async (user: IUserModel): Promise<{userEmail:string}> => {
 
-        const existingUser = await this._userRepository.findByEmail(user.userEmail);
+        const existingUser = await this._userRepository.findUserByEmail(user.userEmail);
         if(existingUser) throw createHttpError(HttpStatus.CONFLICT, HttpResponse.USER_EXIST);
         
         
@@ -91,7 +93,7 @@ export class AuthService implements AuthServiceIF {
 
         console.log(user);
 
-        const newUser = await this._userRepository.create(user);
+        const newUser = await this._userRepository.createUser(user);
         if(!newUser) throw createHttpError(HttpStatus.CONFLICT, HttpResponse.USER_CREATION_FAILED);
 
         await redisClient.del(email);
@@ -105,9 +107,10 @@ export class AuthService implements AuthServiceIF {
 
     forgotPassword = async (email:string)=> {
 
-        const userExist = await this._userRepository.findByEmail(email);
+        const userExist = await this._userRepository.findUserByEmail(email);
         if(!userExist) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
-        
+        if(!userExist.isActive) throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.USER_BLOCKED);
+
         const token = generateNanoId();
         const storedData = await redisClient.setEx(token, 300, userExist.userEmail);
 
@@ -125,8 +128,9 @@ export class AuthService implements AuthServiceIF {
         
         const hashedPassword = await hashPassword(password);
 
-        const userExist = await this._userRepository.findByEmail(storedEmail);
+        const userExist = await this._userRepository.findUserByEmail(storedEmail);
         if(!userExist) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+        if(!userExist.isActive) throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.USER_BLOCKED);
 
         const updatedUser = await this._userRepository.updatePassword(storedEmail,hashedPassword);
         if(!updatedUser) throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, HttpResponse.SERVER_ERROR);
@@ -156,9 +160,9 @@ export class AuthService implements AuthServiceIF {
 
         console.log('googleUser details:',JSON.stringify(googleUser));
 
-        const userExist = await this._userRepository.findByEmail(googleUser.email);
+        const userExist = await this._userRepository.findUserByEmail(googleUser.email);
         if(userExist) {
-
+            if(!userExist.isActive) throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.USER_BLOCKED);
             const payload = { id: userExist._id, role: userExist.role, userName: userExist.userName, userEmail: userExist.userEmail };
             const accessToken = generateAccessToken(payload);
             const refreshToken = generateRefreshToken(payload);
@@ -176,7 +180,7 @@ export class AuthService implements AuthServiceIF {
             password: 'itsdummypassword',
         }
 
-        const createdUser = await this._userRepository.create(user as UserModelIF);
+        const createdUser = await this._userRepository.createUser(user as IUserModel);
         if(!createdUser) throw createHttpError(HttpStatus.CONFLICT, HttpResponse.USER_CREATION_FAILED);
 
         const payload = { id: createdUser._id, role: createdUser.role, userName: createdUser.userName, userEmail: createdUser.userEmail };
@@ -184,6 +188,17 @@ export class AuthService implements AuthServiceIF {
         const refreshToken = generateRefreshToken(payload);
         
         return {user:payload,accessToken,refreshToken};
+    }
+
+    checkUserBlocked = async (userId:string) => {
+
+        const user = await this._userRepository.findUserById(userId);
+        if(!user) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+        console.log('user found');
+        if(!user.isActive) throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.USER_BLOCKED);
+        console.log('Active')
+        return {message:HttpResponse.USER_ACTIVE};
+        
     }
 
 }

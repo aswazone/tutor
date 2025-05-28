@@ -15,9 +15,14 @@ const GoogleAuth: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const googleLogin = useGoogleLogin({
         onSuccess: async (res) => {
-            await dispatch(googleSignin({token: res.access_token}));
-            localStorage.removeItem("userRole");
-            navigate("/home");
+            const response = await dispatch(googleSignin({token: res.access_token}));
+            if(googleSignin.fulfilled.match(response)){
+                localStorage.removeItem("userRole");
+                navigate("/home");
+                toast(`Welcome Back !`);
+            }else{
+                toast.error(response.payload);
+            }
         },
         onError: (error) => console.log("Login Failed:", error),
     });

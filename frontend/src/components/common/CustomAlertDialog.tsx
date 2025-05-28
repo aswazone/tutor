@@ -24,7 +24,7 @@ export function CustomAlertDialog({buttonText,handleSubmit,isDisabled}:{buttonTe
             <AlertDialogTitle className="text-xl font-semibold mb-3">Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
             This action cannot be undone. This will submit your course for
-            review and make sure that it is
+            review.<span className="text-red-500"> Don't forget to save. </span>And make sure that it is
               {
                 <span className="text-green-500 inline-block p-2">
                   <span className="text-green-500 flex bg-accent py-0.5 px-1 rounded">Publish <Switch className="data-[state=checked]:bg-green-400/60 ml-1" checked={true}/></span>

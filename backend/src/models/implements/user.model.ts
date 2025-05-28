@@ -1,9 +1,8 @@
 import {model, Schema } from "mongoose";
-import { UserModelIF } from "../interface/user.model.interface";
-import { string } from "zod";
+import { IUserModel } from "../interface/user.model.interface";
 
 
-const UserSchema = new Schema<UserModelIF>({
+const UserSchema = new Schema<IUserModel>({
     userName:{
         type: String,
         required:[true, 'User Name is required'],
@@ -47,4 +46,4 @@ const UserSchema = new Schema<UserModelIF>({
 
 },{timestamps:true});
 
-export const User = model<UserModelIF>('User', UserSchema);
+export const User = model<IUserModel>('User', UserSchema);

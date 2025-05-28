@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "@/types/auth.type";
 
-export interface CourseControllerIF {
+export interface ICourseController {
   createCourse: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
   updateCourse: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
   getInstructorCourses: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;

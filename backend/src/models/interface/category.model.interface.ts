@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-export interface SubCategoryModelIF extends Document {
+export interface ISubCategoryModel extends Document {
   name: string;
   isListed: boolean;
   coursesCount: number;

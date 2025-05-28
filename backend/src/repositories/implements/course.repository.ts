@@ -1,17 +1,17 @@
 import { BaseRepository } from '@/repositories/base.repository';
-import { CourseModelIF } from '@/models/interface/course.model.interface';
-import { CourseRepositoryIF } from '../interface/course.repository.interface';
+import { ICourseModel } from '@/models/interface/course.model.interface';
+import { ICourseRepository } from '../interface/course.repository.interface';
 import { CourseModel } from '@/models/implements/course.model';
 import { HttpError } from '@/utils/http-error.utils';
 import { HttpStatus } from '@/constants/status.constant';
-import { Types } from 'mongoose';
+import { PopulateOptions, Types } from 'mongoose';
 
-export class CourseRepository extends BaseRepository<CourseModelIF> implements CourseRepositoryIF {
+export class CourseRepository extends BaseRepository<ICourseModel> implements ICourseRepository {
   constructor() {
     super(CourseModel);
   }
 
-  async getByInstructor(instructorId: string): Promise<CourseModelIF[]> {
+  async getByInstructor(instructorId: string): Promise<ICourseModel[]> {
     try {
       if (!Types.ObjectId.isValid(instructorId)) {
         throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid instructor ID');
@@ -23,20 +23,26 @@ export class CourseRepository extends BaseRepository<CourseModelIF> implements C
     }
   }
 
-  async getById(id: string): Promise<CourseModelIF | null> {
-    try {
-      if (!Types.ObjectId.isValid(id)) {
-        throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course ID');
+  async getById(id: string, populate?: PopulateOptions): Promise<ICourseModel | null> {
+      try {
+          if (!Types.ObjectId.isValid(id)) {
+              throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course ID');
+          }
+          const query = this.model.findById(id);
+          
+          if (populate) {
+              query.populate(populate);
+          }
+
+          const course = await query.exec();
+          return course;
+      } catch (error) {
+          if (error instanceof HttpError) throw error;
+          throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch course');
       }
-      const course = await this.findById(id);
-      return course;
-    } catch (error) {
-      if (error instanceof HttpError) throw error;
-      throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch course');
-    }
   }
 
-  override async create(data: Partial<CourseModelIF>): Promise<CourseModelIF> {
+  override async create(data: Partial<ICourseModel>): Promise<ICourseModel> {
     try {
       if (!data.tutor || !Types.ObjectId.isValid(data.tutor.toString())) {
         throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid instructor ID');
@@ -48,15 +54,26 @@ export class CourseRepository extends BaseRepository<CourseModelIF> implements C
     }
   }
 
-  async findAll(options: {isDeleted?: boolean, isActive?: boolean, isVerified?: boolean}): Promise<CourseModelIF[]> {
-    console.log(options);
-    try {
-      const result = await super.find(options);
-      console.log(result);
-      return result;
-    } catch (error) {
-      if (error instanceof HttpError) throw error;
-      throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');
-    }
+  async findAllCourses(
+      options: {
+          isDeleted?: boolean,
+          isActive?: boolean,
+          isVerified?: boolean
+      },
+      populate?: PopulateOptions
+  ): Promise<ICourseModel[]> {
+      try {
+          const query = this.model.find(options);
+          
+          if (populate) {
+              query.populate(populate);
+          }
+
+          const result = await query.exec();
+          return result;
+      } catch (error) {
+          if (error instanceof HttpError) throw error;
+          throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');
+      }
   }
 }

@@ -1,13 +1,13 @@
 import { ICreateCourseDTO, ICourse } from '@/types/course.type';
 import { HttpError } from '@/utils/http-error.utils';
 
-import { CourseServiceIF } from '../interface/course.service.interface';
-import { CourseRepositoryIF } from '@/repositories/interface/course.repository.interface';
+import { ICourseService } from '../interface/course.service.interface';
+import { ICourseRepository } from '@/repositories/interface/course.repository.interface';
 import { Types } from 'mongoose';
 import { HttpStatus } from '@/constants/status.constant';
 
-export class CourseService implements CourseServiceIF {
-  constructor(private readonly _courseRepository: CourseRepositoryIF) {}
+export class CourseService implements ICourseService {
+  constructor(private readonly _courseRepository: ICourseRepository) {}
 
   createCourse = async (userId: string, courseData: ICreateCourseDTO): Promise<ICourse> => {
 
@@ -17,7 +17,7 @@ export class CourseService implements CourseServiceIF {
     console.log('---------------------------- course SErvice ------');
     
     
-      const course = await this._courseRepository.create({
+      const course = await this._courseRepository.createCourse({
         ...courseData.courseDetails,
         thumbnailKey: courseData.thumbnailKey,
         isPublished: courseData.isPublished,
@@ -51,7 +51,7 @@ export class CourseService implements CourseServiceIF {
 
 
   getAllCourses = async (): Promise<ICourse[]> => {
-    const courses = await this._courseRepository.findAll({isDeleted: false, isActive: true ,isVerified: true});
+    const courses = await this._courseRepository.findAllCourses({isDeleted: false, isActive: true ,isVerified: true});
     return courses;
   }
 
@@ -60,7 +60,10 @@ export class CourseService implements CourseServiceIF {
   }
 
   updateCourse = async (courseId: string, courseData: Partial<ICreateCourseDTO>): Promise<ICourse> => {
-
+        console.log(courseId);
+      if (!Types.ObjectId.isValid(courseId)) {
+        throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course ID');
+      }
       const course = await this._courseRepository.findById(courseId);
       if (!course) {
         throw new HttpError(HttpStatus.NOT_FOUND, 'Course not found');

@@ -9,7 +9,7 @@ export interface ISubCategoryCreateDTO extends ICategoryCreateDTO {
   parentId: string;
 }
 
-export interface CategoryServiceIF {
+export interface ICategoryService {
   createCategory(data: ICategoryCreateDTO): Promise<CategoryDocument>;
   createSubCategory(data: ISubCategoryCreateDTO): Promise<CategoryDocument>;
   getAllCategories(): Promise<CategoryDocument[]>;

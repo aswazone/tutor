@@ -1,12 +1,12 @@
 import { BaseRepository } from '@/repositories/base.repository';
 import { CategoryDocument } from '@/models/interface/category.model.interface';
-import { CategoryRepositoryIF } from '../interface/category.repository.interface';
+import { ICategoryRepository } from '../interface/category.repository.interface';
 import { CategoryModel } from '@/models/implements/category.model';
 import { HttpError } from '@/utils/http-error.utils';
 import { HttpStatus } from '@/constants/status.constant';
 import { Types } from 'mongoose';
 
-export class CategoryRepository extends BaseRepository<CategoryDocument> implements CategoryRepositoryIF {
+export class CategoryRepository extends BaseRepository<CategoryDocument> implements ICategoryRepository {
   constructor() {
     super(CategoryModel);
   }

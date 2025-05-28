@@ -9,6 +9,18 @@ export interface UploadCourseResult {
   validationErrors?: string[];
 }
 
+export interface UploadImageResult{
+  thumbnailKey: string;
+  thumbnailUploadStatus: "idle" | "uploading" | "success" | "error";
+  thumbnailUploadError?: string;
+}
+
+export interface UploadVideoResult {
+  videoKey: string | undefined;
+  videoUploadStatus: "idle" | "uploading" | "success" | "error";
+  videoUploadError?: string;
+}
+
 export interface SubmitCourseData {
   courseDetails: CourseLandingFormData;
   thumbnailKey: string;
