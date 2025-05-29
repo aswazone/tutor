@@ -194,9 +194,7 @@ export class AuthService implements IAuthService {
 
         const user = await this._userRepository.findUserById(userId);
         if(!user) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
-        console.log('user found');
         if(!user.isActive) throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.USER_BLOCKED);
-        console.log('Active')
         return {message:HttpResponse.USER_ACTIVE};
         
     }
