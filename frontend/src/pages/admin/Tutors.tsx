@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
 import { DataTable } from "@/components/common/DataTable"
 import { Button } from "@/components/ui/button"
-import { ArrowUpDown, FileText } from "lucide-react"
+import { ArrowUpDown, Check, FileText, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ColumnDef } from "@tanstack/react-table"
 import axiosInstance from "@/config/axios.config"
@@ -54,7 +54,7 @@ const Tutors = () => {
       header: "Status",
       cell: ({ row }) => (
         <Badge variant={
-          row.getValue("isVerified") === "verified" ? "default" :
+          row.getValue("isVerified") === "verified" ? "outline" :
           row.getValue("isVerified") === "pending" ? "secondary" :
           "destructive"
         }>
@@ -66,10 +66,25 @@ const Tutors = () => {
       accessorKey: "isActive",
       header: "Active",
       cell: ({ row }) => (
-        <Badge variant={row.getValue("isActive") ? "default" : "destructive"}>
-          {row.getValue("isActive") ? "Active" : "Inactive"}
-        </Badge>
-      ),
+      <div className="flex justify-center">
+        {row.getValue("isActive") ? (
+          <Check className="h-5 w-5 text-green-500" />
+        ) : (
+          <X className="h-5 w-5 text-red-500" />
+        )}
+      </div>
+    ),
+    },
+    {
+      accessorKey: "coursesCount",
+      header: "Courses",
+      cell: ({ row }) => {
+        return (
+          <Badge variant="secondary" className="w-full justify-center">
+            {row.getValue("coursesCount") || 0}
+          </Badge>
+        )
+      },
     },
     {
       id: "details",
@@ -121,6 +136,38 @@ const Tutors = () => {
     fetchTutors();
   };
 
+
+
+
+  const handleToggleStatus = async (tutor: Tutor) => {
+      try {
+        const response = await axiosInstance.patch(`/api/v1/admin/toggle-user-status/${tutor._id}/${tutor.isActive}`);
+  
+        const updatedTutors = tutors.map((t) => {
+          if (t._id === tutor._id) {
+            return { ...t, isActive: !t.isActive };
+          }
+          return t;
+        });
+        setTutors(updatedTutors);
+        toast.success("Status updated successfully");
+  
+        console.log("Status updated:", response.data);
+      } catch (error) {
+        console.error("Error updating status:", error);
+      }
+    };
+  
+    const handleAction = (action: string, tutor: Tutor) => {
+      switch (action) {
+        case "status":
+          console.log("Block/Unblock tutor", tutor)
+          handleToggleStatus(tutor)
+          break
+      }
+    }
+
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -151,6 +198,13 @@ const Tutors = () => {
               filterPlaceholder="Search by username"
               columns={columns} 
               data={approvedTutors}
+              onSelectionChange={(selectedTutors) => {
+                console.log("Selected tutors:", selectedTutors)
+              }}
+              actionItems={[
+                { label: "Block/Unblock", action: "status" },
+              ]}
+              onRowActionSelect={handleAction}
             />
         </TabsContent>
         

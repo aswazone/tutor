@@ -73,7 +73,7 @@ export function TutorDetailsDialog({
           <DialogTitle className="flex items-center gap-2">
             Tutor Profile
             <Badge variant={
-              tutor?.isVerified === 'verified' ? 'default' :
+              tutor?.isVerified === 'verified' ? 'outline' :
               tutor?.isVerified === 'pending' ? 'secondary' :
               'destructive'
             }>
@@ -85,7 +85,7 @@ export function TutorDetailsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {tutor && tutor.tutorDetails && (
+        {tutor && tutor.tutorDetails ? (
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <h4 className="font-medium">Basic Information</h4>
@@ -97,6 +97,10 @@ export function TutorDetailsDialog({
                 <div>
                   <Label>Email</Label>
                   <p className="text-sm text-muted-foreground">{tutor.userEmail}</p>
+                </div>
+                <div>
+                  <Label>Join date</Label>
+                  <p className="text-sm text-muted-foreground">{new Date(tutor.createdAt).toDateString()}</p>
                 </div>
               </div>
             </div>
@@ -190,7 +194,7 @@ export function TutorDetailsDialog({
               </div>
             )}
           </div>
-        )}
+        ): <p className="text-red-600/70">No details found</p>}
       </DialogContent>
     </Dialog>
   );

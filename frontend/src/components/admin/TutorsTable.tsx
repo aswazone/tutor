@@ -11,7 +11,6 @@ export interface Tutor {
   name: string
   email: string
   rating: number
-  isVerified: string
   coursesCount: number
   joinDate: string
   isActive: boolean
