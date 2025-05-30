@@ -1,7 +1,9 @@
 import { IUserModel } from "@/models/interface/user.model.interface";
-import { UserRole } from "@/types/user.type";
+import { UserRole, UserStatus } from "@/types/user.type";
 
 export interface IAuthService {
+    tutorVerify({userId,status,tutorDetails}: {userId:string,status:UserStatus,tutorDetails?:Partial<IUserModel>['tutorDetails']}): Promise<{ message: string}>
+    getUserById(id: string): Promise<IUserModel | null>;
     signin(data:{role:UserRole,userEmail:string,password:string}): Promise<{user:Partial<IUserModel>,accessToken:string,refreshToken:string}>;
     signup(data: Partial<IUserModel>): Promise<{userEmail:string}>;
     verifyOtp(data:{otp:string,email:string}): Promise<{user:Partial<IUserModel>,accessToken:string,refreshToken:string}>;

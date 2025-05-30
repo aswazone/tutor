@@ -4,6 +4,13 @@ export enum UserRole {
     ADMIN = 'admin'
 }
 
+export enum UserStatus {
+    VERIFIED = 'verified',
+    PENDING = 'pending',
+    REJECTED = 'rejected',
+    UNVERIFIED = 'unverified'
+}
+
 export interface UserResponse {
     id: number;
     userName: string;

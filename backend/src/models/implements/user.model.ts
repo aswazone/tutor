@@ -1,5 +1,6 @@
 import {model, Schema } from "mongoose";
 import { IUserModel } from "../interface/user.model.interface";
+import { UserStatus } from "@/types/user.type";
 
 
 const UserSchema = new Schema<IUserModel>({
@@ -39,6 +40,23 @@ const UserSchema = new Schema<IUserModel>({
         type: Boolean,
         default: false
     },
+    isVerified: {
+        type: String,
+        enum: ['verified', 'pending','unverified', 'rejected'],
+        default: UserStatus.UNVERIFIED
+    },
+    tutorDetails: {
+        type: {
+            qualification:{type: String, default: ''},
+            experience: {type: Number, default: 0},
+            expertise: {type: String, default: ''},
+            about: {type: String, default: ''},
+            resume: {type: String, default: ''},
+            rejectReason: {type: String, default: ''},
+        },
+        default: null
+    },
+    profileImage: {type: String, default: ''},
     wishlist:[{
         type:Schema.Types.ObjectId,
         ref:'Course'

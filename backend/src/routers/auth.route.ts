@@ -13,6 +13,8 @@ authRouter.post("/forgot-password", authController.forgotPassword);
 authRouter.post("/reset-password", authController.resetPassword);
 authRouter.post("/refresh-token", authController.refreshAccessToken);
 authRouter.post("/check-user-blocked", authenticateToken, authController.checkUserBlocked);
+authRouter.get("/", authenticateToken, authController.getUser);
+authRouter.patch("/tutor-verify/:tutorId/:status", authenticateToken, authController.tutorVerify);
 
 
 export default authRouter;
