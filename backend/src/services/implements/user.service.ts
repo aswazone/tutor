@@ -11,7 +11,7 @@ import { generateUniqueUsername } from "@/utils/generate-unique-username.utils";
 import {generateAccessToken,generateRefreshToken, verifyRefreshToken} from "@/utils";
 import { comparePassword, hashPassword } from "@/utils/bcrypt.utils";
 import { JwtPayload } from "jsonwebtoken";
-import { UserRole } from "@/types/user.type";
+import { UserRole, UserStatus } from "@/types/user.type";
 import fetchGoogleUser from "@/utils/google-auth";
 import { generateNanoId } from "@/utils/generate-nanoid";
 
@@ -40,7 +40,7 @@ export class AuthService implements IAuthService {
         const accessToken = generateAccessToken(payload);
         const refreshToken = generateRefreshToken(payload);
 
-        return {user:payload,accessToken,refreshToken};
+        return {user:user,accessToken,refreshToken};
     }
 
     signup = async (user: IUserModel): Promise<{userEmail:string}> => {
@@ -102,7 +102,7 @@ export class AuthService implements IAuthService {
         const accessToken = generateAccessToken(payload);
         const refreshToken = generateRefreshToken(payload);
         
-        return {user:payload,accessToken,refreshToken};
+        return {user:newUser,accessToken,refreshToken};
     }
 
     forgotPassword = async (email:string)=> {
@@ -167,7 +167,7 @@ export class AuthService implements IAuthService {
             const accessToken = generateAccessToken(payload);
             const refreshToken = generateRefreshToken(payload);
         
-            return {user:payload,accessToken,refreshToken};
+            return {user:userExist,accessToken,refreshToken};
         }
 
         const uniqueUsername = await generateUniqueUsername(googleUser.name);
@@ -187,7 +187,7 @@ export class AuthService implements IAuthService {
         const accessToken = generateAccessToken(payload);
         const refreshToken = generateRefreshToken(payload);
         
-        return {user:payload,accessToken,refreshToken};
+        return {user:createdUser,accessToken,refreshToken};
     }
 
     checkUserBlocked = async (userId:string) => {
@@ -197,6 +197,69 @@ export class AuthService implements IAuthService {
         if(!user.isActive) throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.USER_BLOCKED);
         return {message:HttpResponse.USER_ACTIVE};
         
+    }
+
+    getUserById(id: string): Promise<IUserModel | null> {
+        return this._userRepository.findUserById(id);
+    }    
+    tutorVerify = async ({ userId, status, tutorDetails }: { userId: string; status: UserStatus; tutorDetails?: Partial<IUserModel['tutorDetails']> }) => {
+        console.log(userId, status, tutorDetails, 'user service');
+        
+        if(userId && status ){
+            const user = await this._userRepository.findUserById(userId);
+            if(!user) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+
+            let update: Partial<IUserModel> = {};
+
+            if(status === 'pending') {
+                update = {
+                    role: user.role === UserRole.STUDENT ? UserRole.TUTOR : user.role,
+                    isVerified: status,
+                    tutorDetails: tutorDetails ? {
+                        qualification: tutorDetails.qualification || '',
+                        experience: Number(tutorDetails.experience) || 0,
+                        expertise: tutorDetails.expertise || '',
+                        about: tutorDetails.about || '',
+                        resume: tutorDetails.resume || '',
+                        rejectReason: tutorDetails.rejectReason || ''
+                    } : undefined
+                };
+            }else if(status === 'rejected') {
+                update = { 
+                    isVerified: status,
+                    tutorDetails: user.tutorDetails && tutorDetails ? {
+                        qualification: user.tutorDetails.qualification || '',
+                        experience: Number(user.tutorDetails.experience) || 0,
+                        expertise: user.tutorDetails.expertise || '',
+                        about: user.tutorDetails.about || '',
+                        resume: user.tutorDetails.resume || '',
+                        rejectReason: tutorDetails.rejectReason || ''
+                    } : undefined
+                };
+            }else{
+                update = { 
+                    isVerified: status,
+                    tutorDetails: user.tutorDetails ? {
+                        qualification: user.tutorDetails.qualification || '',
+                        experience: Number(user.tutorDetails.experience) || 0,
+                        expertise: user.tutorDetails.expertise || '',
+                        about: user.tutorDetails.about || '',
+                        resume: user.tutorDetails.resume || '',
+                        rejectReason: user.tutorDetails.rejectReason || ''
+                    } : undefined
+                };
+            }
+
+            console.log(update,'update');
+            
+            const newUser = await this._userRepository.updateUser(userId, update);
+            console.log(newUser,'newUser');    
+
+            if(!newUser) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+            return { message: HttpResponse.RESOURCE_UPDATED };
+        }
+
+        return { message:'no change' };
     }
 
 }

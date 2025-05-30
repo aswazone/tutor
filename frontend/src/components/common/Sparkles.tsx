@@ -8,7 +8,7 @@ const starVariants: Variants = {
     scale: 1,
   },
   animate: {
-    scale: [1, 1.1, 1],
+    scale: [1, 1.13, 1],
     transition: {
       duration: 2,
       ease: "easeInOut",

@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { HttpStatus } from "@/constants/status.constant";
 import { setCookie } from "@/utils/cookies.utils";
 import { AuthenticatedRequest } from "@/types/auth.type";
+import { UserStatus } from "@/types/user.type";
 
 export class AuthController implements IAuthController{
     constructor(private readonly _authService:IAuthService) {}
@@ -84,6 +85,27 @@ export class AuthController implements IAuthController{
         try {
             const userId = req.user?.id;
             const {message} = await this._authService.checkUserBlocked(userId as string);
+            res.status(HttpStatus.OK).json({message});
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    getUser = async (req:AuthenticatedRequest, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const userId = req.user?.id;
+            const user = await this._authService.getUserById(userId as string);
+            res.status(HttpStatus.OK).json(user);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    tutorVerify = async (req:AuthenticatedRequest, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const extraData = req.body;
+            console.log(extraData);
+            const {message} = await this._authService.tutorVerify({userId:req.params.tutorId,status:req.params.status as UserStatus                         ,tutorDetails:{...extraData}});
             res.status(HttpStatus.OK).json({message});
         } catch (err) {
             next(err);

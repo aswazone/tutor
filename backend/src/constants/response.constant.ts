@@ -1,4 +1,5 @@
 export const HttpResponse = {
+    USER_STATUS_CHANGE_SUCCESS: "User status changed successfully",
     SERVER_ERROR: "Internal server error",
     USER_EXIST: "User already exist",
     USER_ACTIVE: "User active",

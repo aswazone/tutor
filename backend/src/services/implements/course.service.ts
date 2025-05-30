@@ -17,7 +17,7 @@ export class CourseService implements ICourseService {
     console.log('---------------------------- course SErvice ------');
     
     
-      const course = await this._courseRepository.createCourse({
+      const course = await this._courseRepository.create({
         ...courseData.courseDetails,
         thumbnailKey: courseData.thumbnailKey,
         isPublished: courseData.isPublished,

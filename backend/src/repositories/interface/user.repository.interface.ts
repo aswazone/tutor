@@ -4,6 +4,8 @@ import { UpdateQuery } from "mongoose";
 
 
 export interface IUserRepository {
+    updateUser(id: string, tutorDetails: Partial<IUserModel>): Promise<IUserModel | null>;
+    findByIdChangeStatus(id: string, status: string): Promise<IUserModel | null>;
     createUser(data: Partial<IUserModel>): Promise<IUserModel>;
     findUserById(id: string): Promise<IUserModel | null>;
     findUserByEmail(email: string): Promise<IUserModel | null>;

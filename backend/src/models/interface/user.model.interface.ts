@@ -1,4 +1,4 @@
-import { UserRole } from "@/types/user.type";
+import { UserRole, UserStatus } from "@/types/user.type";
 import { Document } from "mongoose";
 
 export interface IUserModel extends Document {
@@ -8,7 +8,16 @@ export interface IUserModel extends Document {
     password: string;
     isActive: boolean;
     isDeleted: boolean;
-    specialization?: string;
+    isVerified: UserStatus;
+    tutorDetails?:{
+        qualification?: string;
+        experience?: number;
+        expertise?: string;
+        about?: string;
+        resume?: string;
+        rejectReason?: string;
+    }
+    profileImage?: string;
     rating?: number;
     role: UserRole;
     createdAt: Date;
