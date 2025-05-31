@@ -30,6 +30,8 @@ export interface ICourse extends Document {
   welcomeMessage?: string;
   thumbnailKey: string;
   isPublished: boolean;
+  isVerified?: string;
+  rejectReason?: string;
   modules: IModule[];
   tutor: Types.ObjectId;
   createdAt: Date;

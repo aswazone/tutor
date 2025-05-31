@@ -4,6 +4,11 @@ import axiosInstance from "@/config/axios.config"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
 import { useEffect, useState } from "react"
 import { Loader } from "lucide-react"
+import { CourseDetailsDialog } from "@/components/admin/CourseDetailsDialog"
+import { verifyCourse } from "@/store/admin/adminSlice"
+import { toast } from "sonner"
+import { useDispatch } from "react-redux"
+import { AppDispatch } from "@/store"
 
 
 interface ApiCourses {
@@ -22,7 +27,8 @@ interface ApiCourses {
   category: string;
   isDeleted: boolean;
   createdAt: Date;
-  isVerified: boolean;
+  isVerified: string;
+  rejectReason?: string
 }
 
 export interface Course {
@@ -32,7 +38,8 @@ export interface Course {
   category: string
   thumbnailKey: string
   level: string
-  isVerified: boolean
+  isVerified: string
+  rejectReason?: string
   isActive: boolean
   price: string
   enrollments: number
@@ -45,6 +52,8 @@ const Courses = () => {
   const [pendingCourses, setPendingCourses] = useState<Course[]>([]);
   const [selectedTab, setSelectedTab] = useState('approved');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     
   const fetchCourses = async () => {
     try {
@@ -58,6 +67,7 @@ const Courses = () => {
         category: course.category,
         isDeleted: course.isDeleted,
         isVerified: course.isVerified,
+        rejectReason: course.rejectReason,
         isActive: course.isActive,
         level: course.level,
         tutor: course.tutor?.userName,
@@ -73,8 +83,8 @@ const Courses = () => {
       }));
 
       // Split courses based on verification status
-      const approved = transformedCourses.filter((course: Course) => course.isVerified);
-      const pending = transformedCourses.filter((course: Course) => !course.isVerified);
+      const approved = transformedCourses.filter((course: Course) => course.isVerified === 'verified');
+      const pending = transformedCourses.filter((course: Course) => course.isVerified !== 'verified');
 
       setApprovedCourses(approved);
       setPendingCourses(pending);
@@ -84,6 +94,20 @@ const Courses = () => {
       setIsLoading(false);
     }
   };
+
+
+  const dispatch = useDispatch<AppDispatch>();
+  
+    const handleCourseVerified = async (courseId: string, isVerified: string ,rejectReason?: string) => {
+      try {
+        await dispatch(verifyCourse({ courseId, isVerified, rejectReason })).unwrap();
+        toast.success(`Course ${isVerified === 'verified' ? 'approved' : 'rejected'} successfully`);
+        fetchCourses();
+      } catch (error) {
+        toast.error('Failed to update course status');
+        console.error('Verification error:', error);
+      }
+    };
 
   useEffect(() => {
     fetchCourses();
@@ -118,12 +142,18 @@ const Courses = () => {
           </div>
         </TabsList>
         <TabsContent value="approved">
-          <CoursesTable courses={approvedCourses} setCourses={setApprovedCourses} />
+          <CoursesTable setIsDetailsOpen={setIsDetailsOpen} setSelectedCourse={setSelectedCourse} courses={approvedCourses} setCourses={setApprovedCourses} />
         </TabsContent>
         <TabsContent value="pending">
-          <PendingApprovalCourses courses={pendingCourses} onCourseVerified={fetchCourses} />
+          <PendingApprovalCourses setIsDetailsOpen={setIsDetailsOpen} setSelectedCourse={setSelectedCourse} courses={pendingCourses}/>
         </TabsContent>  
       </Tabs>
+      <CourseDetailsDialog
+          course={selectedCourse}
+          isOpen={isDetailsOpen}
+          onOpenChange={setIsDetailsOpen}
+          onStatusChange={handleCourseVerified}
+      />
     </>
   );
 }

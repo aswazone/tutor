@@ -13,11 +13,11 @@ const initialState: AdminState = {
 
 export const verifyCourse = createAsyncThunk<
   { message: string },
-  { courseId: string; isVerified: boolean },
+  { courseId: string; isVerified: string ,rejectReason?: string},
   { rejectValue: string }
->('admin/verifyCourse', async ({ courseId, isVerified }, { rejectWithValue }) => {
+>('admin/verifyCourse', async ({ courseId, isVerified ,rejectReason}, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.patch(`/api/v1/courses/${courseId}/verify/${isVerified}`);
+    const response = await axiosInstance.patch(`/api/v1/courses/${courseId}/verify/${isVerified}`, {rejectReason});
     return response.data;
   } catch (err) {
     const message = axiosErrorMessage(err);

@@ -14,7 +14,7 @@ export interface Course {
   isActive: boolean
   thumbnailKey: string;
   level: string;
-  isVerified: boolean;
+  isVerified: string;
   price: string
   enrollments: number
   rating: number
@@ -116,7 +116,11 @@ const columns: ColumnDef<Course>[] = [
   },
 ]
 
-export function CoursesTable({courses,setCourses}: {courses: Course[],setCourses: React.Dispatch<React.SetStateAction<Course[]>>}) {
+export function CoursesTable({courses,setCourses,setSelectedCourse,setIsDetailsOpen}: 
+  {courses: Course[],
+    setCourses: React.Dispatch<React.SetStateAction<Course[]>>,
+    setIsDetailsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    setSelectedCourse: React.Dispatch<React.SetStateAction<Course | null>>}) {
 
 
 const handleToggleStatus = async (course: Course) => {
@@ -143,6 +147,8 @@ const handleToggleStatus = async (course: Course) => {
   const handleAction = (action: string, course: Course) => {
     switch (action) {
       case "view":
+        setSelectedCourse(course)
+        setIsDetailsOpen(true)
         console.log("View course", course)
         break
       case "status":

@@ -77,8 +77,13 @@ const CourseSchema = new Schema({
     default: 0
   },
   isVerified: {
-    type: Boolean,
-    default: false
+    type: String,
+    enum: ['pending', 'verified', 'rejected'],
+    default: 'pending'
+  },
+  rejectReason:{
+    type: String,
+    default: ''
   },
   isActive: {
     type: Boolean,

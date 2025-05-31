@@ -3,6 +3,11 @@ import { ICourse } from '@/types/course.type';
 
 // Remove Document from ICourse since we'll extend it here
 export type CourseDocumentProps = Omit<ICourse, keyof Document>;
+export enum CourseStatus  {
+    VERIFIED = 'verified',
+    PENDING = 'pending',
+    REJECTED = 'rejected'
+};
 
 export interface ICourseModel extends Document {
     title: string;
@@ -35,7 +40,8 @@ export interface ICourseModel extends Document {
     isPublished: boolean;
     rating: number;
     isActive: boolean;
-    isVerified: boolean;
+    isVerified: CourseStatus;
+    rejectReason?: string;
     createdAt: Date;
     updatedAt: Date;
 }

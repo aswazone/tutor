@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { ICourseController } from '../interfaces/course.controller.interface';
 import { ICourseService } from '@/services/interface/course.service.interface';
 import { AuthenticatedRequest } from '@/types/auth.type';
+import { CourseStatus } from '@/models/interface/course.model.interface';
 
 export class CourseController implements ICourseController {
   constructor(private readonly _courseService: ICourseService) {}  
@@ -78,10 +79,11 @@ export class CourseController implements ICourseController {
   verifyCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { courseId, status } = req.params;
-      const isVerified = status === 'true';
+      const {rejectReason} = req.body;
+      const isVerified = status as CourseStatus;
       
-      await this._courseService.verifyCourse(courseId, isVerified);
-      res.json({ message: `Course ${isVerified ? 'approved' : 'unapproved'} successfully` });
+      await this._courseService.verifyCourse(courseId, isVerified, rejectReason ? rejectReason : '');
+      res.json({ message: `Course ${isVerified === CourseStatus.VERIFIED ? 'approved' : 'unapproved'} successfully` });
     } catch (error) {
       next(error);
     }

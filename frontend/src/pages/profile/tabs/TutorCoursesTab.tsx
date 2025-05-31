@@ -15,6 +15,9 @@ import { env } from '@/config/env.config';
 import { deleteCourse, fetchTutorCourses, toggleCourseStatus } from '@/store/fetch';
 import { DeleteConfirmDialog } from '@/components/common/DeleteConfirmDialog';
 import { setEditMode } from '@/store/course';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import CustomAlert from '@/components/common/CustomAlert';
+import axiosInstance from '@/config/axios.config';
 
 
 export const TutorCoursesTab = () => {
@@ -78,6 +81,20 @@ export const TutorCoursesTab = () => {
     setTooltipStates((prevStates) => ({ ...prevStates, [courseId]: false }));
   };
 
+  const handleVerifyRequest = async(courseId: string, isVerified: string, rejectReason?: string) =>{
+
+    console.log(courseId, isVerified, rejectReason);
+    
+    try {
+      toast('Requested..');
+      await axiosInstance.patch(`/api/v1/courses/${courseId}/verify/${isVerified}`, { rejectReason });
+      await dispatch(fetchTutorCourses()).unwrap();
+    } catch (error) {
+      toast.error('Failed to update course status');
+      console.error('Toggle status error:', error);
+    }
+
+  }
 
 
   if (isLoading) {
@@ -165,7 +182,7 @@ export const TutorCoursesTab = () => {
                 )}
               </motion.div>
               <Card className={
-                course.isVerified && course.isActive
+                course.isVerified === 'verified' && course.isActive
                 ? `pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-500/20 transition-all duration-300`
                 : 'grayscale-50 opacity-50 pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-500/20 transition-all duration-300'}>
                 <DeleteConfirmDialog  
@@ -176,9 +193,50 @@ export const TutorCoursesTab = () => {
                     onClose={() => setOpenDailog(false)} 
                 />
                 <div className="relative aspect-video overflow-hidden">
-                  {!course.isVerified && <Badge className='absolute z-20 top-20 left-20 bg-black/50 text-white'><Loader className="w-4 h-4" /> Verifying...</Badge>}
+                  {course.isVerified === 'pending' && <Badge className='absolute z-20 top-20 left-20 bg-black/50 text-white'><Loader className="w-4 h-4" /> Verifying...</Badge>}
+                  {course.isVerified === 'rejected' && (
+                          <HoverCard>
+                            <HoverCardTrigger asChild>  
+                              <Badge variant={'outline'} className='absolute z-20 top-20 left-20 bg-black/50 text-white'><ShieldAlert size={16}/> Rejected</Badge>
+                            </HoverCardTrigger>
+                            <HoverCardContent className="relative w-70 mt-20 bg-card/95 backdrop-blur-lg rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none border-sky-900/40 shadow-[0px_17px_22px_4px_rgba(3,_7,_13,_0.95)]">
+                              <div className="absolute inset-y-auto left-0 h-80% w-px bg-neutral-200/80 dark:bg-neutral-800/80">
+                                <div className="absolute top-0 h-50% w-px bg-gradient-to-b from-transparent via-sky-500 to-transparent" />
+                              </div>
+                              <div className="absolute inset-x-3 top-0 h-px w-80% bg-neutral-200/80 dark:bg-neutral-800/80">
+                                <div className="absolute mx-auto h-px w-30 bg-gradient-to-r from-transparent via-sky-500 to-transparent" />
+                              </div>
+                              
+                              <div className="flex-col justify-between space-x-4">
+                                <div className="space-y-2">
+                                    {course?.isVerified === 'rejected' && course?.rejectReason && <CustomAlert 
+                                      className="bg-red-950/10 text-red-400/50 hover:text-red-400/60 hover:bg-red-950/30"
+                                      title="Admin Rejected !" 
+                                      description={course?.rejectReason || "No reason provided."} 
+                                      isLoading={false}
+                                      />}
+                                  
+                                    <div className="flex items-center text-xs text-muted-foreground">
+                                      <span className='text-[10px] text-muted-foreground'>~ for re-verify, click on the button below or edit the course.</span>
+                                    </div>                                  
+                                  <div className="flex items-center justify-between gap-2 pt-2">
+                                    <button
+                                      onClick={()=> handleVerifyRequest(course._id, 'pending', '')}
+                                      className="text-white px-3 py-1 text-xs rounded-tl-md rounded-br-md bg-gradient-to-br from-sky-900/30 to-sky-900/60 
+                                        border border-sky-800/30 hover:from-sky-900/40 hover:to-sky-900/70 
+                                        transition-colors"
+                                    >
+                                      Request Verify
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </HoverCardContent>
+                          </HoverCard>
+                        )
+                    }
                   {!course.isActive && <Badge variant={'destructive'} className='absolute z-20 top-20 left-23 bg-black/50 text-white'>Blocked</Badge>}
-                  {course.isVerified && 
+                  {course.isVerified !== 'pending' && 
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -191,7 +249,7 @@ export const TutorCoursesTab = () => {
                     
                     <Trash size={16}/>
                   </Button>}             
-                  {course.isVerified && 
+                  {course.isVerified !== 'pending' && 
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();

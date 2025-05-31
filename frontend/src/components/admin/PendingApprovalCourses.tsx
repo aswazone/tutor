@@ -1,13 +1,8 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { Check, X, ArrowUpDown } from "lucide-react"
+import { Check, X, ArrowUpDown, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/common/DataTable"
 import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
-import { useDispatch } from "react-redux"
-import { AppDispatch } from "@/store"
-import { verifyCourse } from "@/store/admin/adminSlice"
-import { toast } from "sonner"
 
 export interface Course {
   id: string
@@ -18,30 +13,19 @@ export interface Course {
   enrollments: number
   rating: number
   status: "draft" | "published" | "archived"
+  thumbnailKey: string
+  level: string
+  isVerified: string
+  isActive: boolean
 }
 
 interface PendingApprovalCoursesProps {
   courses: Course[];
-  onCourseVerified: () => void;
-}
+  setIsDetailsOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  setSelectedCourse: React.Dispatch<React.SetStateAction<Course | null>>}
 
-export function PendingApprovalCourses({ courses, onCourseVerified }: PendingApprovalCoursesProps) {
-  const dispatch = useDispatch<AppDispatch>();
-  const [loadingCourseId, setLoadingCourseId] = useState<string>("");
-
-  const handleCourseVerification = async (courseId: string, isVerified: boolean) => {
-    try {
-      setLoadingCourseId(courseId);
-      await dispatch(verifyCourse({ courseId, isVerified })).unwrap();
-      toast.success(`Course ${isVerified ? 'approved' : 'rejected'} successfully`);
-      onCourseVerified(); // Refresh the course list
-    } catch (error) {
-      toast.error('Failed to update course status');
-      console.error('Verification error:', error);
-    } finally {
-      setLoadingCourseId("");
-    }
-  };
+export function PendingApprovalCourses({ courses, setIsDetailsOpen, setSelectedCourse }: PendingApprovalCoursesProps) {
+  
 
   const columns: ColumnDef<Course>[] = [
     {
@@ -73,39 +57,45 @@ export function PendingApprovalCourses({ courses, onCourseVerified }: PendingApp
       header: "Price",
     },
     {
-      accessorKey: "status",
+      accessorKey: "isActive",
+      header: "Active",
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          {row.getValue("isActive") ? (
+            <Check className="h-5 w-5 text-green-500" />
+          ) : (
+            <X className="h-5 w-5 text-red-500" />
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "isVerified",
       header: "Status",
       cell: ({ row }) => (
-        <Badge variant={row.getValue("status") === "published" ? "default" : "secondary"}>
-          {row.getValue("status")}
+        <Badge variant={row.getValue("isVerified") === "rejected" ? "destructive" : "outline"}>
+          {row.getValue("isVerified")}
         </Badge>
       ),
     },
     {
-      id: "actions",
+      header: "Details",
+      id: "details",
       cell: ({ row }) => {
         const course = row.original;
-        const isLoading = loadingCourseId === course.id;
-
         return (
-          <div className="space-x-2">
-            <Button 
-              variant="outline" 
-              className="bg-green-500/10 hover:bg-green-500/20 text-green-500"
-              onClick={() => handleCourseVerification(course.id, true)}
-              disabled={isLoading}
-            >
-              <Check className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="outline" 
-              className="bg-red-500/10 hover:bg-red-500/20 text-red-500"
-              onClick={() => handleCourseVerification(course.id, false)}
-              disabled={isLoading}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              console.log("View course details:", course);
+              setSelectedCourse(course);
+              setIsDetailsOpen(true);
+            }}
+            className="hover:bg-sky-500/20 text-sky-500"
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
         );
       },
     },

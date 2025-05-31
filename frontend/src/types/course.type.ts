@@ -32,7 +32,8 @@ export interface ICourse {
   modules: IModule[];
   tutor: string;
   rating?:string;
-  isVerified?: boolean; 
+  isVerified?: string; 
+  rejectReason?: string;
   isActive?: boolean;
   isPublished: boolean;
   createdAt: string;

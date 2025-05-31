@@ -5,6 +5,7 @@ import { ICourseService } from '../interface/course.service.interface';
 import { ICourseRepository } from '@/repositories/interface/course.repository.interface';
 import { Types } from 'mongoose';
 import { HttpStatus } from '@/constants/status.constant';
+import { CourseStatus } from '@/models/interface/course.model.interface';
 
 export class CourseService implements ICourseService {
   constructor(private readonly _courseRepository: ICourseRepository) {}
@@ -70,6 +71,7 @@ export class CourseService implements ICourseService {
       }
 
       const updateData = {
+        isVerified: 'pending',
         ...(courseData.courseDetails || {}),
         ...(courseData.thumbnailKey && { thumbnailKey: courseData.thumbnailKey }),
         ...(courseData.modules && { modules: courseData.modules })
@@ -91,7 +93,7 @@ export class CourseService implements ICourseService {
     }
   }
 
-  verifyCourse = async (courseId: string, isVerified: boolean): Promise<void> => {
+  verifyCourse = async (courseId: string, isVerified: CourseStatus, rejectReason?: string): Promise<void> => {
     if (!Types.ObjectId.isValid(courseId)) {
       throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course ID');
     }
@@ -103,7 +105,7 @@ export class CourseService implements ICourseService {
 
     await this._courseRepository.findByIdAndUpdate(
       courseId,
-      { isVerified },
+      { isVerified , rejectReason: rejectReason ? rejectReason : '' },
       { new: true }
     );
   }
