@@ -52,6 +52,8 @@ export interface ICreateCourseDTO {
   };
   thumbnailKey: string;
   isPublished: boolean;
+  publishDate?: Date;
+  isScheduled?: boolean;
   modules: IModule[];
 }
 

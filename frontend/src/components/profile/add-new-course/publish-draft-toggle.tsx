@@ -10,7 +10,7 @@ export function PublishDraftToggle({isPublished, setIsPublished}: {isPublished: 
       <Switch
         className="data-[state=checked]:bg-green-400/60"
         id="publish-draft-toggle"
-        defaultChecked={isPublished}
+        checked={isPublished}
         onCheckedChange={() => setIsPublished(!isPublished)}
       />
     </div>

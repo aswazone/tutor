@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import CourseCurriculum from "@/components/profile/add-new-course/course-curriculum"
@@ -16,6 +16,7 @@ import { PublishDraftToggle } from "@/components/profile/add-new-course/publish-
 import axiosInstance from "@/config/axios.config"
 import { Button } from "@/components/ui/button"
 import { setActiveTab } from "@/store/auth/authSlice"
+import { PublishScheduleDialog } from "@/components/profile/add-new-course/public-schedule-dailog"
 
 export const CreateCourseTab = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,6 +27,8 @@ export const CreateCourseTab = () => {
   const [courseLandingData, setCourseLandingData] = useState<CourseLandingFormData | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPublished, setIsPublished] = useState<boolean>(false)
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false)
+  const [courseScedule, setCourseSchedule] = useState<{ isScheduled: boolean; publishDate: Date | null }>({ isScheduled: false, publishDate: null });
 
   useEffect(()=>{
     if (editMode.status && editMode.courseId) {
@@ -46,6 +49,10 @@ export const CreateCourseTab = () => {
           welcomeMessage: response.data.welcomeMessage,
         })
         setCourseImage(response.data.thumbnailKey)
+        if(response.data.isScheduled && response.data.publishDate){
+          console.log(response.data.publishDate,response.data.isScheduled)
+          setCourseSchedule({isScheduled: true, publishDate: response.data.publishDate})
+        }
 
       }
       fetchSingleCourse();
@@ -77,6 +84,7 @@ export const CreateCourseTab = () => {
     setCourseImage(null);
     setCourseLandingData(null);
     setIsPublished(false);
+    setCourseSchedule({ isScheduled: false, publishDate: null });
     dispatch(setThumbnailKey(''));
     dispatch(setActiveTab('courses'));
   };
@@ -85,7 +93,15 @@ export const CreateCourseTab = () => {
     resetEditState();
   }
 
+  const handlePublishScheduleDate = (date: Date) =>{
+    if(date){
+      setCourseSchedule({isScheduled: true, publishDate: date})
+      toast.success("Schedule set successfully !")
+      console.log({isScheduled: true, publishDate: date})
+    }
+  }
 
+console.log(courseScedule,'currentstate')
 
   function validateFullCourseData(){
     // Validate everything before submission
@@ -153,6 +169,8 @@ export const CreateCourseTab = () => {
           courseDetails:courseLandingData,
           thumbnailKey: thumbnailKey as string,
           modules:modules,
+          publishDate: isPublished ? null : courseScedule.publishDate,
+          isScheduled: isPublished ? false : courseScedule.isScheduled,
           isPublished,
           courseId:editMode.courseId
         })).unwrap()
@@ -162,6 +180,8 @@ export const CreateCourseTab = () => {
           courseDetails: courseLandingData,
           thumbnailKey: thumbnailKey as string,
           modules: modules,
+          publishDate: isPublished ? null : courseScedule.publishDate,
+          isScheduled: isPublished ? false : courseScedule.isScheduled,
           isPublished
         })).unwrap();
         console.log('reponse course submit:', courseSubmitAction);
@@ -179,6 +199,7 @@ export const CreateCourseTab = () => {
           setCourseImage(null);
           setCourseLandingData(null);
           setIsPublished(false);
+          setCourseSchedule({ isScheduled: false, publishDate: null });
           dispatch(setThumbnailKey(''));
         }
       }
@@ -204,20 +225,48 @@ export const CreateCourseTab = () => {
                 Fill in the details below to {editMode.status && editMode.courseId ? "update an existing course" : "create a new course"}.
             </p>
         </div>
-        <div className="flex items-center gap-2">
-          <PublishDraftToggle isPublished={isPublished} setIsPublished={setIsPublished}/>
+        <div className="flex items-start md:items-center gap-2">
             
-          {editMode.status && editMode.courseId 
-          ? (
-            <>
-              <Button variant="outline"
-                className="text-red-500 rounded-tl-none rounded-br-none border-red-500 hover:text-red-600 hover:border-red-600" 
-                onClick={() => handleCancel()}
-              >Cancel</Button>
-              <CustomAlertDialog buttonText={isSubmitting ? "Submitting..." : "UPDATE"} handleSubmit={handleMainCourseSubmit} isDisabled={isSubmitting}/>
-            </>
-          )
-          : <CustomAlertDialog buttonText={isSubmitting ? "Submitting..." : "SUBMIT"} handleSubmit={handleMainCourseSubmit} isDisabled={isSubmitting}/>}
+            <div className="flex items-center gap-4">
+              <AnimatePresence initial={false}>
+                {!isPublished && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    key="schedule-button"
+                  >
+                    <Button 
+                      onClick={() => setIsScheduleOpen(true)}
+                      className="bg-transparent border text-amber-300/70 border-amber-300/30 hover:bg-transparent hover:text-amber-300 rounded-tl-none rounded-br-none"
+                    >
+                      {courseScedule.isScheduled ? "Reschedule" : "Schedule Publish"}
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>            
+            <PublishScheduleDialog
+                isOpen={isScheduleOpen}
+                onOpenChange={setIsScheduleOpen}
+                onSchedule={handlePublishScheduleDate}
+                initialDate={courseScedule.publishDate}
+                setCourseSchedule={setCourseSchedule}
+            />
+          <div className="flex-col space-y-2 md:space-y-0 md:flex md:flex-row">
+            {editMode.status && editMode.courseId 
+            ? (
+              <div className="flex gap-1">
+                <Button variant="outline"
+                  className="text-red-500 rounded-tl-none rounded-br-none border-red-500 hover:text-red-600 hover:border-red-600" 
+                  onClick={() => handleCancel()}
+                >Cancel</Button>
+                <CustomAlertDialog buttonText={isSubmitting ? "Submitting..." : "UPDATE"} handleSubmit={handleMainCourseSubmit} isDisabled={isSubmitting}/>
+              </div>
+            )
+            : <CustomAlertDialog buttonText={isSubmitting ? "Submitting..." : "SUBMIT"} handleSubmit={handleMainCourseSubmit} isDisabled={isSubmitting}/>}
+            <PublishDraftToggle isPublished={isPublished} setIsPublished={setIsPublished}/>
+          </div>  
         </div>
       </div>
       {submitStatus === 'submitting' || uploadStatus === 'uploading' ? (

@@ -18,6 +18,7 @@ import { setEditMode } from '@/store/course';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import CustomAlert from '@/components/common/CustomAlert';
 import axiosInstance from '@/config/axios.config';
+import { format } from 'date-fns';
 
 
 export const TutorCoursesTab = () => {
@@ -159,7 +160,9 @@ export const TutorCoursesTab = () => {
                 onMouseLeave={() => handleMouseLeave(course._id)}
                 transition={{ repeat: Infinity, duration: 0.6 }}
                 className={`absolute z-30 -top-2 -left-2 shadow-xl bg-gradient-to-br ${
-                  course?.isActive ?
+                course?.isScheduled 
+                ? 'from-sky-500/50 border-sky-500/20 to-sky-800/10 pointer-events-none' 
+                : course?.isActive ?
                     course?.isPublished  
                     ? 'from-green-500/70 border-green-500/50 to-green-800/40' 
                     : 'from-amber-500/40 border-amber-500/20 to-amber-800/10'
@@ -168,17 +171,22 @@ export const TutorCoursesTab = () => {
               >
                  {course.isActive && tooltipStates[course._id] && (
                     <Badge variant={'outline'} className="w-[95px] text-center absolute top-0 left-25 md:-top-2 md:-left-15 transform -translate-x-1/2 text-xs rounded py-0.5 px-2">
-                      {course?.isPublished ? 'Published' : 'Draft'}
+                      {
+                        course?.isScheduled ? `Scheduled on ${course?.publishDate}` :
+                        course?.isPublished ? 'Published' : 'Draft'
+                      }
                     </Badge>
                   )}
                 {toggleLoading === course._id ? (
                   <Loader className="w-4 h-4" />
                 ) : (
-                  course?.isActive ?
-                    course?.isPublished 
-                    ? <FileCheck2 size={15} /> 
-                    : <FileClock size={15} />
-                  : <ShieldAlert size={15} />
+                  course?.isScheduled 
+                  ? <Clock size={15} />
+                  : course?.isActive ?
+                      course?.isPublished 
+                      ? <FileCheck2 size={15} /> 
+                      : <FileClock size={15} />
+                    : <ShieldAlert size={15} />
                 )}
               </motion.div>
               <Card className={
@@ -190,9 +198,15 @@ export const TutorCoursesTab = () => {
                     description="Are you sure you want to delete this course?" 
                     onConfirm={() => handleDelete(course._id)}
                     open={openDailog}
-                    onClose={() => setOpenDailog(false)} 
+                    onClose={() => setOpenDailog(false)}
                 />
                 <div className="relative aspect-video overflow-hidden">
+                  {course?.isScheduled && course?.publishDate && (
+                    <div className='flex items-center justify-between absolute z-20 top-20 left-15 bg-black/50 text-white text-[10px] px-2 py-1 rounded gap-3'>
+                      <Clock size={16} />
+                      <div className='w-[80px]'>Scheduled on {format(course?.publishDate, 'MMMM d, yyyy')}</div>
+                    </div>
+                  )}
                   {course.isVerified === 'pending' && <Badge className='absolute z-20 top-20 left-20 bg-black/50 text-white'><Loader className="w-4 h-4" /> Verifying...</Badge>}
                   {course.isVerified === 'rejected' && (
                           <HoverCard>

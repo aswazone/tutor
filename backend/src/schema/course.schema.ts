@@ -85,6 +85,14 @@ const CourseSchema = new Schema({
     type: String,
     default: ''
   },
+  isScheduled: {
+    type: Boolean,
+    default: false
+  },
+  publishDate: {
+    type: Date,
+    default: null
+  },
   isActive: {
     type: Boolean,
     default: true

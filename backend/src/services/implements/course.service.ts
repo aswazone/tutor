@@ -20,6 +20,8 @@ export class CourseService implements ICourseService {
     
       const course = await this._courseRepository.create({
         ...courseData.courseDetails,
+        publishDate: courseData.publishDate,
+        isScheduled: courseData.isScheduled,
         thumbnailKey: courseData.thumbnailKey,
         isPublished: courseData.isPublished,
         modules: courseData.modules,
@@ -52,7 +54,7 @@ export class CourseService implements ICourseService {
 
 
   getAllCourses = async (): Promise<ICourse[]> => {
-    const courses = await this._courseRepository.findAllCourses({isDeleted: false, isActive: true ,isVerified: true});
+    const courses = await this._courseRepository.findAllCourses({isDeleted: false, isActive: true ,isVerified: CourseStatus.VERIFIED,isPublished: true});
     return courses;
   }
 
@@ -72,6 +74,8 @@ export class CourseService implements ICourseService {
 
       const updateData = {
         isVerified: 'pending',
+        publishDate: courseData.publishDate,
+        isScheduled: courseData.isScheduled,
         ...(courseData.courseDetails || {}),
         ...(courseData.thumbnailKey && { thumbnailKey: courseData.thumbnailKey }),
         ...(courseData.modules && { modules: courseData.modules })

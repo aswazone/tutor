@@ -126,7 +126,7 @@ const Profile = () => {
             : userData?.isVerified === 'pending'
               ? 'blur-sm grayscale-75 mt-5 pointer-events-none'
               : userData?.isVerified === 'rejected'
-                ? 'grayscale-75 mt-5'
+                ? 'grayscale-75 mt-5 pointer-events-none'
                 : userData?.isVerified === 'unverified'
                   ? 'grayscale-85 mt-5'
                   : 'my-5'

@@ -9,9 +9,11 @@ import uploadRouter from './routers/upload.route';
 import adminRouter from './routers/admin.routes';
 import categoryRouter from './routers/category.route';
 import wishlistRouter from './routers/wishlist.route';
+import { initializeCoursePublisher } from './utils/course-schedule-publisher.utils';
 
 const app:Express = express();
 validateEnv();
+initializeCoursePublisher();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(corsMiddleware);

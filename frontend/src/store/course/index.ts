@@ -143,13 +143,15 @@ export const uploadSingleImageFile = createAsyncThunk<UploadImageResult, { cours
 );
 
 
-export const submitCourse = createAsyncThunk<string, { courseDetails: CourseLandingFormData, thumbnailKey: string, modules: Module[], isPublished: boolean }, { rejectValue: string }>(
+export const submitCourse = createAsyncThunk<string, { courseDetails: CourseLandingFormData, thumbnailKey: string, modules: Module[], isPublished: boolean ,publishDate?:Date | null, isScheduled?:boolean}, { rejectValue: string }>(
   "course/submit",
   async (courseData: {
     courseDetails: CourseLandingFormData,
     thumbnailKey: string,
     modules: Module[]
     isPublished: boolean
+    publishDate?:Date | null
+    isScheduled?:boolean
   }, { rejectWithValue }) => {
     try {      
       const response = await axiosInstance.post("/api/v1/courses", courseData);
@@ -161,17 +163,19 @@ export const submitCourse = createAsyncThunk<string, { courseDetails: CourseLand
   }
 );
 
-export const updateCourse = createAsyncThunk<string, { courseDetails: CourseLandingFormData, thumbnailKey: string, modules: Module[], isPublished: boolean ,courseId:string}, { rejectValue: string }>(
+export const updateCourse = createAsyncThunk<string, { courseDetails: CourseLandingFormData, thumbnailKey: string, modules: Module[], isPublished: boolean ,courseId:string, publishDate?:Date | null, isScheduled?:boolean}, { rejectValue: string }>(
   "course/update",
   async ({
     courseDetails,
     thumbnailKey,
     modules,
     isPublished,
-    courseId
+    courseId,
+    publishDate,
+    isScheduled
   }, { rejectWithValue }) => {
     try {      
-      const response = await axiosInstance.put(`/api/v1/courses/${courseId}`, {courseDetails,thumbnailKey,modules,isPublished});
+      const response = await axiosInstance.put(`/api/v1/courses/${courseId}`, {courseDetails,thumbnailKey,modules,isPublished,publishDate,isScheduled});
       return response.data;
     } catch (error) {
       const message = axiosErrorMessage(error);

@@ -34,6 +34,8 @@ export interface ICourse {
   rating?:string;
   isVerified?: string; 
   rejectReason?: string;
+  isScheduled?: boolean;
+  publishDate?: Date;
   isActive?: boolean;
   isPublished: boolean;
   createdAt: string;

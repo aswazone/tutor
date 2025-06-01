@@ -38,6 +38,8 @@ export interface ICourseModel extends Document {
     isDeleted: boolean;
     tutor: Types.ObjectId;
     isPublished: boolean;
+    publishDate?: Date;
+    isScheduled?: boolean;
     rating: number;
     isActive: boolean;
     isVerified: CourseStatus;
