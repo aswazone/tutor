@@ -202,16 +202,16 @@ export const TutorCoursesTab = () => {
                 />
                 <div className="relative aspect-video overflow-hidden">
                   {course?.isScheduled && course?.publishDate && (
-                    <div className='flex items-center justify-between absolute z-20 top-20 left-15 bg-black/50 text-white text-[10px] px-2 py-1 rounded gap-3'>
+                    <div className='flex items-center justify-between absolute z-20 top-23 left-16 bg-black/50 text-white text-[10px] px-2 py-1 rounded gap-3'>
                       <Clock size={16} />
                       <div className='w-[80px]'>Scheduled on {format(course?.publishDate, 'MMMM d, yyyy')}</div>
                     </div>
                   )}
-                  {course.isVerified === 'pending' && <Badge className='absolute z-20 top-20 left-20 bg-black/50 text-white'><Loader className="w-4 h-4" /> Verifying...</Badge>}
+                  {course.isVerified === 'pending' && <Badge className='absolute z-20 top-15 left-20 bg-black/50 text-white'><Loader className="w-4 h-4" /> Verifying...</Badge>}
                   {course.isVerified === 'rejected' && (
                           <HoverCard>
                             <HoverCardTrigger asChild>  
-                              <Badge variant={'outline'} className='absolute z-20 top-20 left-20 bg-black/50 text-white'><ShieldAlert size={16}/> Rejected</Badge>
+                              <Badge variant={'outline'} className='absolute z-20 top-15 left-20 bg-black/50 text-white'><ShieldAlert size={16}/> Rejected</Badge>
                             </HoverCardTrigger>
                             <HoverCardContent className="relative w-70 mt-20 bg-card/95 backdrop-blur-lg rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none border-sky-900/40 shadow-[0px_17px_22px_4px_rgba(3,_7,_13,_0.95)]">
                               <div className="absolute inset-y-auto left-0 h-80% w-px bg-neutral-200/80 dark:bg-neutral-800/80">
