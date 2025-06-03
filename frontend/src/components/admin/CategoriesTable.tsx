@@ -49,7 +49,7 @@ const columns: ColumnDef<TableCategory>[] = [
         <div 
           className={cn(
             "flex items-center",
-            isSubcategory && "pl-6"
+            isSubcategory && "pl-10"
           )}
         >
           {!isSubcategory && <ChevronRight className="mr-2 h-4 w-4" />}

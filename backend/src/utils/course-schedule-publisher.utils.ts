@@ -3,7 +3,7 @@ import { CourseModel } from '../models/implements/course.model'
 
 export const initializeCoursePublisher = () => {
     
-    cron.schedule('0 0 * * *', async () => {  // 12 am every day
+    cron.schedule('* * * * *', async () => {  // 12 am every day
         try {
             const now = new Date();
             console.log('Checking scheduled courses at:', now.toISOString());

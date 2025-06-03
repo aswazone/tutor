@@ -1,104 +1,58 @@
 import { motion } from 'framer-motion'
-import { StarIcon, Clock, Users, Loader, Heart } from 'lucide-react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/store'
+import { StarIcon, Clock, Users, Heart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ICourse } from '@/types/course.type'
-import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import axiosInstance from '@/config/axios.config'
-import { setActiveTab } from '@/store/auth/authSlice'
-import CardSkeleton from '@/components/common/CardSkeleton'
-import { fetchWishlist, addToWishlist, removeFromWishlist } from '@/store/wishlist'
-import { toast } from 'sonner'
 import { env } from '@/config/env.config';
+import { useNavigate } from 'react-router-dom'
+import { ICourse } from "@/types/course.type"
+import CardSkeleton from '@/components/common/CardSkeleton'
+import Loader from '@/components/ui/loader'
+import { setActiveTab } from '@/store/auth/authSlice'
+import { AppDispatch } from '@/store'
+import { useDispatch } from 'react-redux'
 
-export const StudentsCoursesTab = () => {
+type Props = {
+  courses: ICourse[];
+  isLoading: boolean;
+  wishlistItems: ICourse[];
+  handleWishlistToggle: (courseId: string, isInWishlist: boolean) => void;
+}
+
+export const StudentsCoursesTab = ({ isLoading, courses, wishlistItems, handleWishlistToggle }: Props) => {
+  const navigate = useNavigate(); 
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-  const [courses, setCourses] = useState<ICourse[]>([]);
-  const { isLoading: coursesLoading } = useSelector((state: RootState) => ({
-    isLoading: state.course.courseEditor.uploadStatus === 'uploading'
-  }));
-
-  const { items: wishlistItems, isLoading: wishlistLoading } = useSelector(
-    (state: RootState) => state.wishlist
-  );
-
-  useEffect(() => {
-    // Fetch all public courses
-    const fetchCourses = async () => {
-      try {        
-        const response = await axiosInstance.get<ICourse[]>('/api/v1/courses');
-        setCourses(response.data);    
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Failed to fetch courses:', error);
-        toast.error(error.message);
-      } else {
-        console.error('Failed to fetch courses:', error);
-        toast.error('Failed to fetch courses');
-      }
-      }
-    };
-
-    fetchCourses();
-    dispatch(fetchWishlist());
-  }, [dispatch]);
-  const handleWishlistToggle = async (courseId: string, isInWishlist: boolean) => {
-    try {
-      if (isInWishlist) {
-        await dispatch(removeFromWishlist(courseId)).unwrap();
-        toast.success('Removed from wishlist');
-      } else {
-        await dispatch(addToWishlist(courseId)).unwrap();
-        toast.success('Added to wishlist');
-      }
-      // Refresh wishlist after toggle
-      void dispatch(fetchWishlist());
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error('Failed to update wishlist');
-      }
-    }
-  };
-
-  const isLoading = coursesLoading || wishlistLoading;
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <CardSkeleton key={i} />
-          ))}
+      return (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
+          <div className="flex items-center mt-2 animate-caret-blink text-sky-400/30">
+            <Loader className="mr-2 text-sky-400/50"/>
+            Loading courses...
+          </div>
         </div>
-        <div className="flex items-center mt-2 animate-caret-blink text-sky-400/30">
-          <Loader className="mr-2 text-sky-400/50"/>
-          Loading courses...
+      );
+    }
+  
+    if (!courses?.length) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[200px] text-muted-foreground">
+          <p>No courses found</p>
+          <Button 
+            variant="link" 
+            onClick={() => dispatch(setActiveTab("courses"))}
+            className="mt-2"
+          >
+            Comming soon !!
+          </Button>
         </div>
-      </div>
-    );
-  }
-
-  if (!courses?.length) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[200px] text-muted-foreground">
-        <p>No courses found</p>
-        <Button 
-          variant="link" 
-          onClick={() => dispatch(setActiveTab("courses"))}
-          className="mt-2"
-        >
-          Comming soon !!
-        </Button>
-      </div>
-    );
-  }
+      );
+    }
 
   return (
     <motion.div
@@ -106,7 +60,7 @@ export const StudentsCoursesTab = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6">
         {courses.map((course) => {
           const isInWishlist = wishlistItems.some(item => item._id === course._id);
           
@@ -130,7 +84,7 @@ export const StudentsCoursesTab = () => {
                 >
                     {isInWishlist ? <Heart fill='white' size={15} /> : <Heart size={15} />}
                 </motion.div>   
-              <Card className="pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-500/20 transition-all duration-300">
+              <Card className="pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-800/50 transition-all duration-300">
                 <div className="relative aspect-video overflow-hidden">
                                
                   <img

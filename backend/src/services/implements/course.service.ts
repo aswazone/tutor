@@ -6,6 +6,7 @@ import { ICourseRepository } from '@/repositories/interface/course.repository.in
 import { Types } from 'mongoose';
 import { HttpStatus } from '@/constants/status.constant';
 import { CourseStatus } from '@/models/interface/course.model.interface';
+import { QueryFilter, QueryOptions } from '@/utils/queryToFilter.utils';
 
 export class CourseService implements ICourseService {
   constructor(private readonly _courseRepository: ICourseRepository) {}
@@ -23,7 +24,7 @@ export class CourseService implements ICourseService {
         publishDate: courseData.publishDate,
         isScheduled: courseData.isScheduled,
         thumbnailKey: courseData.thumbnailKey,
-        isPublished: courseData.isPublished,
+        isPublished: courseData.isScheduled ? false : courseData.isPublished,
         modules: courseData.modules,
         tutor: new Types.ObjectId(userId)
       });
@@ -53,9 +54,11 @@ export class CourseService implements ICourseService {
   }
 
 
-  getAllCourses = async (): Promise<ICourse[]> => {
-    const courses = await this._courseRepository.findAllCourses({isDeleted: false, isActive: true ,isVerified: CourseStatus.VERIFIED,isPublished: true});
-    return courses;
+  getAllCourses = async (query: { filter: QueryFilter; options: QueryOptions }): Promise<{ courses: ICourse[]; count: number }> => {
+    const { filter, options } = query;
+    console.log(query);
+    const courses = await this._courseRepository.findAllCourses({isDeleted: false, isActive: true ,isVerified: CourseStatus.VERIFIED, ...filter}, options);
+    return {courses: courses.result, count: courses.resultCount};
   }
 
   toggleCourseStatus = async (courseId: string, status: boolean): Promise<void> => {
@@ -76,6 +79,7 @@ export class CourseService implements ICourseService {
         isVerified: 'pending',
         publishDate: courseData.publishDate,
         isScheduled: courseData.isScheduled,
+        isPublished: courseData.isScheduled ? false : courseData.isPublished,
         ...(courseData.courseDetails || {}),
         ...(courseData.thumbnailKey && { thumbnailKey: courseData.thumbnailKey }),
         ...(courseData.modules && { modules: courseData.modules })

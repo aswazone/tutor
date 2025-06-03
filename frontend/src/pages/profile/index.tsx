@@ -26,7 +26,6 @@ import { StudentsSettingsTab } from './tabs/StudentsSettingsTab'
 import { CreateCourseTab } from './tabs/CreateCourseTab'
 import { setActiveTab } from '@/store/auth/authSlice'
 import { WishlistTab } from './tabs/WishlistTab'
-import { StudentsCoursesTab } from './tabs/StudentsCoursesTab'
 import { EnrolledCoursesTab } from './tabs/EnrolledCoursesTab'
 import { Sparkles } from '@/components/common/Sparkles'
 import { CheckCheck } from '@/components/common/VerifiedBadge'
@@ -73,7 +72,6 @@ const getTabs = (role: UserRole) => {
       return [
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: StudentsOverviewTab },
         { id: 'enrolled-courses', name: 'Enrolled Courses', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: EnrolledCoursesTab },
-        { id: 'courses', name: 'All Courses', icon: <BookOpenIcon className="h-5 w-5 md:hidden" />, component: StudentsCoursesTab },
         { id: 'wishlist', name: 'Wishlist', icon: <AcademicCapIcon className="h-5 w-5 md:hidden" />, component: WishlistTab },
         { id: 'teachers', name: 'Teachers', icon: <UserIcon className="h-5 w-5 md:hidden" />, component: TeachersTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: StudentsSettingsTab },

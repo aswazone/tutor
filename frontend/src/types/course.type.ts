@@ -61,3 +61,17 @@ export interface IChapter {
   videoUploadError?: string
 }
 
+
+export interface IOptionBase {
+  id: string;
+}
+
+export interface ISubcategoryOption extends IOptionBase {
+  parentId: string;
+}
+
+export type IOptions = IOptionBase | ISubcategoryOption;
+
+export type Filters = {
+  [key: string]: string[] | ISubcategoryOption[];
+};

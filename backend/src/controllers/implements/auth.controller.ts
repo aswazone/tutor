@@ -5,12 +5,10 @@ import { HttpStatus } from "@/constants/status.constant";
 import { setCookie } from "@/utils/cookies.utils";
 import { AuthenticatedRequest } from "@/types/auth.type";
 import { UserStatus } from "@/types/user.type";
-import { ICourseService } from "@/services/interface/course.service.interface";
 
 export class AuthController implements IAuthController{
     constructor(
-        private readonly _authService:IAuthService,
-        private readonly _courseService:ICourseService
+        private readonly _authService:IAuthService
     ) {}
 
     signin = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{

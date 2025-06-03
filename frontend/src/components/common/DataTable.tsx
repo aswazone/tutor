@@ -74,7 +74,7 @@ export function DataTable<TData>({
       id: "serialNumber",
       header: "S.No",
       cell: ({ row }) => {
-        return <div className="text-center">{pagination.pageIndex * pagination.pageSize + row.index + 1}</div>;
+        return <div className="text-center">{row.index +1}</div>;
       },
       enableSorting: false,
       enableHiding: false,
@@ -142,7 +142,7 @@ export function DataTable<TData>({
       finalColumns.push(actionsColumn)
     }
     return finalColumns
-  }, [userColumns, showSelection, actionItems, onRowActionSelect, pagination.pageIndex, pagination.pageSize])
+  }, [userColumns, showSelection, actionItems, onRowActionSelect])
 
   const table = useReactTable({
     data,

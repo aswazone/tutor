@@ -219,13 +219,17 @@ export const sortOptions: ICommonOptions[] = [
   { id: "price-hightolow", label: "Price: High to Low" },
   { id: "title-atoz", label: "Title: A to Z" },
   { id: "title-ztoa", label: "Title: Z to A" },
+  { id: "newest", label: "Newest" },
+  { id: "oldest", label: "Oldest" },
 ];
 
-export const filterOptions:{
+export interface IfilterOptions {
     category: CategoryDTO[] | undefined, 
     level: ICommonOptions[], 
     primaryLanguage: ICommonOptions[]
-} = {
+}
+
+export const filterOptions: IfilterOptions = {
     category: courseCategories,
     level: courseLevelOptions,
     primaryLanguage: languageOptions,

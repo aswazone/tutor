@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import {
@@ -57,6 +58,9 @@ const toolsAndTopics: string[] = [
 
 
 export const Cards = () => {
+
+  const navigate = useNavigate();
+
   return (
     <section id="courses" className="container py-24 md:px-20 sm:px-3 sm:py-32 space-y-8">
       {/* Example usage of the loading animation */}
@@ -137,6 +141,9 @@ export const Cards = () => {
             </Card>
           </motion.div>
         ))}
+      </div>
+      <div className="flex justify-center mt-20">
+        <Button size={"lg"} className="text-lg" variant="outline" onClick={()=>navigate("/courses")}>View All Courses ✨</Button>
       </div>
     </section>
   );

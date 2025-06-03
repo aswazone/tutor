@@ -60,7 +60,7 @@ const Courses = () => {
       setIsLoading(true);
       const response = await axiosInstance.get('/api/v1/admin/courses');
       console.log(response.data,'response.data');
-      const transformedCourses = response.data.map((course: ApiCourses) => ({
+      const transformedCourses = response.data.result.map((course: ApiCourses) => ({
         id: course._id,
         title: course.title,
         status: course.isPublished ? 'published' : 'draft',

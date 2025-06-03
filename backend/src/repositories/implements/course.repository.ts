@@ -1,10 +1,11 @@
 import { BaseRepository } from '@/repositories/base.repository';
-import { ICourseModel } from '@/models/interface/course.model.interface';
+import { CourseStatus, ICourseModel } from '@/models/interface/course.model.interface';
 import { ICourseRepository } from '../interface/course.repository.interface';
 import { CourseModel } from '@/models/implements/course.model';
 import { HttpError } from '@/utils/http-error.utils';
 import { HttpStatus } from '@/constants/status.constant';
 import { PopulateOptions, Types } from 'mongoose';
+import { QueryOptions } from '@/utils/queryToFilter.utils';
 
 export class CourseRepository extends BaseRepository<ICourseModel> implements ICourseRepository {
   constructor() {
@@ -58,19 +59,32 @@ export class CourseRepository extends BaseRepository<ICourseModel> implements IC
       options: {
           isDeleted?: boolean,
           isActive?: boolean,
-          isVerified?: boolean
+          isVerified?: CourseStatus,
       },
-      populate?: PopulateOptions
-  ): Promise<ICourseModel[]> {
+      populate?: PopulateOptions | QueryOptions
+  ): Promise<{ result: ICourseModel[]; resultCount: number }> {
       try {
-          const query = this.model.find(options);
+          const query = this.model.find(options)
           
-          if (populate) {
-              query.populate(populate);
+          if (populate && typeof populate === 'object' && 'path' in populate) {
+            query.populate(populate as PopulateOptions);
           }
 
+          if(typeof populate === 'object' && 'sort' in populate) {
+              query.sort(populate.sort);
+          }
+
+          if(typeof populate === 'object' && 'page' in populate && 'limit' in populate) {
+             if(populate.page && populate.limit) {
+                query.skip((populate.page - 1) * populate.limit).limit(populate.limit);
+             }
+          }
+
+
           const result = await query.exec();
-          return result;
+          const resultCount = await this.model.countDocuments(options);
+          console.log(resultCount, 'resultCount');
+          return {result, resultCount};
       } catch (error) {
           if (error instanceof HttpError) throw error;
           throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');

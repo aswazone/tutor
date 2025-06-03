@@ -134,6 +134,12 @@ html {
     animation: rotate-hor-center-normal 0.7s cubic-bezier(0.455, 0.030, 0.515, 0.955) 2s 1 normal both;
   }
 
+  @keyframes rotate-scale-up-ver-normal {0% { transform: scale(1) rotateY(0); } 50% { transform: scale(2) rotateY(180deg); } 100% { transform: scale(1) rotateY(360deg);} }
+
+.rotate-scale-up-ver-normal { 
+    animation: rotate-scale-up-ver-normal 0.65s linear 0s 1 normal both; 
+}
+
   @keyframes flip-coin {
     0% { transform: rotateY(0); }
     100% { 
@@ -208,7 +214,7 @@ html {
 
   .shadow-three {
     position: absolute;
-    background: linear-gradient(135deg, #10006c, #747dfaf4);
+    background: linear-gradient(135deg, #021632, #071b51);
     border-radius: 50%;
     filter: blur(100px);
     width: 200px;
