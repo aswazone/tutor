@@ -129,8 +129,8 @@ export const WishlistTab = () => {
       // Fetch all public courses
       const fetchCourses = async () => {
         try {        
-          const response = await axiosInstance.get<ICourse[]>('/api/v1/courses');
-          setCourses(response.data);    
+          const response = await axiosInstance.get<{ courses: ICourse[]}>('/api/v1/courses');
+          setCourses(response.data.courses);    
       } catch (error) {
         if (error instanceof Error) {
           console.error('Failed to fetch courses:', error);
