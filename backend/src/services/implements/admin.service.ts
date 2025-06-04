@@ -15,7 +15,7 @@ export class AdminService implements IAdminService {
     getAllTutors = async () => this._adminRepository.findAllUsers(UserRole.TUTOR);
     getAllStudents = async () => this._adminRepository.findAllUsers(UserRole.STUDENT)
     getAllCourses = async () => {
-    const courses = await this._courseRepository.findAllCourses(
+    const {result:courses} = await this._courseRepository.findAllCourses(
         { isDeleted: false },
         { 
             path: 'tutor',

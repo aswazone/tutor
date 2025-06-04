@@ -12,6 +12,7 @@ export interface Chapter {
   content: string
   pdfUrl?: File
   subtitleUrl?: File
+  freePreview?: boolean
   videoKey?: string // S3 object key after upload
   videoUploadStatus: "idle" | "uploading" | "success" | "error";
   videoUploadError?: string
@@ -30,7 +31,7 @@ export interface ICourse {
   welcomeMessage: string;
   thumbnailKey: string;
   modules: IModule[];
-  tutor: string;
+  tutor: ITutor;
   rating?:string;
   isVerified?: string; 
   rejectReason?: string;
@@ -41,7 +42,12 @@ export interface ICourse {
   createdAt: string;
   updatedAt: string;
 }
-
+export interface ITutor {
+  id: string
+  name: string
+  userEmail: string
+  isActive: boolean
+}
 export interface IModule {
   id: string
   title: string
@@ -55,6 +61,7 @@ export interface IChapter {
   content: string
   pdfUrl?: File
   subtitleUrl?: File
+  freePreview?: boolean
   videoKey?: string // S3 object key after upload
   video?: File // Temporary field for file upload
   videoUploadStatus: "idle" | "uploading" | "success" | "error";
