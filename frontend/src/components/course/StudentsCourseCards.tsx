@@ -19,7 +19,7 @@ type Props = {
   handleWishlistToggle: (courseId: string, isInWishlist: boolean) => void;
 }
 
-export const StudentsCoursesTab = ({ isLoading, courses, wishlistItems, handleWishlistToggle }: Props) => {
+export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleWishlistToggle }: Props) => {
   const navigate = useNavigate(); 
   const dispatch = useDispatch<AppDispatch>();
 

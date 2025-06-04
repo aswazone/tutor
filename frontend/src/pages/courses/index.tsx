@@ -11,7 +11,7 @@ import { ArrowUpDownIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { toast } from "sonner"
-import { StudentsCoursesTab } from "../profile/tabs/StudentsCoursesTab"
+import { StudentsCourseCards } from "../../components/course/StudentsCourseCards"
 import { buildFilterFromQueryParams, buildQueryParams } from "@/utils/query.utils"
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom"
 import { Input } from "@/components/ui/input"
@@ -244,7 +244,7 @@ const AllCourses = () => {
             </div>
           </div>
           <div>
-            <StudentsCoursesTab isLoading={isLoading} courses={courses} wishlistItems={wishlistItems} handleWishlistToggle={handleWishlistToggle} />
+            <StudentsCourseCards isLoading={isLoading} courses={courses} wishlistItems={wishlistItems} handleWishlistToggle={handleWishlistToggle} />
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

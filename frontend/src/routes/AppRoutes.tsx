@@ -21,7 +21,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { env } from "@/config/env.config";
 import ResetPassword from "@/pages/reset-password";
 import { CheckUserStatus } from "./CheckUserStatus";
-import AllCourses from "@/pages/course";
+import AllCourses from "@/pages/courses";
+import CourseDetailsPage from "@/pages/courses/course";
 
 
 export const router = createBrowserRouter([
@@ -41,6 +42,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: "courses", element: <AllCourses />,
+            },
+            {
+                path: "course/:id", element: <CourseDetailsPage />,
             },
             {
                 path: "profile", element: <ProtectedRoutes><Profile /></ProtectedRoutes>,
