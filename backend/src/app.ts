@@ -9,6 +9,7 @@ import uploadRouter from './routers/upload.route';
 import adminRouter from './routers/admin.routes';
 import categoryRouter from './routers/category.route';
 import wishlistRouter from './routers/wishlist.route';
+import orderRouter from './routers/order.routes';
 import { initializeCoursePublisher } from './utils/course-schedule-publisher.utils';
 
 const app:Express = express();
@@ -26,5 +27,6 @@ app.use('/api/v1/courses', courseRouter);
 app.use('/api/v1/wishlist', wishlistRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/category', categoryRouter)
+// app.use('/api/v1/order', orderRouter);
 
 export default app;

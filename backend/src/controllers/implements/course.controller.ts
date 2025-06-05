@@ -4,6 +4,7 @@ import { ICourseService } from '@/services/interface/course.service.interface';
 import { AuthenticatedRequest } from '@/types/auth.type';
 import { CourseStatus } from '@/models/interface/course.model.interface';
 import { queryToFilter } from '@/utils/queryToFilter.utils';
+import { getPaypalAccessToken } from '@/utils/paypal.utils';
 
 export class CourseController implements ICourseController {
   constructor(private readonly _courseService: ICourseService) {}  
@@ -50,6 +51,8 @@ export class CourseController implements ICourseController {
   getAllCourses = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       console.log(req.query);
+      const paypalToken = await getPaypalAccessToken();
+      console.log(paypalToken, 'paypal token');
       const query = await queryToFilter(req);
       const courses = await this._courseService.getAllCourses(query);
       res.json(courses);

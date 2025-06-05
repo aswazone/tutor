@@ -23,6 +23,8 @@ import ResetPassword from "@/pages/reset-password";
 import { CheckUserStatus } from "./CheckUserStatus";
 import AllCourses from "@/pages/courses";
 import CourseDetailsPage from "@/pages/courses/course";
+import CompletePayment from "@/components/payment/CompletePayment";
+import CancelPayment from "@/components/payment/CancelPayment";
 
 
 export const router = createBrowserRouter([
@@ -85,6 +87,12 @@ export const router = createBrowserRouter([
     },
     {
         path: "reset-password", element: <ResetPassword /> 
+    },
+    {
+        path: "/complete-payment", element: <ProtectedRoutes><CompletePayment /></ProtectedRoutes>
+    },
+    {
+        path: "/cancel-payment", element: <ProtectedRoutes><CancelPayment /></ProtectedRoutes>
     }
 
 ])

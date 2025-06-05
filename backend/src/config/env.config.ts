@@ -35,7 +35,11 @@ export const {
     AWS_REGION,
     AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY,
-    AWS_S3_BUCKET
+    AWS_S3_BUCKET,
+    PAYPAL_CLIENT_ID,
+    PAYPAL_SECRET_KEY,
+    PAYPAL_BASE_URL,
+    PAYPAL_REDIRECT_URL,
 
 } = process.env
 
