@@ -20,14 +20,12 @@ export interface ICourseModel extends Document {
     objectives?: string;
     welcomeMessage?: string;
     thumbnailKey: string;
-    students?: [
-        {
+    students: {
             studentId:string;
             studentName: string;
             studentEmail: string;
             paidAmount: string;
-        }
-    ]
+        }[];
     modules: Array<{
         id: string;
         title: string;
@@ -39,6 +37,7 @@ export interface ICourseModel extends Document {
             videoKey?: string;
             pdfUrl?: string;
             subtitleUrl?: string;
+            freePreview?: boolean;
             videoUploadStatus: 'idle' | 'uploading' | 'success' | 'error';
             videoUploadError?: string;
         }>;

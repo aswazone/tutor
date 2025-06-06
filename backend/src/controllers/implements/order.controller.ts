@@ -21,4 +21,18 @@ export class OrderController implements IOrderController {
             next(error);
         }
     };
+
+    capturePayment = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> =>{
+        try {
+            const {orderItemId} = req.params;
+            if(!orderItemId) {
+                res.status(400).json({ message: 'Order item id is required' });
+                return;
+            }
+            const result = await this._orderService.capturePayment(orderItemId,req.body);
+            res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    };
 }

@@ -5,6 +5,7 @@ export interface IOrderModel extends Document {
     userName: string;
     userEmail: string;
     orderStatus: string;
+    paymentStatus: string;
     paymentMethod: string;
     orderDate: Date;
     paymentId: string;

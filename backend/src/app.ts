@@ -27,6 +27,6 @@ app.use('/api/v1/courses', courseRouter);
 app.use('/api/v1/wishlist', wishlistRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/category', categoryRouter)
-// app.use('/api/v1/order', orderRouter);
+app.use('/api/v1/order', orderRouter);
 
 export default app;

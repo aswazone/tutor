@@ -5,7 +5,7 @@ import { QueryOptions } from '@/utils/queryToFilter.utils';
 
 export interface ICourseRepository extends IBaseRepository<ICourseModel> {
     getByInstructor(instructorId: string): Promise<ICourseModel[]>;
-    getById(id: string): Promise<ICourseModel | null>;
+    getById(id: string, populate?: PopulateOptions): Promise<ICourseModel | null>;
     findAllCourses(
         options: {
             isDeleted?: boolean, 
