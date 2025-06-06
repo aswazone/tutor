@@ -38,6 +38,20 @@ export class CourseController implements ICourseController {
     }
   };
 
+  getStudentCourses = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user?.id) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
+
+      const courses = await this._courseService.getCoursesByStudent(req.user.id);
+      res.json(courses);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { courseId } = req.params;

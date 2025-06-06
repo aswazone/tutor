@@ -7,9 +7,14 @@ import { Types } from 'mongoose';
 import { HttpStatus } from '@/constants/status.constant';
 import { CourseStatus } from '@/models/interface/course.model.interface';
 import { QueryFilter, QueryOptions } from '@/utils/queryToFilter.utils';
+import { IStudentCoursesRepository } from '@/repositories/interface/studentCourses.repository.interface';
+import { IStudentCoursesModel } from '@/models/interface/studentCourses.model.interface';
 
 export class CourseService implements ICourseService {
-  constructor(private readonly _courseRepository: ICourseRepository) {}
+  constructor(
+    private readonly _courseRepository: ICourseRepository,
+    private readonly _studentCourseRepository: IStudentCoursesRepository
+  ) {}
 
   createCourse = async (userId: string, courseData: ICreateCourseDTO): Promise<ICourse> => {
 
@@ -41,6 +46,14 @@ export class CourseService implements ICourseService {
     const courses = await this._courseRepository.getByInstructor(userId);
     if(!courses) throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch instructor courses');
     
+    return courses;
+  }
+
+  getCoursesByStudent = async (userId: string): Promise<IStudentCoursesModel> => {
+
+    const courses = await this._studentCourseRepository.getStudentCourses(userId);
+    if(!courses) throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch student courses');
+
     return courses;
   }
 

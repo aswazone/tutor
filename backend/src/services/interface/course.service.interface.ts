@@ -1,10 +1,12 @@
 import { CourseStatus } from "@/models/interface/course.model.interface";
+import { IStudentCoursesModel } from "@/models/interface/studentCourses.model.interface";
 import { ICreateCourseDTO, ICourse } from "@/types/course.type";
 import { QueryFilter, QueryOptions } from "@/utils/queryToFilter.utils";
 
 export interface ICourseService {
   createCourse(userId: string, courseData: ICreateCourseDTO): Promise<ICourse>;
   getCoursesByInstructor(userId: string): Promise<ICourse[]>;
+  getCoursesByStudent(userId: string): Promise<IStudentCoursesModel>;
   getCourseById(courseId: string): Promise<ICourse>;
   getAllCourses(query: {
     filter: QueryFilter;

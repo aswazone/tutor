@@ -1,6 +1,6 @@
 import { IOrderService } from "../interface/order.service.interface";
 import { capturePaypalPayment, createPaypalOrder } from "@/utils/paypal.utils";
-import { ICourse } from "@/types/course.type";
+import { IOrderDataDTO } from "@/types/course.type";
 import { IOrderRepository } from "@/repositories/interface/order.repository.interface";
 import { IUserRepository } from "@/repositories/interface/user.repository.interface";
 import { IStudentCoursesRepository } from "@/repositories/interface/studentCourses.repository.interface";
@@ -29,7 +29,7 @@ export class OrderService implements IOrderService {
         private readonly _courseRepository: ICourseRepository
     ){}
 
-    createOrder = async (userId: string, orderData: ICourse): Promise<{paypalId: string, orderId: string}> => {
+    createOrder = async (userId: string, orderData: IOrderDataDTO): Promise<{paypalId: string, orderId: string}> => {
 
         const user = await this._userRepository.findUserById(userId);
         if(!user) throw new Error('User not found');

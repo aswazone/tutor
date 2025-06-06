@@ -1,7 +1,7 @@
 import { PAYPAL_BASE_URL, PAYPAL_CLIENT_ID, PAYPAL_REDIRECT_URL, PAYPAL_SECRET_KEY } from '@/config/env.config';
 import { redisClient } from '@/config/redis.config';
 import { approvedPayment } from '@/services/implements/order.service';
-import { ICourse } from '@/types/course.type';
+import { IOrderDataDTO } from '@/types/course.type';
 import got from 'got';
 
 export const getPaypalAccessToken = async () => {
@@ -37,7 +37,7 @@ export const getPaypalAccessToken = async () => {
 }
 
 // Helper function to create orders
-export const createPaypalOrder = async (orderData:ICourse) => {
+export const createPaypalOrder = async (orderData:IOrderDataDTO) => {
     try {
         const accessToken = await getPaypalAccessToken();
         console.log(accessToken,'access token');

@@ -8,13 +8,8 @@ export class StudentCoursesRepository extends BaseRepository<IStudentCoursesMode
         super(StudentCoursesModel);
     }
 
-    async addCourseToStudent(userId: string, courseId: string): Promise<void> {
-        await this.model.create({userId, courseId});
-    }
-    async removeCourseFromStudent(userId: string, courseId: string): Promise<void> {
-        await this.model.deleteOne({userId, courseId});
-    }
-    async getStudentCourse(userId: string): Promise<IStudentCoursesModel | null> {
-        return this.model.findOne({userId});
+
+    async getStudentCourses(userId: string): Promise<IStudentCoursesModel | null> {
+        return this.model.findOne({studentId:userId});
     }
 }
