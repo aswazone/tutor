@@ -1,27 +1,55 @@
 import { CourseModules } from "@/components/course/modulesAccordion";
 import VideoPlayer from "@/components/course/VideoPlayer";
+import {PaypalPayment} from "@/components/payment/PaypalPayment";
 import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
 import Loader from "@/components/ui/loader";
 import { env } from "@/config/env.config";
 import { AppDispatch, RootState } from "@/store";
 import { fetchCourse } from "@/store/fetch";
 import { Chapter } from "@/types/course.type";
-import { CheckCircle, Globe, PlayCircle } from "lucide-react";
+import { BadgeAlertIcon, CheckCircle, Globe, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom"
+import { toast } from "sonner";
+import { Alert } from "@/components/ui/alert";
 
 const CourseDetailsPage = () => {
 
     const {id} = useParams();
     const dispatch = useDispatch<AppDispatch>();
+    const {isAuthenticated} = useSelector((state:RootState)=>state.auth);
     const {items:courses,isLoading} = useSelector((state:RootState)=>state.fetch);
     const [currentCourseId,setCurrentCourseId] = useState<string>('');
     const [freeUrl,setFreeUrl] = useState<string | undefined>('');
     const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] = useState('');
     const [showDialog, setShowDialog] = useState(false);
+    const [isToggledPayButton, setIsToggledPayButton] = useState(false);
+
+    const handleTogglePayButton = () => {
+        setIsToggledPayButton(!isToggledPayButton);
+        setTimeout(() => {
+            setIsToggledPayButton(false);
+        }, 5000);
+    }
+
+
+    console.log(courses,'test-----------------');
+
+    const toastAuthCheck = () => {
+        toast("Please login to unlock this course",{
+            position: "top-right",
+            className: "mt-10",
+            action: {
+                label: "Login",
+                onClick: () => {
+                    window.location.href = "/auth";
+                }
+            }
+        });
+    }
 
     useEffect(()=>{
         return () => {
@@ -69,7 +97,9 @@ const CourseDetailsPage = () => {
         setDisplayCurrentVideoFreePreview(chapter?.videoKey as string);
     }
 
-
+    if(!courses[0]?.isActive) return <Alert className="w-1/4 mx-auto mt-10" variant={"destructive"}>
+        <CheckCircle className="w-4 h-4 text-center" /> This course is discontinued !
+    </Alert>
     if(isLoading)  return <div className="flex items-center justify-center"><Loader /> Please Wait..</div>
 
     return (
@@ -144,7 +174,13 @@ const CourseDetailsPage = () => {
 
                     <aside className="lg:w-[480px] relative">
                         <div className="sticky top-20 rounded-br-xl rounded-tl-xl p-3 bg-sky-950/30 overflow-hidden">
-                            <div className="aspect-video">
+                            <div className="relative aspect-video">
+                                {!freeUrl && 
+                                <div className="absolute z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                    <Alert variant={'default'}>
+                                        <BadgeAlertIcon/> No free preview
+                                    </Alert>
+                                </div>}
                                 <VideoPlayer 
                                     url={`${env.AMZ_BUCKET_NAME}/${freeUrl}`}
                                 />
@@ -156,9 +192,32 @@ const CourseDetailsPage = () => {
                                         {courses[0]?.level}
                                     </span>
                                 </div>
-                                <button className="rounded-tr-none rounded-bl-none bg-sky-800/30 border border-sky-700/50 hover:bg-sky-600/40 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-                                    Buy Now
-                                </button>
+                                
+                                <AnimatePresence mode="wait">
+                                   
+                                        <motion.button
+                                            key="buyButton"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ duration: 0.1 }}
+                                            onClick={isAuthenticated ? handleTogglePayButton : toastAuthCheck}
+                                            className={`${isToggledPayButton && 'hidden'} rounded-tr-none rounded-bl-none bg-sky-800/30 border border-sky-700/50 hover:bg-sky-600/40 text-white font-semibold py-2 px-4 rounded-lg`}
+                                        >
+                                            Buy Now
+                                        </motion.button>
+                                        <motion.div
+                                            key="paypalButton"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ duration: 0.1 }}
+                                            className={`${!isToggledPayButton && 'hidden'}`}
+                                        >
+                                            <PaypalPayment courseData={courses[0]}/>
+                                        </motion.div>
+                                   
+                                </AnimatePresence>
                             </div>
                         </div>
                     </aside>

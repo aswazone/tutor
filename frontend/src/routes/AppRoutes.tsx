@@ -23,6 +23,7 @@ import ResetPassword from "@/pages/reset-password";
 import { CheckUserStatus } from "./CheckUserStatus";
 import AllCourses from "@/pages/courses";
 import CourseDetailsPage from "@/pages/courses/course";
+import MyCourses from "@/pages/courses/my-courses";
 
 
 export const router = createBrowserRouter([
@@ -57,6 +58,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: "otp-verification", element: <OtpForm />
+            },
+            {
+                path: "my-courses", element: <ProtectedRoutes><MyCourses /></ProtectedRoutes>
             }
         ]
     },
@@ -85,6 +89,6 @@ export const router = createBrowserRouter([
     },
     {
         path: "reset-password", element: <ResetPassword /> 
-    }
+    },
 
 ])

@@ -8,6 +8,10 @@ const ChapterSchema = new Schema({
   videoKey: String,
   pdfUrl: String,
   subtitleUrl: String,
+  freePreview: {
+    type: Boolean,
+    default: false
+  },
   videoUploadStatus: {
     type: String,
     enum: ['idle', 'uploading', 'success', 'error'],
@@ -55,6 +59,14 @@ const CourseSchema = new Schema({
     type: String,
     required: true
   },
+  students: [
+    {
+      studentId:String,
+      studentName: String,
+      studentEmail: String,
+      paidAmount: String
+    }
+  ],
   modules: {
     type: [ModuleSchema],
     required: true

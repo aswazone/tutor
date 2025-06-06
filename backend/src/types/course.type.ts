@@ -1,5 +1,12 @@
-import { Document, Types } from 'mongoose';
+import { Document} from 'mongoose';
 
+export interface ITutor {
+  _id: string;
+  name: string;
+  userEmail: string;
+  userName: string;
+  isActive: boolean;
+}
 export interface IChapter {
   id: string;
   title: string;
@@ -33,7 +40,7 @@ export interface ICourse extends Document {
   isVerified?: string;
   rejectReason?: string;
   modules: IModule[];
-  tutor: Types.ObjectId;
+  tutor?: ITutor;
   createdAt: Date;
   updatedAt: Date;
 }
