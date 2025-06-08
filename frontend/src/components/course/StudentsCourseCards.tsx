@@ -11,6 +11,7 @@ import Loader from '@/components/ui/loader'
 import { setActiveTab } from '@/store/auth/authSlice'
 import { AppDispatch, RootState } from '@/store'
 import { useDispatch, useSelector } from 'react-redux'
+import axiosInstance from '@/config/axios.config'
 
 type Props = {
   courses: ICourse[];
@@ -23,6 +24,17 @@ export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleW
   const navigate = useNavigate(); 
   const dispatch = useDispatch<AppDispatch>();
   const {user} = useSelector((state:RootState) => state.auth);
+
+  const handleNavigation = async (courseId: string) => {
+    const isPurchased = await axiosInstance.get(`/api/v1/courses/check-purchased/${courseId}/${user?._id}`);
+    console.log('isPurchased:', isPurchased.data);
+
+    if(isPurchased.data) {
+      navigate(`/course-progress/${courseId}`);
+    }else {
+      navigate(`/course/${courseId}`);
+    }
+  }
 
   if (isLoading) {
       return (
@@ -139,7 +151,7 @@ export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleW
                     <span className="font-semibold">₹ {course.pricing}</span>
                     <Button size='sm' className="opacity-0 group-hover:opacity-100 transition-opacity" variant={'outline'} onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/course/${course._id}/${user?._id}`);
+                      handleNavigation(course._id);
                     }}>
                       View Course
                     </Button>

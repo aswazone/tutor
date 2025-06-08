@@ -12,7 +12,7 @@ import { Chapter } from "@/types/course.type";
 import { BadgeAlertIcon, CheckCircle, Globe, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { toast } from "sonner";
 import { Alert } from "@/components/ui/alert";
 
@@ -21,14 +21,12 @@ const CourseDetailsPage = () => {
     const {id,userId} = useParams();
     const dispatch = useDispatch<AppDispatch>();
     const {isAuthenticated} = useSelector((state:RootState)=>state.auth);
-    const {items:courses,isLoading,enrolledId} = useSelector((state:RootState)=>state.fetch);
+    const {items:courses,isLoading} = useSelector((state:RootState)=>state.fetch);
     const [currentCourseId,setCurrentCourseId] = useState<string>('');
     const [freeUrl,setFreeUrl] = useState<string | undefined>('');
     const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] = useState('');
     const [showDialog, setShowDialog] = useState(false);
     const [isToggledPayButton, setIsToggledPayButton] = useState(false);
-    const [isPurchased, setIsPurchased] = useState(false);
-    const navigate = useNavigate();
 
     const handleTogglePayButton = () => {
         setIsToggledPayButton(!isToggledPayButton);
@@ -66,15 +64,10 @@ const CourseDetailsPage = () => {
 
     useEffect(()=>{
         if(currentCourseId){
-            dispatch(fetchCourse({courseId:currentCourseId,userId:userId as string}));
-            if(enrolledId !== null) setIsPurchased(true);
-            else setIsPurchased(false);
+            dispatch(fetchCourse(currentCourseId));
         }
-    },[currentCourseId,dispatch,userId,enrolledId])
+    },[currentCourseId,dispatch,userId])
 
-    useEffect(()=>{
-        if(isPurchased) navigate(`/course-progress/${enrolledId}`,{replace:true})
-    },[isPurchased,enrolledId,navigate])
 
     useEffect(()=>{
         const getFreePreviewVideoUrl = () => {
@@ -106,9 +99,6 @@ const CourseDetailsPage = () => {
     }
 
     if(isLoading)  return <div className="flex h-screen items-center justify-center"><Loader /> Please Wait..</div>
-    // if(isPurchased && !isLoading){
-    //     navigate(`/course-progress/${enrolledId}`,{replace:true});
-    // }
     if(!courses[0]?.isActive) return <Alert className="w-1/4 mx-auto mt-10" variant={"destructive"}>
         <CheckCircle className="w-4 h-4 text-center" /> This course is discontinued !
     </Alert>

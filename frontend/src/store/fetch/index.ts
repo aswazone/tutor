@@ -4,14 +4,12 @@ import axiosInstance, { axiosErrorMessage } from '@/config/axios.config';
 
 interface CourseState {
   items: ICourse[];
-  enrolledId: string | null;
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: CourseState = {
   items: [],
-  enrolledId: null,
   isLoading: false,
   error: null,
 };
@@ -34,9 +32,9 @@ export const fetchAllCourses = createAsyncThunk(
 export const fetchCourse = createAsyncThunk(
 
   'courses/fetchItem',
-  async ({ courseId, userId }: {courseId: string, userId: string}, { rejectWithValue }) => {
+  async (courseId: string, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`/api/v1/courses/${courseId}/${userId}`);
+      const response = await axiosInstance.get(`/api/v1/courses/${courseId}`);
       return response.data;
     } catch (err) {
       return rejectWithValue(axiosErrorMessage(err));
@@ -95,8 +93,7 @@ const fetchSlice = createSlice({
       })
       .addCase(fetchCourse.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.enrolledId = action.payload.enrolledId;
-        state.items = [action.payload.course];
+        state.items = [action.payload];
       })
       .addCase(fetchCourse.rejected, (state, action) => {
         state.isLoading = false;

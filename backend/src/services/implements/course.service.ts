@@ -57,17 +57,23 @@ export class CourseService implements ICourseService {
     return courses;
   }
 
-  getCourseById = async (userId: string, courseId: string): Promise<{course: ICourse, enrolledId: string | null}> => {
+  getCourseById = async (courseId: string): Promise<ICourse> => {
     
       const course = await this._courseRepository.getById(courseId, {path: 'tutor'});
       if (!course) throw new HttpError(HttpStatus.NOT_FOUND, 'Course not found');
 
-      const studentCourses = await this._studentCourseRepository.getStudentCourses(userId);
-      const isEnrolled = studentCourses?.courses.findIndex(course => course.courseId.toString() === courseId) !== -1;
-      
-      console.log('isEnrolledInCurrentCourse:',isEnrolled);
-      return {course, enrolledId: isEnrolled ? courseId: null};
+      return course;
 
+  }
+
+  checkIfCoursePurchased = async (userId: string, courseId: string): Promise<boolean> => {
+    if(!Types.ObjectId.isValid(courseId)) throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course id');
+    if(!Types.ObjectId.isValid(userId)) throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid user id');
+    const studentCourses = await this._studentCourseRepository.getStudentCourses(userId);
+    const isPurchased = studentCourses?.courses.findIndex(course => course.courseId.toString() === courseId) !== -1;
+
+    console.log('isPurchased:', isPurchased);
+    return isPurchased;
   }
 
 

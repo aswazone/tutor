@@ -7,7 +7,8 @@ export interface ICourseService {
   createCourse(userId: string, courseData: ICreateCourseDTO): Promise<ICourse>;
   getCoursesByInstructor(userId: string): Promise<ICourse[]>;
   getCoursesByStudent(userId: string): Promise<IStudentCoursesModel>;
-  getCourseById(userId: string, courseId: string): Promise<{ course: ICourse; enrolledId: string | null }>;
+  getCourseById(courseId: string): Promise<ICourse>;
+  checkIfCoursePurchased(userId: string, courseId: string): Promise<boolean>;
   getAllCourses(query: {
     filter: QueryFilter;
     options: QueryOptions;
