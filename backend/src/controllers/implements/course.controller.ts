@@ -54,8 +54,9 @@ export class CourseController implements ICourseController {
 
   getCourse = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { courseId } = req.params;
-      const course = await this._courseService.getCourseById(courseId);
+      const { courseId, userId} = req.params;
+
+      const course = await this._courseService.getCourseById(userId,courseId);
       res.json(course);
     } catch (error) {
       next(error);

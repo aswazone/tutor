@@ -123,15 +123,20 @@ export const WishlistTab = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [courses, setCourses] = useState<ICourse[]>([]);
   const navigate = useNavigate();
+  const {user} = useSelector((state: RootState) => state.auth);
+  const [loading,setLoading] = useState(false);
   const { items: wishlist, isLoading, error } = useSelector((state: RootState) => state.wishlist);
 
     useEffect(() => {
       // Fetch all public courses
       const fetchCourses = async () => {
+        setLoading(true);
         try {        
           const response = await axiosInstance.get<{ courses: ICourse[]}>('/api/v1/courses');
-          setCourses(response.data.courses);    
+          setCourses(response.data.courses);  
+          setLoading(false);  
       } catch (error) {
+        setLoading(false);
         if (error instanceof Error) {
           console.error('Failed to fetch courses:', error);
           toast.error(error.message);
@@ -155,7 +160,7 @@ export const WishlistTab = () => {
     
 
   const handleNavigate = (id: string) => {
-    navigate(`/course/${id}`);
+    navigate(`/course/${id}/${user?._id}`);
   };
 
 //   console.log(wishlist,'wishlistTAb');
@@ -171,7 +176,7 @@ export const WishlistTab = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || loading) {
     return (
       <>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

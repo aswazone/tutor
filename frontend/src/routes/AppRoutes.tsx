@@ -24,6 +24,7 @@ import { CheckUserStatus } from "./CheckUserStatus";
 import AllCourses from "@/pages/courses";
 import CourseDetailsPage from "@/pages/courses/course";
 import MyCourses from "@/pages/courses/my-courses";
+import CourseProgressPage from "@/pages/courses/course-progress";
 
 
 export const router = createBrowserRouter([
@@ -45,7 +46,7 @@ export const router = createBrowserRouter([
                 path: "courses", element: <AllCourses />,
             },
             {
-                path: "course/:id", element: <CourseDetailsPage />,
+                path: "course/:id/:userId", element: <CourseDetailsPage />,
             },
             {
                 path: "profile", element: <ProtectedRoutes><Profile /></ProtectedRoutes>,
@@ -61,7 +62,10 @@ export const router = createBrowserRouter([
             },
             {
                 path: "my-courses", element: <ProtectedRoutes><MyCourses /></ProtectedRoutes>
-            }
+            },
+            {
+                path: "course-progress/:id", element: <ProtectedRoutes><CourseProgressPage /></ProtectedRoutes>
+            },
         ]
     },
     {

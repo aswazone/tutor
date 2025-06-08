@@ -21,7 +21,6 @@ interface IBoughtCourse {
 const MyCourses = () => {
 
   const [studentBoughtCourses, setStudentBoughtCourses] = useState<IBoughtCourse[]>([]);
-
   console.log(studentBoughtCourses,'student-bought-courses');
   const navigate = useNavigate();
 
@@ -100,7 +99,7 @@ const MyCourses = () => {
                           <div className="flex justify-between items-center">
                             <Button size='sm' className="text-sky-500 opacity-60 grayscale-20 group-hover:opacity-100 hover:grayscale-0 transition-opacity" variant={'outline'} onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/course/${course._id}`);
+                              navigate(`/course-progress/${course._id}`);
                             }}>
                               <Play className="h-4 w-4 mr-2 text-sky-500" />
                               Watch

@@ -265,7 +265,7 @@ const Profile = () => {
                               <div className="space-y-2">
                                 <h4 className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-br from-sky-900/90 from-40% to-sky-200/70">{userData?.userEmail}</h4>                                
                                 
-                                  {userData?.isVerified === 'rejected' && <CustomAlert 
+                                  {userData?.role !== UserRole.STUDENT && userData?.isVerified === 'rejected' && <CustomAlert 
                                     className="bg-red-950/10 text-red-400/50 hover:text-red-400/60 hover:bg-red-950/30"
                                     title="Admin Rejected !" 
                                     description={userData?.tutorDetails?.rejectReason || "No reason provided."} 

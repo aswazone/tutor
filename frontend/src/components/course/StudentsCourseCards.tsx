@@ -9,8 +9,8 @@ import { ICourse } from "@/types/course.type"
 import CardSkeleton from '@/components/common/CardSkeleton'
 import Loader from '@/components/ui/loader'
 import { setActiveTab } from '@/store/auth/authSlice'
-import { AppDispatch } from '@/store'
-import { useDispatch } from 'react-redux'
+import { AppDispatch, RootState } from '@/store'
+import { useDispatch, useSelector } from 'react-redux'
 
 type Props = {
   courses: ICourse[];
@@ -22,6 +22,7 @@ type Props = {
 export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleWishlistToggle }: Props) => {
   const navigate = useNavigate(); 
   const dispatch = useDispatch<AppDispatch>();
+  const {user} = useSelector((state:RootState) => state.auth);
 
   if (isLoading) {
       return (
@@ -138,7 +139,7 @@ export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleW
                     <span className="font-semibold">₹ {course.pricing}</span>
                     <Button size='sm' className="opacity-0 group-hover:opacity-100 transition-opacity" variant={'outline'} onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/course/${course._id}`);
+                      navigate(`/course/${course._id}/${user?._id}`);
                     }}>
                       View Course
                     </Button>

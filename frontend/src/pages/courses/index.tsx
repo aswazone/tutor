@@ -17,6 +17,7 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom"
 import { Input } from "@/components/ui/input"
 import useDebounce from "@/components/hooks/useDebounce"
 import { Pagination } from "@/components/ui/pagination"
+import Loader from "@/components/ui/loader"
 
 
 const AllCourses = () => {
@@ -33,7 +34,7 @@ const AllCourses = () => {
   const limit = Number(searchParams.get('limit')) || 5;
   const debouncedSearch = useDebounce(searchQuery, 500);
   const [sort, setSort] = useState(() => searchParams.get('sort') || 'price-lowtohigh');
-  
+  const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState<Filters>(() => buildFilterFromQueryParams(searchParams));
   const { items: wishlistItems, isLoading: wishlistLoading } = useSelector(
     (state: RootState) => state.wishlist
@@ -99,7 +100,7 @@ const AllCourses = () => {
   useEffect(() => {
     // Fetch all public courses
     const fetchCourses = async () => {
-      console.log('Fetching courses...');
+      setIsLoading(true);
       console.log('Filters:', filters, currentPage, limit);
       const query = buildQueryParams(filters, debouncedSearch, sort);
       try {
@@ -107,7 +108,9 @@ const AllCourses = () => {
         setCourses(response.data.courses);
         setCourseCount(response.data.count);
         setTotalPages(Math.ceil(response.data.count / limit));
+        setIsLoading(false);
       } catch (error) {
+        setIsLoading(false);
         if (error instanceof Error) {
           console.error('Failed to fetch courses:', error);
           toast.error(error.message);
@@ -143,8 +146,9 @@ const AllCourses = () => {
     }
   };
 
-  const isLoading = wishlistLoading;
+  const totalLoading = wishlistLoading || isLoading;
 
+  
 
   return (
     <div className="container mx-auto p-4 ">
@@ -244,7 +248,8 @@ const AllCourses = () => {
             </div>
           </div>
           <div>
-            <StudentsCourseCards isLoading={isLoading} courses={courses} wishlistItems={wishlistItems} handleWishlistToggle={handleWishlistToggle} />
+            {totalLoading ? <div className="flex h-[300px] items-center justify-center"><Loader className="mr-2" /> Please Wait..</div>
+            : <StudentsCourseCards isLoading={isLoading} courses={courses} wishlistItems={wishlistItems} handleWishlistToggle={handleWishlistToggle} />}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

@@ -7,7 +7,7 @@ export interface ICourseService {
   createCourse(userId: string, courseData: ICreateCourseDTO): Promise<ICourse>;
   getCoursesByInstructor(userId: string): Promise<ICourse[]>;
   getCoursesByStudent(userId: string): Promise<IStudentCoursesModel>;
-  getCourseById(courseId: string): Promise<ICourse>;
+  getCourseById(userId: string, courseId: string): Promise<{ course: ICourse; enrolledId: string | null }>;
   getAllCourses(query: {
     filter: QueryFilter;
     options: QueryOptions;
