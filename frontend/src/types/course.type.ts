@@ -13,6 +13,7 @@ export interface Chapter {
   pdfUrl?: File
   subtitleUrl?: File
   freePreview?: boolean
+  progressValue?:number
   videoKey?: string // S3 object key after upload
   videoUploadStatus: "idle" | "uploading" | "success" | "error";
   videoUploadError?: string
@@ -44,7 +45,7 @@ export interface ICourse {
 }
 export interface ITutor {
   id: string
-  name: string
+  userName: string
   userEmail: string
   isActive: boolean
 }
@@ -82,3 +83,34 @@ export type IOptions = IOptionBase | ISubcategoryOption;
 export type Filters = {
   [key: string]: string[] | ISubcategoryOption[];
 };
+
+export interface IProgressData {
+  isPurchased: boolean;
+  message: string;
+  progress: {
+    completed: boolean;
+    completionDate: Date;
+    moduleProgress: {
+      moduleId: string;
+      viewed: boolean;
+      dateViewed: Date;
+      chapterProgress: {
+        chapterId: string;
+        viewed: boolean;
+        dateViewed: Date;
+      }[];
+    }[];
+  };
+  courseDetails: ICourse;
+}
+
+
+export interface IBoughtCourse {
+  _id: string;
+ courseId: string;
+ title: string;
+ courseImage: string;
+ dateOfPurchase: string;
+ tutorId: string;
+ tutorName: string;
+}

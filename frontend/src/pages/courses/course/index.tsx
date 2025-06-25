@@ -12,22 +12,25 @@ import { Chapter } from "@/types/course.type";
 import { BadgeAlertIcon, CheckCircle, Globe, PlayCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom"
-import { toast } from "sonner";
+import { useNavigate, useParams } from "react-router-dom"
 import { Alert } from "@/components/ui/alert";
+import axiosInstance from "@/config/axios.config";
+import { toastAuthCheck } from "@/utils/check-auth.utils";
+import { toast } from "sonner";
 
 const CourseDetailsPage = () => {
 
     const {id,userId} = useParams();
     const dispatch = useDispatch<AppDispatch>();
-    const {isAuthenticated} = useSelector((state:RootState)=>state.auth);
+    const {isAuthenticated,user} = useSelector((state:RootState)=>state.auth);
     const {items:courses,isLoading} = useSelector((state:RootState)=>state.fetch);
     const [currentCourseId,setCurrentCourseId] = useState<string>('');
     const [freeUrl,setFreeUrl] = useState<string | undefined>('');
     const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] = useState('');
     const [showDialog, setShowDialog] = useState(false);
     const [isToggledPayButton, setIsToggledPayButton] = useState(false);
-
+    const navigate = useNavigate();
+    
     const handleTogglePayButton = () => {
         setIsToggledPayButton(!isToggledPayButton);
         setTimeout(() => {
@@ -35,21 +38,27 @@ const CourseDetailsPage = () => {
         }, 5000);
     }
 
-
-    console.log(courses,'test-----------------');
-
-    const toastAuthCheck = () => {
-        toast("Please login to unlock this course",{
+    const handleProgressUpdate = async () => {
+        if(user?._id && id){
+              const isPurchased = await axiosInstance.get(`/api/v1/courses/check-purchased/${id}/${user?._id}`);
+              console.log('isPurchased:', isPurchased.data);
+        
+              if(isPurchased.data) navigate(`/course-progress/${id}`);
+        }
+        toast("Buy the course to unlock it... ✨",{
             position: "top-right",
             className: "mt-10",
             action: {
-                label: "Login",
+                label: "Buy",
                 onClick: () => {
-                    window.location.href = "/auth";
+                    handleTogglePayButton();
                 }
             }
         });
     }
+
+
+    console.log(courses,'test-----------------');
 
     useEffect(()=>{
         return () => {
@@ -64,9 +73,20 @@ const CourseDetailsPage = () => {
 
     useEffect(()=>{
         if(currentCourseId){
+            const checkPurchased =  async (courseId: string) => {
+                const isPurchased = await axiosInstance.get(`/api/v1/courses/check-purchased/${courseId}/${user?._id}`);
+                console.log('isPurchased:', isPurchased.data);
+
+                if(isPurchased.data) {
+                    navigate(`/course-progress/${courseId}`,{replace:true});
+                    return
+                }
+            
+            };
+            checkPurchased(currentCourseId);
             dispatch(fetchCourse(currentCourseId));
         }
-    },[currentCourseId,dispatch,userId])
+    },[currentCourseId,dispatch,userId,navigate,user?._id])
 
 
     useEffect(()=>{
@@ -122,7 +142,7 @@ const CourseDetailsPage = () => {
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                             </svg>
-                            Created By {courses[0]?.tutor?.name}
+                            Created By {courses[0]?.tutor?.userName}
                         </span>
                         <span className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,6 +203,7 @@ const CourseDetailsPage = () => {
                                     </Alert>
                                 </div>}
                                 <VideoPlayer 
+                                    onProgressUpdate={handleProgressUpdate}
                                     url={`${env.AMZ_BUCKET_NAME}/${freeUrl}`}
                                 />
                             </div>
@@ -236,6 +257,7 @@ const CourseDetailsPage = () => {
                         </DialogHeader>
                             <div className="aspect-video">
                                 <VideoPlayer 
+                                    // onProgressUpdate={setDummyCurrentChapter} progressData={currentDummyChapter}
                                     url={`${env.AMZ_BUCKET_NAME}/${displayCurrentVideoFreePreview}`}
                                 />
                             </div>

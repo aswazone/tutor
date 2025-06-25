@@ -5,7 +5,7 @@ import {
   courseLandingPageFormControls, 
   courseLandingInitialFormData,
   type IFormControl 
-} from "@/config"
+} from "@/config/helper.config"
 import { courseLandingSchema } from "@/schemas/course/course-landing.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, FormProvider } from "react-hook-form"

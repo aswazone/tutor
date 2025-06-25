@@ -70,10 +70,14 @@ export class CourseService implements ICourseService {
     if(!Types.ObjectId.isValid(courseId)) throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course id');
     if(!Types.ObjectId.isValid(userId)) throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid user id');
     const studentCourses = await this._studentCourseRepository.getStudentCourses(userId);
-    const isPurchased = studentCourses?.courses.findIndex(course => course.courseId.toString() === courseId) !== -1;
-
-    console.log('isPurchased:', isPurchased);
-    return isPurchased;
+    console.log(studentCourses,'studentCourses--|||')
+    if(studentCourses){
+      const isPurchased = studentCourses?.courses.findIndex(course => course.courseId.toString() === courseId) > -1;
+      console.log('check-isPurchased:--',isPurchased);
+      return isPurchased;
+    }
+    console.log('check-isPurchased:--',false);
+    return false;
   }
 
 

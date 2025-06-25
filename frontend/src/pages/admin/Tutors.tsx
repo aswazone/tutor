@@ -8,25 +8,7 @@ import axiosInstance from "@/config/axios.config"
 import { useEffect, useState, useCallback } from "react"
 import { toast } from "sonner"
 import { TutorDetailsDialog } from "@/components/admin/TutorDetailsDialog"
-
-interface TutorDetails {
-  qualification: string;
-  experience: number;
-  expertise: string;
-  about: string;
-  resume?: string;
-}
-
-interface Tutor {
-  _id: string;
-  userName: string;
-  userEmail: string;
-  tutorDetails: TutorDetails | null;
-  isVerified: 'verified' | 'pending' | 'rejected';
-  isActive: boolean;
-  createdAt: string;
-  rejectReason?: string;
-}
+import { Tutor } from "@/types/admin.type"
 
 const Tutors = () => {
   const [selectedTab, setSelectedTab] = useState('approved');

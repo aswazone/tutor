@@ -15,7 +15,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { ICategoryOption } from "@/config";
+import type { ICategoryOption } from "@/config/helper.config";
 
 interface CategorySelectorProps {
   categories: ICategoryOption[];

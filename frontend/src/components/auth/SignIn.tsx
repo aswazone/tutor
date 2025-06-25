@@ -1,4 +1,4 @@
-import { IFormControl } from "@/config"
+import { IFormControl } from "@/config/helper.config"
 import { SignInFormData } from "@/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import CommonForm from "../common/form"

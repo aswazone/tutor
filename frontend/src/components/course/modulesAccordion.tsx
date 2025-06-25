@@ -20,7 +20,7 @@ export function CourseModules({ course,handleSetFreePreview }: { course: ICourse
         <AccordionItem 
           key={module.id} 
           value={module.id}
-          className="rounded-bl-xl rounded-tr-xl pb-0 bg-gradient-to-bl from-sky-700/12 from-20% to-10% to-sky-950/15 backdrop-blur-3xl shadow-lg"
+          className="border-none rounded-bl-xl rounded-tr-xl pb-0 bg-gradient-to-bl from-sky-700/12 from-20% to-10% to-sky-950/15 backdrop-blur-3xl shadow-lg"
         >
           <AccordionTrigger className="px-6 py-4 text-lg font-semibold hover:text-sky-400 transition-colors">
             {module.title}
@@ -40,10 +40,10 @@ export function CourseModules({ course,handleSetFreePreview }: { course: ICourse
                   <div className="flex items-center gap-3" onClick={chapter.freePreview ? () => handleSetFreePreview(chapter):undefined}>
                     
                     {chapter.freePreview ? <CirclePlay className="w-5 h-5 text-sky-400" /> : <Lock className="w-5 h-5 text-sky-400" /> }
-                    <p className="font-medium">{chapter.title}</p>
+                    <p className="font-medium text-sm">{chapter.title}</p>
                   </div>
                   {chapter.freePreview && (
-                    <span className="text-xs bg-sky-500/20 text-sky-300 px-2 py-1 rounded">
+                    <span className="text-[8px] bg-sky-500/20 text-sky-300 px-2 py-1 rounded">
                       Free Preview
                     </span>
                   )}

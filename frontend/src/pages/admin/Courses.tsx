@@ -9,43 +9,8 @@ import { verifyCourse } from "@/store/admin/adminSlice"
 import { toast } from "sonner"
 import { useDispatch } from "react-redux"
 import { AppDispatch } from "@/store"
+import { ApiCourses, Course } from "@/types/admin.type"
 
-
-interface ApiCourses {
-  _id: string;
-  title: string;
-  isPublished: boolean;
-  isActive: boolean;
-  thumbnailKey: string;
-  level: string;
-  pricing: string;
-  tutor: {
-    id: string;
-    userName: string;
-  };
-  rating: string;
-  category: string;
-  isDeleted: boolean;
-  createdAt: Date;
-  isVerified: string;
-  rejectReason?: string
-}
-
-export interface Course {
-  id: string
-  title: string
-  tutor: string
-  category: string
-  thumbnailKey: string
-  level: string
-  isVerified: string
-  rejectReason?: string
-  isActive: boolean
-  price: string
-  enrollments: number
-  rating: number
-  status: "draft" | "published" | "archived"
-}
 
 const Courses = () => {
   const [approvedCourses, setApprovedCourses] = useState<Course[]>([]);

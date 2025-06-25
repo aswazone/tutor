@@ -26,7 +26,6 @@ import { StudentsSettingsTab } from './tabs/StudentsSettingsTab'
 import { CreateCourseTab } from './tabs/CreateCourseTab'
 import { setActiveTab } from '@/store/auth/authSlice'
 import { WishlistTab } from './tabs/WishlistTab'
-import { EnrolledCoursesTab } from './tabs/EnrolledCoursesTab'
 import { Sparkles } from '@/components/common/Sparkles'
 import { CheckCheck } from '@/components/common/VerifiedBadge'
 import { BadgeAlert } from '@/components/common/AlertBadge'
@@ -37,25 +36,8 @@ import { useEffect, useState } from 'react'
 import axiosInstance from '@/config/axios.config'
 import CustomAlert from '@/components/common/CustomAlert'
 import { LightbulbIcon } from 'lucide-react'
-
-interface User {
-  _id: string
-  userName: string
-  userEmail: string
-  name?: string
-  role: UserRole
-  profileImage?: string
-  isVerified?: string
-  tutorDetails?: {
-    qualification?: string
-    experience?: number
-    expertise?: string
-    about?: string
-    resume?: string
-    rejectReason?: string
-  }
-  createdAt?: Date
-}
+import { User } from '@/types/profile.type'
+import { GridLineHorizontal, GridLineVertical } from '@/components/common/GridLines'
 
 const getTabs = (role: UserRole) => {
   switch (role) {
@@ -71,7 +53,6 @@ const getTabs = (role: UserRole) => {
     case UserRole.STUDENT:
       return [
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: StudentsOverviewTab },
-        { id: 'enrolled-courses', name: 'Enrolled Courses', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: EnrolledCoursesTab },
         { id: 'wishlist', name: 'Wishlist', icon: <AcademicCapIcon className="h-5 w-5 md:hidden" />, component: WishlistTab },
         { id: 'teachers', name: 'Teachers', icon: <UserIcon className="h-5 w-5 md:hidden" />, component: TeachersTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: StudentsSettingsTab },
@@ -156,13 +137,15 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Profile Header */}
-      <div className="relative">
-        <div className="h-48 w-full bg-background bg-gradient-to-br from-sky-900/50 via-black to-sky-900/50 text-sky-600  overflow-hidden border border-sky-900/10 dark:bg-conic-210" />
+      <div className="relative mt-18 md:mt-25">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-2 md:gap-0 -mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
-            <div className="flex">
-              <div className="relative rotate-hor-center-normal flip-coin h-24 w-24 rounded-full border-1 shadow-[inset_0px_0px_25px_7px_rgba(2,_13,_19,_0.94)] border-black overflow-hidden">
-                <Avatar className="h-24 w-24">
+        <GridLineVertical className='ml-2'/>
+          <div className="relative flex gap-2 md:gap-0 -mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
+          <div className="absolute h-25 md:h-48 w-full bg-background bg-gradient-to-br from-sky-900/50 via-[#09090b] to-sky-900/50 text-sky-600  overflow-hidden border border-sky-900/10 dark:bg-conic-210" />
+          <div className='absolute h-25 md:h-48 w-full bg-gradient-to-b from-sky-900/10 to-[#09090b]'/>
+            <div className="flex mx-4 mt-2 md:mt-0">
+              <div className="relative rotate-hor-center-normal flip-coin h-18 w-18 md:h-24 md:w-24 rounded-full border-1 shadow-[inset_0px_0px_25px_7px_rgba(2,_13,_19,_0.94)] border-black overflow-hidden">
+                <Avatar className="h-18 w-18 md:h-24 md:w-24">
                   <AvatarImage
                     src={userData?.profileImage || "https://i.pravatar.cc/150?img=67"}
                     alt={userData?.userName || "User Avatar"}
@@ -176,11 +159,11 @@ const Profile = () => {
                 </Avatar>
               </div>
             </div>
-            <div className="md:mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
+            <div className="md:mt-8 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
               <div className="sm:hidden md:flex md:items-start mt-6 min-w-0 flex-1">
-                <div className=''>
-                  <h1 className="text-4xl font-mono font-bold text-foreground truncate">{userData?.userName?.slice(0,1).toUpperCase().concat(userData?.userName?.slice(1)) || userData?.userName}</h1>
-                  <p className="text-gray-500 dark:text-gray-400">@{userData?.userName.toLowerCase()}</p>
+                <div className='absolute top-4'>
+                  <h1 className="text-xl md:text-4xl font-mono font-bold text-foreground truncate">{userData?.userName?.slice(0,1).toUpperCase().concat(userData?.userName?.slice(1)) || userData?.userName}</h1>
+                  <p className="text-gray-500 text-sm md:text-md dark:text-gray-400">@{userData?.userName.toLowerCase()}</p>
                 </div>
                 {userData?.role === UserRole.TUTOR && ( userData?.isVerified === 'verified'
                   ? <CheckCheck stroke='#34D399' className="h-5 w-5 mt-1 text"/>
@@ -247,13 +230,13 @@ const Profile = () => {
                     ? <Loader className='h-5 w-5 ml-1 mt-3'/> 
                     : (
                         <HoverCard>
-                          <HoverCardTrigger asChild>
+                          <HoverCardTrigger asChild className='absolute bottom-0 right-4 md:top-5 md:right-4 '>
                             <Sparkles 
                               stroke='#38bdf8' 
                               className="h-8 w-8 mt-1 cursor-pointer animate-in grayscale-25 hover:grayscale-0 hover:scale-105 transition-all"
                             />
                           </HoverCardTrigger>
-                          <HoverCardContent sideOffset={15} side='left' className="relative w-80 mb-25 bg-card/95 backdrop-blur-lg rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none border-sky-900/40 shadow-[0px_17px_22px_4px_rgba(3,_7,_13,_0.95)]">
+                          <HoverCardContent sideOffset={15} side='left' className="relative w-80 mt-20 bg-card/95 backdrop-blur-lg rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none border-sky-900/40 shadow-[0px_17px_22px_4px_rgba(3,_7,_13,_0.95)]">
                             <div className="absolute inset-y-auto left-0 h-80% w-px bg-neutral-200/80 dark:bg-neutral-800/80">
                               <div className="absolute top-0 h-20 w-px bg-gradient-to-b from-transparent via-sky-500 to-transparent" />
                             </div>
@@ -299,12 +282,14 @@ const Profile = () => {
                       ))
                   }
             </div>
+        <GridLineVertical className='right-2'/>
           </div>
         </div>
+
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-15 md:mt-6">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Sidebar */}
           <div className="w-full lg:w-1/3 space-y-6">
@@ -315,12 +300,13 @@ const Profile = () => {
           {/* Right Content */}
           <div className="w-full lg:w-2/3 space-y-6">
             <div className="w-full overflow-x-auto scrollbar-none -mb-px">
-              <nav className="flex justify-around space-x-4 border-b border-border pb-4">
+              <nav className="relative flex justify-around space-x-4 border-border pb-4 overflow-hidden">
+                <GridLineHorizontal className='left-50'/>
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => dispatch(setActiveTab(tab.id))}
-                    className={` px-3 py-1  rounded-bl-lg rounded-tr-lg transition-colors ${
+                    className={` px-3 py-1 my-3 rounded-bl-lg rounded-tr-lg transition-colors ${
                       activeTab === tab.id
                         ? 'bg-gradient-to-br border-2 border-sky-800/30 from-sky-900/30 to-sky-9from-sky-900/60 text-primary-background'
                         : 'text-muted-foreground hover:text-foreground'

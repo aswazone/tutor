@@ -1,13 +1,5 @@
 import { CategoryDocument } from '@/models/interface/category.model.interface';
-
-export interface ICategoryCreateDTO {
-  name: string;
-  isListed: boolean;
-}
-
-export interface ISubCategoryCreateDTO extends ICategoryCreateDTO {
-  parentId: string;
-}
+import { ICategoryCreateDTO, ISubCategoryCreateDTO } from '@/types/category.type';
 
 export interface ICategoryService {
   createCategory(data: ICategoryCreateDTO): Promise<CategoryDocument>;

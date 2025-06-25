@@ -5,11 +5,9 @@ import { HttpError } from '../../utils/http-error.utils';
 import { AWS_S3_BUCKET } from '@/config/env.config';
 import { IUploadService } from '../interface/upload.service.interface';
 import { HttpStatus } from '@/constants/status.constant';
+import { FolderConfig } from '@/types/upload.type';
 
-interface FolderConfig {
-  path: string;
-  contentType: string;
-}
+
 
 export class UploadService implements IUploadService {
     private readonly folderConfigs: Record<string, FolderConfig> = {

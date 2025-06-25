@@ -14,3 +14,16 @@ export interface ICreateOrderDTO{
     courseId: string,
     coursePricing: string
 }
+
+export interface IOrderDTO{
+    id: string;
+}
+ export type approvedPayment ={
+    status: string
+}
+
+export type OnApproveData = {
+    orderID: string;
+    payerID?: string | null;
+    paymentID?: string | null;
+};

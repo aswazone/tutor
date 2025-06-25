@@ -20,10 +20,10 @@ import { LogoIcon } from "./Icons";
 import { NavMenu } from "./NavMenu";
 import HoldToConfirmButton from "../common/HoldToSubmit";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { logout } from "@/store/auth/authSlice";
+import { GridLineHorizontal } from "../common/GridLines";
 
 interface RouteProps {
   href: string;
@@ -65,7 +65,8 @@ export const Navbar = () => {
     }
  
   return (
-    <header className="sticky z-50 border-b-[1px] top-0  w-full bg-white dark:border-b-slate-700 dark:bg-background">
+    <header className="sticky z-50 top-0 w-full bg-white dark:border-b-slate-700 dark:bg-background">
+      <GridLineHorizontal className="bottom-0" offset="1px"/>
       <NavigationMenu className="mx-auto">
         <NavigationMenuList className="container h-14 px-5 md:px-20 w-screen flex justify-between ">
           <NavigationMenuItem className="font-bold flex items-center">

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import CommonForm from '../common/form'
 import { SignUpFormData } from '@/types'
-import { IFormControl } from '@/config'
+import { IFormControl } from '@/config/helper.config'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signUpSchema } from '@/schemas/auth'

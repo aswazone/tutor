@@ -7,19 +7,8 @@ import { IStudentCoursesRepository } from "@/repositories/interface/studentCours
 import { StudentCourses } from "@/schema/studentCourses.schema";
 import { ICourseRepository } from "@/repositories/interface/course.repository.interface";
 import { IOrderModel } from "@/models/interface/order.model.interface";
+import { approvedPayment, IOrderDTO, OnApproveData } from "@/types/order.type";
 
-interface IOrderDTO{
-    id: string;
-}
- export type approvedPayment ={
-    status: string
-}
-
-export type OnApproveData = {
-    orderID: string;
-    payerID?: string | null;
-    paymentID?: string | null;
-};
 
 export class OrderService implements IOrderService {
     constructor(

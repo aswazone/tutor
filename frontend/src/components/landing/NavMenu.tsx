@@ -8,10 +8,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { ShoppingCart, User } from "lucide-react";
+import { User } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "@/store";
+import { BorderBeam } from "../magicui/border-beam";
 
 export function NavMenu() {
 
@@ -21,11 +22,15 @@ export function NavMenu() {
     return (
         
       <div className='flex items-center lg:flex-row gap-4'>
-        {user?.role !== 'admin' && 
-        <Button variant='outline' size='icon'>
-          <ShoppingCart className='h-6 w-6'/>
-          <span className="sr-only">User cart</span>
-        </Button>}
+        {user?.role === 'student' ? 
+        <Button className="relative" variant='ghost' onClick={() => navigate('/my-courses')}>
+          My courses ✨
+          <BorderBeam colorFrom="#00bcff" colorTo="#014f79" size={20} delay={0} duration={6}/>
+          <BorderBeam colorFrom="#00bcff" colorTo="#014f79" size={20} delay={0} duration={6} initialOffset={450}/>
+        </Button>
+        :
+          null
+        }
         {isAuthenticated && (<DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className=' bg-black hover:opacity-90 transition-all duration-200 cursor-pointer ring-[0.5px] ring-transparent dark:ring-gray-600'>

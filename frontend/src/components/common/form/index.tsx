@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import FormControls from './form-controls';
-import { IFormControl } from '@/config';
+import { IFormControl } from '@/config/helper.config';
 import { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { Loader2 } from 'lucide-react';

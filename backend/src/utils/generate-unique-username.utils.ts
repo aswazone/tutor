@@ -7,7 +7,7 @@ export const generateUniqueUsername = async (userName: string): Promise<string> 
 
     let newUserName = baseUserName;
     
-    while (await userReposiory.findByEmail(newUserName)) {
+    while (await userReposiory.findUserByEmail(newUserName)) {
         const counter = Math.floor(Math.random() * 100);
         newUserName = `${baseUserName}${counter}`;
     }

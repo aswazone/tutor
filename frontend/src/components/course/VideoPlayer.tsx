@@ -115,6 +115,8 @@ function VideoPlayer({
     };
   }, []);
 
+  // console.log(played, "played");
+
   useEffect(() => {
     if (played === 1) {
       onProgressUpdate({
@@ -127,7 +129,7 @@ function VideoPlayer({
   return (
     <div
       ref={playerContainerRef}
-      className={`relative bg-gray-900 rounded-lg overflow-hidden shadow-2xl transition-all duration-300 ease-in-out 
+      className={`relative bg-gradient-to-l from-[#111826]/60 via-background/30 to-[#111826]/60 bg-clip-padding backdrop-filter backdrop-blur bg-opacity-10 backdrop-saturate-100 backdrop-contrast-100 rounded-lg overflow-hidden shadow-2xl transition-all duration-300 ease-in-out 
       ${isFullScreen ? "w-screen h-screen" : ""}
       `}
       style={{ width, height }}
@@ -210,7 +212,7 @@ function VideoPlayer({
               />
             </div>
             <div className="flex items-center space-x-2">
-              <div className="text-white">
+              <div className="text-white text-xs">
                 {formatTime(played * (playerRef?.current?.getDuration() || 0))}/{" "}
                 {formatTime(playerRef?.current?.getDuration() || 0)}
               </div>

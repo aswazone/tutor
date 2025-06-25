@@ -1,4 +1,4 @@
-import { type IFormControl } from "@/config";
+import { type IFormControl } from "@/config/helper.config";
 import {
   FormControl,
   FormField,

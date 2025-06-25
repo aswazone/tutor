@@ -1,7 +1,7 @@
 import SignIn from "@/components/auth/SignIn";
 import SignUp from "@/components/auth/SignUp";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { signInFormControl, signUpFormControl } from "@/config";
+import { signInFormControl, signUpFormControl } from "@/config/helper.config";
 import { SignInFormData, SignUpFormData, UserRole } from "@/types";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";

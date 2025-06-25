@@ -1,22 +1,10 @@
 import { Student, StudentsTable } from "@/components/admin/StudentsTable"
 import axiosInstance from "@/config/axios.config";
+import { ApiStudents } from "@/types/admin.type";
 import { useEffect, useState } from "react";
 
 
-interface ApiStudents {
-  _id: string;
-  name: string;
-  userName: string;
-  userEmail: string;
-  isActive: boolean;
-  isDeleted: boolean;
-  createdAt: Date;
-}
-
-
-
 const Students = () => {
-
 
 const [students, setstudents] = useState<Student[]>([]);
   

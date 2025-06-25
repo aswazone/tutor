@@ -1,23 +1,16 @@
-import { IFormControl, signInFormControl } from "@/config"
 import { SignInFormData, UserRole } from "@/types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import CommonForm from "@/components/common/form"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signInSchema } from "@/schemas/auth"
-
-export interface SignInProps {
-    handleSignInSubmit: (data: SignInFormData) => void;
-    signInFormControl: IFormControl[];
-}
-
-
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { signinUser } from "@/store/auth/authSlice";
 import { AppDispatch } from "@/store"; 
 import { toast } from "sonner";
+import { signInFormControl } from "@/config/helper.config"
 
 const AdminAuthPage: React.FC = () => {
     const role = UserRole.ADMIN;

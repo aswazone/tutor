@@ -26,14 +26,13 @@ export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleW
   const {user} = useSelector((state:RootState) => state.auth);
 
   const handleNavigation = async (courseId: string) => {
-    const isPurchased = await axiosInstance.get(`/api/v1/courses/check-purchased/${courseId}/${user?._id}`);
-    console.log('isPurchased:', isPurchased.data);
+    if(user?._id && courseId){
+      const isPurchased = await axiosInstance.get(`/api/v1/courses/check-purchased/${courseId}/${user?._id}`);
+      console.log('isPurchased:', isPurchased.data);
 
-    if(isPurchased.data) {
-      navigate(`/course-progress/${courseId}`);
-    }else {
-      navigate(`/course/${courseId}`);
+      if(isPurchased.data) navigate(`/course-progress/${courseId}`);
     }
+    navigate(`/course/${courseId}`);
   }
 
   if (isLoading) {

@@ -7,12 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ICourse } from '@/types/course.type';
 import { useNavigate } from 'react-router-dom';
-import { useCallback, useEffect, useState, memo } from 'react';
-import axiosInstance from '@/config/axios.config';
+import { useCallback, useState, memo } from 'react';
 import { setActiveTab } from '@/store/auth/authSlice';
 import CardSkeleton from '@/components/common/CardSkeleton';
 import Loader from '@/components/ui/loader';
-import { toast } from 'sonner';
 import { env } from '@/config/env.config';
 
 type CourseCardProps = {

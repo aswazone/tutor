@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
-import { filterOptions, sortOptions } from "@/config"
 import axiosInstance from "@/config/axios.config"
 import { AppDispatch, RootState } from "@/store"
 import { addToWishlist, fetchWishlist, removeFromWishlist } from "@/store/wishlist"
@@ -18,6 +17,8 @@ import { Input } from "@/components/ui/input"
 import useDebounce from "@/components/hooks/useDebounce"
 import { Pagination } from "@/components/ui/pagination"
 import Loader from "@/components/ui/loader"
+import { BorderBeam } from "@/components/magicui/border-beam"
+import { filterOptions, sortOptions } from "@/config/helper.config"
 
 
 const AllCourses = () => {
@@ -200,6 +201,8 @@ const AllCourses = () => {
             <div className="absolute inset-x-3 top-0 h-6px w-1/2 bg-neutral-200/80 dark:bg-neutral-800/80">
               <div className="absolute left-1/2 transform -translate-x-1/2 h-px w-20 bg-gradient-to-r from-transparent via-sky-800 to-transparent" />
             </div>
+            <BorderBeam duration={8} size={100} />
+            <BorderBeam initialOffset={100} duration={8} size={100} />
           </div>
         </aside>
         <main className="relative flex-1">

@@ -14,14 +14,8 @@ import Loader from '@/components/ui/loader';
 import { StarIcon, Clock, Users, GraduationCap, Trash } from 'lucide-react';
 import { env } from '@/config/env.config';
 import axiosInstance from '@/config/axios.config';
-import { setActiveTab } from '@/store/auth/authSlice';
+import { CourseCardProps } from '@/types/profile.type';
 
-
-type CourseCardProps = {
-  course: ICourse;
-  onNavigate: (id: string) => void;
-  onDelete: (id: string) => void;
-};
 
 // Memoized Course Card Component
 const CourseCard = memo(({ course, onNavigate, onDelete}: CourseCardProps) => {
@@ -123,8 +117,8 @@ export const WishlistTab = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [courses, setCourses] = useState<ICourse[]>([]);
   const navigate = useNavigate();
-  const {user} = useSelector((state: RootState) => state.auth);
   const [loading,setLoading] = useState(false);
+  const { user } = useSelector((state: RootState) => state.auth);
   const { items: wishlist, isLoading, error } = useSelector((state: RootState) => state.wishlist);
 
     useEffect(() => {
@@ -159,9 +153,15 @@ export const WishlistTab = () => {
     // console.log(wishlistedCourses,'wishlistedCourses');
     
 
-  const handleNavigate = (id: string) => {
-    navigate(`/course/${id}/${user?._id}`);
-  };
+  const handleNavigation = async (courseId: string) => {
+      if(user?._id && courseId){
+        const isPurchased = await axiosInstance.get(`/api/v1/courses/check-purchased/${courseId}/${user?._id}`);
+        console.log('isPurchased:', isPurchased.data);
+  
+        if(isPurchased.data) navigate(`/course-progress/${courseId}`);
+      }
+      navigate(`/course/${courseId}`);
+  }
 
 //   console.log(wishlist,'wishlistTAb');
 //   console.log(courses,'wishlist-TAb');
@@ -210,13 +210,13 @@ export const WishlistTab = () => {
   if (!wishlist?.length || !courses?.length || !wishlistedCourses?.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[200px] text-muted-foreground">
-        <p>Your wishlist is empty</p>
+        <p className='text-xl text-sky-200/60'>~ Your wishlist is empty ~</p>
         <Button 
-          variant="link" 
-          onClick={() => dispatch(setActiveTab('courses'))}
-          className="mt-2"
+          variant="ghost" 
+          onClick={() => navigate('/courses')}
+          className="mt-8"
         >
-          Browse Courses
+          Browse Courses <span className='animate-caret-blink'>✨</span>
         </Button>
       </div>
     );
@@ -233,7 +233,7 @@ export const WishlistTab = () => {
           <CourseCard
             key={course._id}
             course={course}
-            onNavigate={handleNavigate}
+            onNavigate={()=>handleNavigation(course._id)}
             onDelete={handleRemoveFromWishlist}
           />
         ))}

@@ -10,6 +10,7 @@ import adminRouter from './routers/admin.routes';
 import categoryRouter from './routers/category.route';
 import wishlistRouter from './routers/wishlist.route';
 import orderRouter from './routers/order.routes';
+import progressRouter from './routers/courseProgress.routes';
 import { initializeCoursePublisher } from './utils/course-schedule-publisher.utils';
 
 const app:Express = express();
@@ -28,5 +29,6 @@ app.use('/api/v1/wishlist', wishlistRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/category', categoryRouter)
 app.use('/api/v1/order', orderRouter);
+app.use('/api/v1/course-progress', progressRouter);
 
 export default app;
