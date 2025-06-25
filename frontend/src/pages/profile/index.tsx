@@ -166,15 +166,17 @@ const Profile = () => {
                   <p className="text-gray-500 text-sm md:text-md dark:text-gray-400">@{userData?.userName.toLowerCase()}</p>
                 </div>
                 {userData?.role === UserRole.TUTOR && ( userData?.isVerified === 'verified'
-                  ? <CheckCheck stroke='#34D399' className="h-5 w-5 mt-1 text"/>
+                  ? <CheckCheck stroke='#34D399' className="absolute top-4 left-23 md:top-6 md:left-58 h-5 w-5 mt-1"/>
                   : userData?.isVerified === 'pending' 
-                    ? <Loader className='h-5 w-5 ml-1 mt-3'/> 
+                    ? <div className='absolute top-17 left-23 md:top-20 md:left-28 flex items-center gap-1 text'>
+                      <Loader className='h-2 w-2 text-orange-500'/><span className='text-[8px] md:text-xs text-orange-400/60'>verification pending !</span> 
+                    </div>
                     : (
                         <HoverCard defaultOpen={userData?.isVerified !== 'verified'}>
                           <HoverCardTrigger asChild>  
                             <BadgeAlert 
                               stroke='#f59e0b' 
-                              className="h-5 w-5 mt-1 cursor-pointer animate-caret-blink grayscale-25 hover:grayscale-0 hover:scale-105 transition-all"
+                              className="absolute top-4 left-23 md:top-6 md:left-58 h-5 w-5 mt-1 cursor-pointer animate-caret-blink grayscale-25 hover:grayscale-0 hover:scale-105 transition-all"
                             />
                           </HoverCardTrigger>
                           <HoverCardContent className="relative w-80 mt-2 ml-10 bg-card/95 backdrop-blur-lg rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none border-sky-900/40 shadow-[0px_17px_22px_4px_rgba(3,_7,_13,_0.95)]">
