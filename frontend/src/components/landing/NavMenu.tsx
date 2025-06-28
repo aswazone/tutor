@@ -22,22 +22,14 @@ export function NavMenu() {
     return (
         
       <div className='flex items-center lg:flex-row gap-4'>
-        {user?.role === 'student' ? 
-        <Button className="relative" variant='ghost' onClick={() => navigate('/my-courses')}>
-          My courses ✨
-          <BorderBeam colorFrom="#00bcff" colorTo="#014f79" size={20} delay={0} duration={6}/>
-          <BorderBeam colorFrom="#00bcff" colorTo="#014f79" size={20} delay={0} duration={6} initialOffset={450}/>
-        </Button>
-        :
-          null
-        }
-        {isAuthenticated && (<DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        {isAuthenticated && location.pathname !== '/profile' && (
+          <DropdownMenu>
+          <DropdownMenuTrigger className="ml-3 md:ml-0" asChild>
             <Avatar className=' bg-black hover:opacity-90 transition-all duration-200 cursor-pointer ring-[0.5px] ring-transparent dark:ring-gray-600'>
               <AvatarFallback className='bg-black text-white font-extrabold'>{user?.userName[0].toUpperCase()}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className='fixed top-5 -left-14 w-40 p-2 bg-background dark:bg-background/90' align='start'>
+          <DropdownMenuContent className='fixed top-4 w-40 p-2 bg-background dark:bg-background/90' align='start'>
             <DropdownMenuLabel className='px-2 py-1.5'>
               <span className='text-xs text-muted-foreground'>Logged in as</span>
               <p className='font-medium'>{(user?.userName as string).slice(0,1).toUpperCase() + user?.userName.slice(1)}</p>
@@ -52,6 +44,15 @@ export function NavMenu() {
           </DropdownMenuContent>
         </DropdownMenu>
       )}
+        {user?.role === 'student' ? 
+        <Button className="relative" variant='ghost' onClick={() => navigate('/my-courses')}>
+          My courses ✨
+          <BorderBeam colorFrom="#00bcff" colorTo="#014f79" size={20} delay={0} duration={6}/>
+          <BorderBeam colorFrom="#00bcff" colorTo="#014f79" size={20} delay={0} duration={6} initialOffset={450}/>
+        </Button>
+        :
+          null
+        }
       </div>
     )
   }

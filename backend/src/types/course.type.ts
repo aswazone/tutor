@@ -13,7 +13,6 @@ export interface IChapter {
   content: string;
   videoKey?: string;
   pdfUrl?: string;
-  subtitleUrl?: string;
   videoUploadStatus: 'idle' | 'uploading' | 'success' | 'error';
   videoUploadError?: string;
 }

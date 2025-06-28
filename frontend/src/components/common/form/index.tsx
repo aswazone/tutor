@@ -20,7 +20,7 @@ const CommonForm = <T extends FieldValues>({ form, onSubmit, buttonText = "Submi
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormControls form={form} formControls={formControls} />
+        <FormControls formControls={formControls} />
         <Button 
           disabled={isLoading} 
           type='submit' 

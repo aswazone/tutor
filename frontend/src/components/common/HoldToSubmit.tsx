@@ -44,7 +44,7 @@ const HoldToConfirmButton: React.FC<HoldToConfirmButtonProps> = ({
         onMouseUp={resetHold}
         onMouseLeave={resetHold}
         onTouchEnd={resetHold}
-        className="relative text-xs z-10 p-1.5 rounded-full  bg-red-900/30 border-1 border-red-900/50 text-black shadow-lg select-none"
+        className="relative text-xs z-10 p-1.5 rounded-full  bg-sky-900/30 border-1 border-sky-900/50 text-black shadow-lg select-none"
       >
         {children}
       </button>
@@ -59,8 +59,8 @@ const HoldToConfirmButton: React.FC<HoldToConfirmButtonProps> = ({
           cy="56"
           r={radius}
           fill="none"
-          stroke="red"
-          strokeWidth="3"
+          stroke="#5da9cc"
+          strokeWidth="4"
           strokeDasharray={circumference}
           strokeDashoffset={circumference}
           animate={controls}

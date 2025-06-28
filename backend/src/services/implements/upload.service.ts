@@ -19,20 +19,17 @@ export class UploadService implements IUploadService {
             path: 'course-videos',
             contentType: 'video/*'
         },
-        'pdf': {
+        'application': {
             path: 'course-documents',
             contentType: 'application/pdf'
         },
-        'subtitle': {
-            path: 'course-subtitles',
-            contentType: 'text/vtt'
-        }
     };
 
     getPresignedUrl = async (fileName: string, contentType: string) => {
         try {
 
             
+            console.log(fileName, contentType);
             // Extract file type from content type
             const type = contentType.split('/')[0];
             
@@ -44,6 +41,11 @@ export class UploadService implements IUploadService {
             // Build folder path
             let folderPath = config.path;
             if (type === 'video') {
+                const [moduleId, chapterId] = fileName.split('/');
+                if (!moduleId || !chapterId) throw new HttpError( HttpStatus.BAD_REQUEST, 'Invalid video file path format. Expected: moduleId/chapterId/filename');
+                folderPath = `${folderPath}/${moduleId}/${chapterId}`;
+            }
+            if(type === 'pdf') {
                 const [moduleId, chapterId] = fileName.split('/');
                 if (!moduleId || !chapterId) throw new HttpError( HttpStatus.BAD_REQUEST, 'Invalid video file path format. Expected: moduleId/chapterId/filename');
                 folderPath = `${folderPath}/${moduleId}/${chapterId}`;

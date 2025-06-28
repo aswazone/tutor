@@ -68,7 +68,7 @@ export const Cards = () => {
       <motion.h2 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-3xl lg:text-4xl font-bold md:text-center"
+        className="text-3xl lg:text-4xl font-bold md:text-center auto-show"
       >
         Best{" "}
         <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
@@ -90,7 +90,7 @@ export const Cards = () => {
           >
             <Badge
               variant="secondary"
-              className="text-sm cursor-pointer hover:bg-gray-600 hover:text-white transition-colors"
+              className="text-sm cursor-pointer auto-show hover:bg-gray-600 hover:text-white transition-colors"
             >
               {topic}
             </Badge>
@@ -108,7 +108,7 @@ export const Cards = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="group pt-0 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <Card className="group pt-0 auto-show overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="relative overflow-hidden">
                 <motion.img
                   whileHover={{ scale: 1.1 }}

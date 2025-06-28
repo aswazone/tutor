@@ -21,6 +21,12 @@ export interface UploadVideoResult {
   videoUploadError?: string;
 }
 
+export interface UploadPdfResult {
+  pdfKey: string | undefined;
+  pdfUploadStatus: "idle" | "uploading" | "success" | "error";
+  pdfUploadError?: string;
+}
+
 export interface SubmitCourseData {
   courseDetails: CourseLandingFormData;
   thumbnailKey: string;

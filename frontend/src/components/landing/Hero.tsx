@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { buttonVariants } from "../ui/button";
-import { HeroCards } from "./HeroCards";
+import { HeroCards } from "../home/HeroCards";
 import { motion } from "framer-motion";
 export const Hero = () => {
   const letterAnimation = {

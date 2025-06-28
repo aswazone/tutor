@@ -7,7 +7,6 @@ const ChapterSchema = new Schema({
   content: String,
   videoKey: String,
   pdfUrl: String,
-  subtitleUrl: String,
   freePreview: {
     type: Boolean,
     default: false

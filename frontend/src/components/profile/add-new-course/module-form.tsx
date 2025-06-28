@@ -14,8 +14,14 @@ import {
 } from "@/components/ui/form"
 
 const moduleFormSchema = z.object({
-  title: z.string().min(5, "Title is required, at least 5 characters"),
-  description: z.string().min(8, "Description is required, at least 8 characters"),
+  title: z.string()
+    .trim()
+    .min(5, "Title is required, at least 5 characters")
+    .nonempty("Title cannot be empty or whitespace"),
+  description: z.string()
+    .trim()
+    .min(8, "Description is required, at least 8 characters")
+    .nonempty("Description cannot be empty or whitespace"),
 })
 
 type ModuleFormValues = z.infer<typeof moduleFormSchema>

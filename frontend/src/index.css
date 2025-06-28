@@ -107,3 +107,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #043d55f7 #081a3364;
+}

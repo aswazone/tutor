@@ -54,7 +54,7 @@ const initialState: InitialStateTypes = {
 
 
 
-import { UploadImageResult, UploadVideoResult } from "@/types/store.types";
+import { UploadImageResult, UploadPdfResult, UploadVideoResult } from "@/types/store.types";
 
 export const uploadSingleVideoFile = createAsyncThunk<UploadVideoResult, { video: File, moduleId: string, chapterId: string }, { rejectValue: string }>(
   "course/uploadSingleVideoFile",
@@ -87,6 +87,47 @@ export const uploadSingleVideoFile = createAsyncThunk<UploadVideoResult, { video
               videoKey: videoResponse.data.key,
               videoUploadStatus: "success" as const,
               videoUploadError: "",
+            }
+    } catch (err) {
+      console.log(err, 'upload error');
+      const message = axiosErrorMessage(err);
+      return rejectWithValue(message);
+    }
+  
+})
+
+export const uploadSinglePdfFile = createAsyncThunk<UploadPdfResult, { pdf: File, moduleId: string, chapterId: string }, { rejectValue: string }>(
+  "course/uploadSingleVideoFile",
+  async ({ pdf , moduleId, chapterId}, { rejectWithValue }) => {
+    
+    try {
+            const pdfResponse = await axiosInstance.get<{ url: string; key: string }>("/api/v1/upload/presigned-url", {
+              params: {
+                fileName: `${moduleId}/${chapterId}/${pdf.name}`,
+                fileType: pdf.type
+              }
+            });
+
+            fetch(pdfResponse.data.url, {
+              method: 'PUT',
+              body: pdf,
+              headers: {
+                'Content-Type': 'application/pdf' 
+              }
+            })
+            .then(response => {
+              if (response.ok) {
+                console.log('Upload successful!');
+              } else {
+                console.error('Upload failed:', response.statusText);
+              }
+            })
+            .catch(error => console.error('Error:', error));
+
+            return {
+              pdfKey: pdfResponse.data.key,
+              pdfUploadStatus: "success" as const,
+              pdfUploadError: "",
             }
     } catch (err) {
       console.log(err, 'upload error');

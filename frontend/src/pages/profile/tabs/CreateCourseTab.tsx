@@ -36,7 +36,7 @@ export const CreateCourseTab = () => {
         const response = await axiosInstance.get(`/api/v1/courses/${editMode.courseId}`)
         console.log(response.data)
         setIsPublished(response.data.isPublished)
-        await dispatch(setModules(response.data.modules))
+        dispatch(setModules(response.data.modules))
         setCourseLandingData({
           title: response.data.title,
           description: response.data.description,
@@ -128,6 +128,12 @@ console.log(courseScedule,'currentstate')
         errorMessage.push(`Module(s) "${emptyModules.map(m => m.title).join(", ")}" have no chapters`);
       }
 
+      const hasFreePreview = modules.some(module => module.chapters.some(chapter => chapter.freePreview));
+      if (!hasFreePreview) {
+        isValid = false;
+        errorMessage.push("At least one chapter should have free preview");
+      }
+
       for (const module of modules) {
         for (const chapter of module.chapters) {
           if (!chapter.title || !chapter.content || chapter.content.length < 50) {
@@ -147,12 +153,13 @@ console.log(courseScedule,'currentstate')
       toast.error("Validation Failed", {
         description: errorMessage.join(", "),
       });
-      return;
+      return false;
     }
+    return true;
   }
 
   const handleMainCourseSubmit = async () => {
-    validateFullCourseData();
+    if(!validateFullCourseData()) return
 
     setIsSubmitting(true);
     

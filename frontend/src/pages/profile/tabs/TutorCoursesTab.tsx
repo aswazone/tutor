@@ -207,13 +207,13 @@ export const TutorCoursesTab = () => {
                       <div className='w-[80px]'>Scheduled on {format(course?.publishDate, 'MMMM d, yyyy')}</div>
                     </div>
                   )}
-                  {course.isVerified === 'pending' && <Badge className='absolute z-20 top-15 left-20 bg-black/50 text-white'><Loader className="w-4 h-4" /> Verifying...</Badge>}
+                  {course.isVerified === 'pending' && <Badge className='absolute z-20 top-15 left-30 md:top-15 md:left-16 bg-black/50 text-white text-[9px]'><Loader className="w-4 h-4" /> Verification Pending</Badge>}
                   {course.isVerified === 'rejected' && (
                           <HoverCard>
                             <HoverCardTrigger asChild>  
-                              <Badge variant={'outline'} className='absolute z-20 top-15 left-20 bg-black/50 text-white'><ShieldAlert size={16}/> Rejected</Badge>
+                              <Badge variant={'outline'} className='absolute z-20 top-20 left-32 md:top-15 md:left-20 bg-black/50 text-white'><ShieldAlert size={16}/> Rejected</Badge>
                             </HoverCardTrigger>
-                            <HoverCardContent className="relative w-70 mt-20 bg-card/95 backdrop-blur-lg rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none border-sky-900/40 shadow-[0px_17px_22px_4px_rgba(3,_7,_13,_0.95)]">
+                            <HoverCardContent className="relative w-70 md:mt-20 bg-card/95 backdrop-blur-lg rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none border-sky-900/40 shadow-[0px_17px_22px_4px_rgba(3,_7,_13,_0.95)]">
                               <div className="absolute inset-y-auto left-0 h-80% w-px bg-neutral-200/80 dark:bg-neutral-800/80">
                                 <div className="absolute top-0 h-50% w-px bg-gradient-to-b from-transparent via-sky-500 to-transparent" />
                               </div>

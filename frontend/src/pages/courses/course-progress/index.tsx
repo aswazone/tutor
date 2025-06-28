@@ -292,11 +292,10 @@ const CourseProgressPage = () => {
                               <div className="flex items-center gap-2 ml-6">
                                 {chapter.pdfUrl ? (
                                   <a 
-                                    href={(chapter.pdfUrl as File).name} 
+                                    href={`${env.AMZ_BUCKET_NAME}/${chapter.pdfUrl}`} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 p-1.5 bg-sky-500/10 hover:bg-sky-500/20 transition-colors rounded-md group"
-                                  >
+                                    className="flex items-center border-x-2 bg-gradient-to-bl from-sky-900/30 to-sky-900/10 hover:bg-gradient-to-bl hover:from-sky-900/40 hover:to-sky-900/50 group rounded-md px-1"                                  >
                                     <FileStack className="h-4 w-4 text-sky-400 group-hover:text-sky-300" />
                                     <span className="text-xs text-sky-300/70 group-hover:text-sky-300">View Notes</span>
                                   </a>

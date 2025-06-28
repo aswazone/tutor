@@ -10,8 +10,7 @@ export interface Chapter {
   id: string
   title: string
   content: string
-  pdfUrl?: File
-  subtitleUrl?: File
+  pdfUrl?: string
   freePreview?: boolean
   progressValue?:number
   videoKey?: string // S3 object key after upload
@@ -60,8 +59,7 @@ export interface IChapter {
   id: string
   title: string
   content: string
-  pdfUrl?: File
-  subtitleUrl?: File
+  pdfUrl?: string
   freePreview?: boolean
   videoKey?: string // S3 object key after upload
   video?: File // Temporary field for file upload

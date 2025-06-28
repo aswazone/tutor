@@ -1,13 +1,17 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { AlertCircle, Check, X, BookOpen, Star, User, IndianRupee, BarChart } from "lucide-react"
+import { AlertCircle, Check, X, BookOpen, Star, User, IndianRupee, BarChart, CirclePlay, File, FileText } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Course } from "@/pages/admin/Courses"
 import { env } from "@/config/env.config"
+import { Course } from "@/types/admin.type"
+import axiosInstance from "@/config/axios.config"
+import { Chapter, ICourse, Module } from "@/types/course.type"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
+import VideoPlayer from "../course/VideoPlayer"
 
 interface CourseDetailsDialogProps {
   course: Course | null;
@@ -24,6 +28,35 @@ export function CourseDetailsDialog({
 }: CourseDetailsDialogProps) {
   const [rejectReason, setRejectReason] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [courseFetched, setCourseFetched] = useState<ICourse>()
+  const [isLoading, setIsLoading] = useState(false)
+  const [displayCurrentVideoFreePreview, setDisplayCurrentVideoFreePreview] = useState('');
+  const [showDialog, setShowDialog] = useState(false);
+
+  useEffect(() => {
+    if (course) {
+      const fetchCourse = async () => {
+        setIsLoading(true);
+        try {
+          const response = await axiosInstance.get(`/api/v1/courses/${course.id}`);
+          const data = response.data;
+          setCourseFetched(data);
+          setIsLoading(false);
+        } catch (error) {
+          setIsLoading(false);
+          console.error('Error fetching course details:', error);
+        }
+      }
+
+      fetchCourse();
+    }
+  }, [course])
+
+  if(courseFetched) {
+    console.log(courseFetched,'courseFetched');
+  }
+
+  console.log(course,'course-in-dialog');
 
   const handleStatusChange = async (status: 'verified' | 'rejected') => {
     if (!course) return;
@@ -45,9 +78,15 @@ export function CourseDetailsDialog({
     }
   };
 
+  const handleSetPreview = (chapter: Chapter) => {
+      console.log(chapter);
+      setShowDialog(true);
+      setDisplayCurrentVideoFreePreview(chapter?.videoKey as string);
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-card/95 backdrop-blur-lg border border-sky-900/40">
+    <Dialog  open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="h-full overflow-y-auto sm:max-w-[600px] bg-card/95 backdrop-blur-lg border-y-4 border-sky-900/50">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             Course Details
@@ -64,8 +103,8 @@ export function CourseDetailsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {course && (
-          <div className="grid gap-4 py-4">
+        {isLoading ? <p className="text-muted-foreground m-auto">Loading course details...</p> : course && (
+          <div className="grid gap-4 pb-4">
             {/* Thumbnail Section */}
             <div className="w-full aspect-video relative overflow-hidden rounded-lg border border-sky-900/20">
               <img 
@@ -124,6 +163,76 @@ export function CourseDetailsDialog({
               </div>
             </div>
 
+            {/* Module List */}
+              <Accordion
+                type="single"
+                collapsible
+                className="w-full space-y-2"
+                defaultValue="item-1"
+              >
+                {courseFetched && courseFetched.modules.map((module: Module) => (
+                  <AccordionItem 
+                    key={module.id} 
+                    value={module.id}
+                    className="shadow-sky-600/30 shadow-[0px_1.5px_2px_0.1px] border-none rounded-bl-xl rounded-tr-xl pb-0 bg-gradient-to-bl from-sky-700/12 from-20% to-10% to-sky-950/15 backdrop-blur-3xl"
+                  >
+                    <AccordionTrigger className="px-4 py-2 text-sm font-semibold  hover:text-sky-400 transition-colors">
+                      {module.title}
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-2">
+                      <p className=" text-muted-foreground text-sm mb-4">{module.description}</p>
+                      <div className="space-y-2">
+                        {module.chapters.map((chapter: Chapter) => (
+                          <div 
+                            key={chapter.id}
+                            className={`p-2 rounded-xl rounded-tl-none rounded-br-none bg-sky-900/30 border border-sky-800/50 cursor-pointer hover:bg-sky-900/40' 
+                                 backdrop-blur-sm flex items-center justify-between`}
+                          >
+                            <div className="flex items-center gap-3" onClick={()=> handleSetPreview(chapter)}>
+                              <CirclePlay className="w-5 h-5 text-sky-400" />
+                              <p className="font-medium text-xs">{chapter.title}</p>
+                            </div>
+                            {chapter.pdfUrl && (
+                              <a href={`${env.AMZ_BUCKET_NAME}/${chapter.pdfUrl}`} target="_blank">
+                                <FileText className="text-[8px] bg-sky-500/20 text-sky-300 p-1 rounded"/>
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+                
+              </Accordion>
+              <Dialog
+                open={showDialog} 
+                onOpenChange={()=>{
+                    setShowDialog(false)
+                    setDisplayCurrentVideoFreePreview('')
+                }}>
+                <DialogContent className="bg-card backdrop-blur-xl gap-2 border border-sky-900/40">
+                    <DialogHeader>
+                    <DialogTitle className="text-white/70">Course Preview</DialogTitle>
+                    
+                    </DialogHeader>
+                        <div className="aspect-video">
+                            <VideoPlayer 
+                                // onProgressUpdate={setDummyCurrentChapter} progressData={currentDummyChapter}
+                                url={`${env.AMZ_BUCKET_NAME}/${displayCurrentVideoFreePreview}`}
+                            />
+                        </div>
+                        
+                    <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild>
+                        <Button className="px-2 py-1" type="button" variant="ghost">
+                        Close
+                        </Button>
+                    </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             {/* Verification Controls */}
             {course.isVerified === 'pending' && (
               <div className="space-y-4 pt-4 border-t">
@@ -176,5 +285,6 @@ export function CourseDetailsDialog({
         )}
       </DialogContent>
     </Dialog>
+    
   );
 }

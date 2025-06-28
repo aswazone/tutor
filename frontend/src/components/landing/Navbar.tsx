@@ -63,6 +63,17 @@ export const Navbar = () => {
         className: "mt-10",
       });
     }
+
+    const handleNavigation = (href: string) => {
+        setIsOpen(false);
+        const pathname = location.pathname;
+        if(href === '#courses' && pathname !== '/home'){ 
+          window.location.href = "/courses";
+        }
+        if(href === '#profile' && pathname !== '/profile'){ 
+          window.location.href = "/profile";
+        }
+    };
  
   return (
     <header className="sticky z-50 top-0 w-full bg-white dark:border-b-slate-700 dark:bg-background">
@@ -112,7 +123,10 @@ export const Navbar = () => {
                       rel="noreferrer noopener"
                       key={label}
                       href={href}
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        setIsOpen(false);
+                        handleNavigation(href);
+                      }}
                       className={buttonVariants({ variant: "ghost" })}
                     >
                       {label}
@@ -142,7 +156,7 @@ export const Navbar = () => {
             {routeList.map((route: RouteProps, i) => (
               <a
                 rel="noreferrer noopener"
-                href={route.href}
+                href={route.href} onClick={() => handleNavigation(route.href)}
                 key={i}
                 className={`text-[14px] ${buttonVariants({
                   variant: "ghost",

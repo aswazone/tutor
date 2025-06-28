@@ -8,11 +8,14 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/store'
 import { AdminNavbar } from '@/components/admin/Navbar'
 
-function Letter({ children, position, isDarkMode }) {
+function Letter({ children, position, isDarkMode }:{
+  children: string,
+  position: [number, number, number],
+  isDarkMode: boolean}) {
   const [hovered, setHovered] = useState(false)
-  const textRef = useRef()
+  const textRef = useRef<THREE.Mesh>(null)
 
-  useFrame((state) => {
+  useFrame(() => {
     if (textRef.current) {
       textRef.current.scale.x = THREE.MathUtils.lerp(
         textRef.current.scale.x,
@@ -61,6 +64,10 @@ export default function NotFound() {
   const [isDarkMode, setIsDarkMode] = useState(() => 
     window.matchMedia('(prefers-color-scheme: dark)').matches
   )
+
+  window
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', (e) => setIsDarkMode(e.matches))
   
   return (
     
@@ -139,7 +146,7 @@ export default function NotFound() {
 }
 
 function Astronaut() {
-  const ref = useRef(THREE.Group)
+  const ref = useRef<THREE.Group>(null)
   
   useFrame((state) => {
     if (ref.current) {

@@ -15,7 +15,7 @@ import { ChapterForm } from "./chapter-form"
 import { Chapter, Module } from "@/types/course.type"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/store"
-import { addModule, addChapter, closeChapterModal, closeModuleModal, openChapterModal, openModuleModal, editChapter, editModule, deleteChapter, deleteModule, uploadSingleVideoFile, setSelectedChapterId, setSelectedModuleId } from "@/store/course"
+import { addModule, addChapter, closeChapterModal, closeModuleModal, openChapterModal, openModuleModal, editChapter, editModule, deleteChapter, deleteModule, uploadSingleVideoFile, setSelectedChapterId, setSelectedModuleId, uploadSinglePdfFile } from "@/store/course"
 import {v4 as uuid} from 'uuid'
 import { toast } from "sonner"
 
@@ -74,57 +74,71 @@ const CourseCurriculum = () => {
   };
 
   const handleAddChapter = async (data: {
-    title: string;
-    content: string;
-    video?: File;
-    pdf?: File;
-    subtitle?: File;
-  }) => {
-    if (selectedModuleIndex === null) return;
-    const moduleId = modules[selectedModuleIndex].id;
-    const chapterId = uuid();
-   
-    console.log(data.video,'add chapter video',typeof data.video);
-    // return
-    console.log(chapterId, moduleId, 'WHEN EDIT/ADD CHAPTER !!');
-    const uploadedVideo = typeof data.video === 'string' 
-        ? { videoKey: data.video, videoUploadStatus: "success" as const, videoUploadError: "" } 
-        : await dispatch(uploadSingleVideoFile({ video: data.video! , moduleId, chapterId})).unwrap();
-    if(uploadedVideo.videoUploadStatus === "error") {
-      toast.error("Failed to upload video, please try again");
-      return;
-    }
-    const newChapter: Chapter = {
-      id: chapterId,
-      title: data.title,
-      content: data.content,
-      videoKey: uploadedVideo.videoKey,
-      videoUploadStatus: uploadedVideo.videoUploadStatus,
-      videoUploadError: uploadedVideo.videoUploadError,
-      pdfUrl: data.pdf ? data.pdf: undefined,
-      subtitleUrl: data.subtitle ? data.subtitle : undefined,
-    };
+  title: string;
+  content: string;
+  video?: File | string;
+  pdf?: File | string | null;
+  freePreview?: boolean;
+}) => {
+  if (selectedModuleIndex === null) return;
+  const moduleId = modules[selectedModuleIndex].id;
+  const chapterId = uuid();
 
-    if (selectedChapterIndex !== null) {
-      // Edit existing chapter
-      dispatch(editChapter({ 
-        moduleIndex: selectedModuleIndex, 
-        chapterIndex: selectedChapterIndex,
-        chapter: {
-          ...modules[selectedModuleIndex].chapters[selectedChapterIndex],
-          ...newChapter
-        }
-      }));
-    } else {
-      // Add new chapter
-      dispatch(addChapter({ 
-        moduleIndex: selectedModuleIndex, 
-        chapter: newChapter 
-      }));
-    }
-    toast.success("Chapter saved successfully!");
-    dispatch(closeChapterModal());
+  // Video upload logic ---
+  const uploadedVideo = typeof data.video === 'string'
+    ? { videoKey: data.video, videoUploadStatus: "success" as const, videoUploadError: "" }
+    : await dispatch(uploadSingleVideoFile({ video: data.video!, moduleId, chapterId })).unwrap();
+  if (uploadedVideo.videoUploadStatus === "error") {
+    toast.error("Failed to upload video, please try again");
+    return;
+  }
+
+  // PDF upload logic ---
+  let uploadPdf;
+  if (typeof data.pdf === 'string') {
+    uploadPdf = { pdfKey: data.pdf, pdfUploadStatus: "success" as const, pdfUploadError: "" };
+  } else if (data.pdf instanceof File) {
+    uploadPdf = await dispatch(uploadSinglePdfFile({ pdf: data.pdf, moduleId, chapterId })).unwrap();
+  } else {
+    uploadPdf = { pdfKey: "", pdfUploadStatus: "success" as const, pdfUploadError: "" };
+  }
+
+  if (uploadPdf.pdfUploadStatus === "error") {
+    toast.error("Failed to upload PDF, please try again");
+    return;
+  }
+
+  const newChapter: Chapter = {
+    id: chapterId,
+    title: data.title,
+    content: data.content,
+    videoKey: uploadedVideo.videoKey,
+    videoUploadStatus: uploadedVideo.videoUploadStatus,
+    videoUploadError: uploadedVideo.videoUploadError,
+    pdfUrl: uploadPdf.pdfKey,
+    freePreview: data.freePreview
   };
+
+  if (selectedChapterIndex !== null) {
+    // Edit existing chapter
+    dispatch(editChapter({
+      moduleIndex: selectedModuleIndex,
+      chapterIndex: selectedChapterIndex,
+      chapter: {
+        ...modules[selectedModuleIndex].chapters[selectedChapterIndex],
+        ...newChapter
+      }
+    }));
+  } else {
+    // Add new chapter
+    dispatch(addChapter({
+      moduleIndex: selectedModuleIndex,
+      chapter: newChapter
+    }));
+  }
+  toast.success("Chapter saved successfully!");
+  dispatch(closeChapterModal());
+};
 
   // Get the initial data for the form when editing
   const getModuleInitialData = () => {
@@ -147,7 +161,7 @@ const CourseCurriculum = () => {
         content: chapter.content,
         video: chapter.videoKey,
         pdfUrl: chapter.pdfUrl,
-        subtitleUrl: chapter.subtitleUrl
+        freePreview: chapter.freePreview
       };
     }
     return undefined;
@@ -215,7 +229,7 @@ const CourseCurriculum = () => {
       ))}
 
       <Sheet open={isModuleModalOpen} onOpenChange={()=> dispatch(closeModuleModal())}>
-        <SheetContent side="right">
+        <SheetContent side="right" className="border-1 border-sky-950/50">
           <SheetHeader>
             <SheetTitle>{selectedModuleIndex !== null ? 'Edit Module' : 'Add Module'}</SheetTitle>
           </SheetHeader>          
@@ -228,7 +242,7 @@ const CourseCurriculum = () => {
       </Sheet>
 
       <Sheet open={isChapterModalOpen} onOpenChange={() => dispatch(closeChapterModal())}>
-        <SheetContent side="right" className="overflow-y-scroll">
+        <SheetContent side="right" className="overflow-y-scroll border-1 border-sky-950/50">
           <SheetHeader>
             <SheetTitle>{selectedChapterIndex !== null ? 'Edit Chapter' : 'Add Chapter'}</SheetTitle>
           </SheetHeader>          

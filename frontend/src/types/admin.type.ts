@@ -1,6 +1,7 @@
 
 import { IFormControl } from "@/config/helper.config";
 import { SignInFormData } from ".";
+import { Module } from "./course.type";
 
 export interface SignInProps {
     handleSignInSubmit: (data: SignInFormData) => void;
@@ -19,6 +20,32 @@ export interface ApiStudents {
   createdAt: Date;
 }
 
+// // export interface ApiModules {
+// //   _id: string;
+// //   title: string;
+// //   chapters: {
+// //     _id: string;
+// //     title: string;
+// //   }[];
+// // }
+
+// export interface IApiChapter {
+//   id: string;
+//   title: string;
+//   content: string;
+//   videoKey?: string;
+//   pdfUrl?: string;
+//   videoUploadStatus?: 'idle' | 'uploading' | 'success' | 'error';
+//   videoUploadError?: string;
+// }
+
+// export interface IApiModule {
+//   id: string;
+//   title: string;
+//   description: string;
+//   chapters: IApiChapter[];
+// }
+
 export interface ApiCourses {
   _id: string;
   title: string;
@@ -31,6 +58,7 @@ export interface ApiCourses {
     id: string;
     userName: string;
   };
+  modules: Module[];
   rating: string;
   category: string;
   isDeleted: boolean;
