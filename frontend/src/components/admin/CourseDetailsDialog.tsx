@@ -1,6 +1,6 @@
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { AlertCircle, Check, X, BookOpen, Star, User, IndianRupee, BarChart, CirclePlay, File, FileText } from "lucide-react"
+import { AlertCircle, Check, X, BookOpen, Star, User, IndianRupee, BarChart, CirclePlay, FileText } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
