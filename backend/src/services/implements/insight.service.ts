@@ -2,6 +2,7 @@ import { ICourseRepository } from "@/repositories/interface/course.repository.in
 import { ICourseProgressRepository } from "@/repositories/interface/courseProgress.repository.interface";
 import { IStudentCoursesRepository } from "@/repositories/interface/studentCourses.repository.interface";
 import { IInsightService } from "../interface/insight.service.interface";
+import { ICourseInsights } from "@/types/course.type";
 
 export class InsightService implements IInsightService {
   constructor(
@@ -119,8 +120,8 @@ export class InsightService implements IInsightService {
 
     
 
-    const insight = {
-      courseId: course._id,
+    const insight:ICourseInsights = {
+      courseId: course._id as string,
       courseTitle: course.title,
       enrolledStudents,
       totalRevenue,
