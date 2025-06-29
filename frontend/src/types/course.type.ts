@@ -17,6 +17,12 @@ export interface Chapter {
   videoUploadStatus: "idle" | "uploading" | "success" | "error";
   videoUploadError?: string
 }
+export interface IStudent {
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  paidAmount: string;
+}
 
 export interface ICourse {
   _id: string;
@@ -36,6 +42,7 @@ export interface ICourse {
   isVerified?: string; 
   rejectReason?: string;
   isScheduled?: boolean;
+  students?: IStudent[];
   publishDate?: Date;
   isActive?: boolean;
   isPublished: boolean;
@@ -111,4 +118,27 @@ export interface IBoughtCourse {
  dateOfPurchase: string;
  tutorId: string;
  tutorName: string;
+}
+
+
+export interface ICourseInsights {
+    courseId: string;
+    courseTitle: string;
+    enrolledStudents?: number;
+    totalRevenue?: number;
+    activeStudentsThisWeek: number;
+    completionRate: number;
+    averageRating?: string | number;
+    mostActiveModule: string;
+    mostRewatchedChapter: string;
+    feedback: string[];
+    weeklyTrends: {
+        week: string;
+        activeStudents?: number;
+        newEnrollments?: number;
+    }[];
+    moduleProgress: {
+        module: string;
+        completion: number;
+    }[];
 }

@@ -88,3 +88,25 @@ export interface IOrderDataDTO extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface ICourseInsights {
+    courseId: string;
+    courseTitle: string;
+    enrolledStudents?: number;
+    totalRevenue?: number;
+    activeStudentsThisWeek: number;
+    completionRate: number;
+    averageRating?: string | number;
+    mostActiveModule: string;
+    mostRewatchedChapter: string;
+    feedback: string[];
+    weeklyTrends: {
+        week: string;
+        activeStudents?: number;
+        newEnrollments?: number;
+    }[];
+    moduleProgress: {
+        module: string;
+        completion: number;
+    }[];
+}

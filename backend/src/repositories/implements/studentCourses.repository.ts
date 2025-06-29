@@ -8,6 +8,9 @@ export class StudentCoursesRepository extends BaseRepository<IStudentCoursesMode
         super(StudentCoursesModel);
     }
 
+    async getAllStudentCourses(): Promise<IStudentCoursesModel[]> {
+        return this.model.find();
+    }
 
     async getStudentCourses(userId: string): Promise<IStudentCoursesModel | null> {
         return this.model.findOne({studentId:userId});

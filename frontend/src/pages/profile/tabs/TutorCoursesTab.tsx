@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { StarIcon, Clock, Users, Trash, Edit, FileCheck2, FileClock, ShieldAlert } from 'lucide-react';
+import { StarIcon, Clock, Users, Trash, Edit, FileCheck2, FileClock, ShieldAlert, BarChart} from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,10 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import CustomAlert from '@/components/common/CustomAlert';
 import axiosInstance from '@/config/axios.config';
 import { format } from 'date-fns';
+import CourseInsightsModal from '@/components/course/CourseInsightModal';
+import { ICourseInsights } from '@/types/course.type';
+
+
 
 
 export const TutorCoursesTab = () => {
@@ -27,15 +31,27 @@ export const TutorCoursesTab = () => {
   const [toggleLoading, setToggleLoading] = useState<string>('');
   const [openDailog, setOpenDailog] = useState(false);
   const [tooltipStates, setTooltipStates] = useState<{ [key: string]: boolean }>({});
-
+  const [courseInsight, setCourseInsight] = useState<ICourseInsights | null>(null);
+  const [isDataFetching, setIsDataFetching] = useState(false);
 
   useEffect(() => {
     dispatch(fetchTutorCourses());
   }, [dispatch]);
 
+  const getAllStudentsProgress = async (courseId: string, tutorId: string) => {
+    
+    console.log(tutorId, courseId, 'modal-onclick');
+    // return
+    try {
+        const response = await axiosInstance.get(`/api/v1/insights/${tutorId}/${courseId}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
 
   const { items: courses, isLoading } = useSelector((state:RootState ) => state.fetch);
-
+  const { user } = useSelector((state: RootState) => state.auth);
   const handleToggleStatus = useCallback(async (courseId: string, currentStatus: boolean) => {
     try {
       setToggleLoading(courseId);
@@ -72,6 +88,20 @@ export const TutorCoursesTab = () => {
     // toast(`Editing course with ID: ${courseId}`);
     dispatch(setActiveTab('create-course'));
     dispatch(setEditMode({status:true,courseId:courseId}));
+  }
+
+  const handleDashboardCourse = async (courseId: string) => {
+    try {
+      if(user){
+        setIsDataFetching(true);
+        const insights = await getAllStudentsProgress(courseId, user._id);
+        setIsDataFetching(false);
+        setCourseInsight(insights);
+      }
+    } catch (error) {
+      setIsDataFetching(false);
+      console.log(error);
+    }
   }
 
   const handleMouseEnter = (courseId:string) => {
@@ -135,6 +165,11 @@ export const TutorCoursesTab = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
+      {isDataFetching && <div className='absolute flex justify-center text-sky-400 w-full h-full z-40 bg-black/40 backdrop-blur-[1px] shadow-black/60 shadow-[0_0_20px_10px] rounded-xl'>
+        <div className="flex sticky mt-30">
+          <Loader className='w-6 h-6 mr-1'/><span>Wait..</span>
+        </div>
+      </div>}
       <div className="relative grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {courses.map((course) => {
                    
@@ -257,7 +292,7 @@ export const TutorCoursesTab = () => {
                       setOpenDailog(true);
                     }}
 
-                    className="absolute z-20 top-10 right-2 w-8 h-8 p-0 bg-black/50 rounded-full hover:bg-red-900/50"
+                    className="absolute z-20 top-7 right-2 w-8 h-8 p-0 bg-black/50 rounded-full hover:bg-red-900/50"
                     variant="ghost"
                   > 
                     
@@ -270,12 +305,22 @@ export const TutorCoursesTab = () => {
                       console.log(course)
                       handleEditCourse(course._id);
                     }}
-                    className="absolute z-20 top-20 right-2 w-8 h-8 p-0 bg-black/50 rounded-full hover:bg-red-900/50"
+                    className="absolute z-20 top-16 right-2 w-8 h-8 p-0 bg-black/50 rounded-full hover:bg-red-900/50"
                     variant="ghost"
                   >
                     <Edit size={16}/>
                   </Button>}
-                          
+                  {course.isVerified !== 'pending' && 
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDashboardCourse(course._id);
+                    }}
+                    className="absolute z-20 top-25 right-2 w-8 h-8 p-0 bg-black/50 rounded-full hover:bg-red-900/50"
+                    variant="ghost"
+                  >
+                    <BarChart size={16}/>
+                  </Button>}
                   <img
                     src={`${env.AMZ_BUCKET_NAME}/${course.thumbnailKey}`}
                     alt={course.title}
@@ -338,6 +383,7 @@ export const TutorCoursesTab = () => {
           );
         })}
       </div>
+      {courseInsight && <CourseInsightsModal open={courseInsight ? true : false} onClose={() => setCourseInsight(null)} insights={courseInsight!} />}
     </motion.div>
   );
 

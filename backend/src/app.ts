@@ -11,6 +11,7 @@ import categoryRouter from './routers/category.route';
 import wishlistRouter from './routers/wishlist.route';
 import orderRouter from './routers/order.routes';
 import progressRouter from './routers/courseProgress.routes';
+import insightRouter from './routers/insight.routes';
 import { initializeCoursePublisher } from './utils/course-schedule-publisher.utils';
 
 const app:Express = express();
@@ -30,5 +31,6 @@ app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/category', categoryRouter)
 app.use('/api/v1/order', orderRouter);
 app.use('/api/v1/course-progress', progressRouter);
+app.use('/api/v1/insights', insightRouter);
 
 export default app;

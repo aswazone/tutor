@@ -19,4 +19,8 @@ export class CourseProgressRepository extends BaseRepository<ICourseProgressMode
     async resetProgress(courseProgressId: string): Promise<void> {
         await this.model.findByIdAndDelete(courseProgressId);
     }
+
+    async getAllCourseProgress(): Promise<ICourseProgressModel[]> {
+        return this.model.find().populate('courseId').exec();
+    }
 }
