@@ -33,7 +33,7 @@ const MyCourses = () => {
 
   return (
     // <BackgroundBeamsWithCollision className='bg-gradient-to-tl from-sky-700/12 to-100% from-5% to-sky-950/15 h-screen md:h-[43rem] flex items-start'>
-    <div className="absolute flex-col">
+    <div className="flex-col">
       <GridLineHorizontal className="top-13 bg-sky-700/30 w-1/2 pt-1 opacity-50"  />
       <GridLineVertical className='bg-sky-700/10 right-3 p-1.5 opacity-40'/>
       <h1 className="text-3xl font-bold mb-8 text-sky-300/70 bg-gradient-to-l from-transparent to-sky-700/20 px-15 py-2 my-0">My Courses</h1>

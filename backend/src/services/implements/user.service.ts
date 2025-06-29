@@ -105,6 +105,35 @@ export class AuthService implements IAuthService {
         return {user:newUser,accessToken,refreshToken};
     }
 
+    resendOtp = async (email: string) => {
+        
+        const otp = generateOtp();
+        await sendOtpEmail(email, otp);
+        console.log(otp,email,'---resend');
+    
+        const storedDataJSONString = await redisClient.get(email);
+        if (!storedDataJSONString) {
+            throw createHttpError(HttpStatus.NOT_FOUND, "No OTP session found for this email.");
+        }
+        const storedData = JSON.parse(storedDataJSONString);
+        console.log(storedData);
+    
+        storedData.otp = otp;
+    
+
+        const response = await redisClient.setEx(
+            email,
+            300,
+            JSON.stringify(storedData)
+        );
+        
+        console.log(response,'--res-redis');
+
+        if(!response) throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, HttpResponse.SERVER_ERROR);
+
+        return { status: HttpStatus.OK, message: 'Otp resent successfully' };
+    }
+
     forgotPassword = async (email:string)=> {
 
         const userExist = await this._userRepository.findUserByEmail(email);

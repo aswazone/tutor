@@ -41,6 +41,15 @@ export class AuthController implements IAuthController{
         }
     }
 
+    resendOtp = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const result = await this._authService.resendOtp(req.body.email);
+            res.status(HttpStatus.CREATED).json(result);
+        } catch (err) {
+            next(err);
+        }
+    }
+
     forgotPassword = async (req:Request, res:Response, next:NextFunction):Promise<void> =>{
         try {
             const {email} = req.body;

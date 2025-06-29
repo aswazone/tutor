@@ -24,7 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { Loader2 } from "lucide-react";
-import { verifyOtp } from "@/store/auth/authSlice";
+import { resendOtp, verifyOtp } from "@/store/auth/authSlice";
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
@@ -39,6 +39,37 @@ const OtpForm = () => {
 
   const [email, setEmail] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [timer, setTimer] = useState(5);
+  const [canResend, setCanResend] = useState(false);
+  
+  const resetTimer = () => {
+    setTimer(5);
+    setCanResend(false);
+  };
+  
+  useEffect(() => {
+    if (!canResend && timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    } else if (timer === 0) {
+      setCanResend(true);
+    }
+  }, [timer, canResend]);
+  
+  const handleResend = async () => {
+    // Call your resend OTP API here
+    try {
+      if (!email) return;
+      await dispatch(resendOtp({ email }));
+      resetTimer();
+      toast.success("OTP resent!");
+    } catch (error) {
+      console.error("Failed to resend OTP:", error);
+    }
+    
+  };
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("pendingEmail"); 
@@ -66,6 +97,9 @@ const OtpForm = () => {
 
     try {
       if(email && data.pin){
+
+        console.log(data, email,'--otp');
+        resetTimer();
         const resultAction = await dispatch(verifyOtp({ otp: data.pin, email }));
         if(resultAction){
           if (verifyOtp.fulfilled.match(resultAction)) {
@@ -146,11 +180,30 @@ const OtpForm = () => {
                 </FormItem>
               )}
             />
-            { isLoading
-            ? <Button disabled={isLoading} variant={"outline"} type="submit" className="bg-background">
-                <Loader2 className="animate-spin" /> wait..
-              </Button> 
-            : <Button variant={"outline"} type="submit" className="bg-background">Submit</Button>}
+            <Button
+              variant="outline"
+              type="submit"
+              className="bg-background"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin" /> wait..
+                </>
+              ) : (
+                "Submit"
+              )}
+            </Button>
+            
+            <Button
+              type="button"
+              variant="link"
+              className="ml-2"
+              onClick={handleResend}
+              disabled={!canResend}
+            >
+              {canResend ? "Resend OTP" : `Resend in ${Math.floor(timer / 60)}:${(timer % 60).toString().padStart(2, "0")}`}
+            </Button>
           </form>
         </Form>
       </motion.div>

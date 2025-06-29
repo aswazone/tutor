@@ -56,6 +56,20 @@ export const verifyOtp = createAsyncThunk<
     }
 });
 
+export const resendOtp = createAsyncThunk<
+    { accessToken: string; user: Record<string, string> },
+    { email: string },
+    { rejectValue: string }
+>('/auth/resend-otp', async ({ email }, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.post('api/v1/auth/resend-otp', { email });
+        return response.data;
+    } catch (err: unknown) {
+        const message = axiosErrorMessage(err);
+        return rejectWithValue(message);
+    }
+});
+
 export const googleSignin = createAsyncThunk<
     { accessToken: string; user: Record<string, string> },
     { token: string },
@@ -154,6 +168,16 @@ const authSlice = createSlice({
                 state.isAuthenticated = true;
             })
             .addCase(verifyOtp.rejected, (state, action: { payload: string | undefined }) => {
+                state.isLoading = false;
+                state.error = action.payload ?? null;
+            })
+            .addCase(resendOtp.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(resendOtp.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(resendOtp.rejected, (state, action: { payload: string | undefined }) => {
                 state.isLoading = false;
                 state.error = action.payload ?? null;
             })
