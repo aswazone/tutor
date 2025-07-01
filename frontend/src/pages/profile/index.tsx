@@ -32,7 +32,7 @@ import { BadgeAlert } from '@/components/common/AlertBadge'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { TutorVerifyModal } from '@/components/profile/TutorVerifyModal'
 import Loader from '@/components/ui/loader'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '@/config/axios.config'
 import CustomAlert from '@/components/common/CustomAlert'
 import { LightbulbIcon } from 'lucide-react'
@@ -62,11 +62,48 @@ const getTabs = (role: UserRole) => {
   }
 }
 
+interface TeachersCardProps {
+    noOfCourses: number;
+    enrolledStudents: number;
+    tutorRating: number;
+};
+
+interface StudentsCardProps {
+    enrolled: number;
+    wishlist: number;
+    completed: number;
+};
+
+
 const Profile = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { user, activeTab } = useSelector((state: RootState) => state.auth)
   const [isLoading, setIsLoading] = useState(true)
   const [userData, setUserData] = useState<User | null>(null)
+  const [tutorInsight, setTutorInsight] = useState<TeachersCardProps|null>();
+  const [studentInsight, setStudentInsight] = useState<StudentsCardProps|null>();
+
+  const fetchInsight = useCallback(async () => {
+    try {
+      if(user?.role === 'tutor'){
+        console.log(user._id);
+        // return
+        const response = await axiosInstance.get(`/api/v1/insights/dashboard/${user._id}/tutor`);
+        setTutorInsight(response.data);
+        console.log(response.data, 'insight');
+      }else{
+        const response = await axiosInstance.get(`/api/v1/insights/dashboard/${user?._id}/student`);
+        setStudentInsight(response.data);
+        console.log(response.data, 'insight-student');
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  },[user])
+
+  useEffect(() => {
+    fetchInsight();
+  }, [fetchInsight])
 
   console.log(userData)
 
@@ -296,7 +333,7 @@ const Profile = () => {
           {/* Left Sidebar */}
           <div className="w-full lg:w-1/3 space-y-6">
             <ProfileCard userData={userData as User} />
-            {userData?.role === UserRole.TUTOR ? <TeachersCard /> : <StudentsCard />}
+            {userData?.role === UserRole.TUTOR ? <TeachersCard insight={tutorInsight as TeachersCardProps}/> : <StudentsCard insight={studentInsight as StudentsCardProps}/>}
           </div>
 
           {/* Right Content */}
@@ -356,7 +393,7 @@ const ProfileCard = ({ userData }: { userData: User }) => (
   </motion.div>
 )
 
-const TeachersCard = () => (
+const TeachersCard = ({insight}: {insight?:TeachersCardProps}) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -366,15 +403,15 @@ const TeachersCard = () => (
     <h2 className="text-xl font-semibold mb-4">My Stats</h2>
     <div className="grid grid-cols-2 gap-4">
       <div className="text-center">
-        <div className="text-2xl font-bold">15</div>
+        <div className="text-2xl font-bold">{insight?.noOfCourses || 100}</div>
         <div className="text-sm text-muted-foreground">Courses</div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold">156</div>
+        <div className="text-2xl font-bold">{insight?.enrolledStudents || 10}</div>
         <div className="text-sm text-muted-foreground">Students</div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold">4.8</div>
+        <div className="text-2xl font-bold">{insight?.tutorRating || 4.0}</div>
         <div className="text-sm text-muted-foreground">Rating</div>
       </div>
       <div className="text-center">
@@ -385,7 +422,7 @@ const TeachersCard = () => (
   </motion.div>
 )
 
-const StudentsCard = () => (
+const StudentsCard = ({insight}: {insight?:StudentsCardProps}) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -395,20 +432,16 @@ const StudentsCard = () => (
     <h2 className="text-xl font-semibold mb-4">My Stats</h2>
     <div className="grid grid-cols-2 gap-4">
       <div className="text-center">
-        <div className="text-2xl font-bold">8</div>
+        <div className="text-2xl font-bold">{insight?.enrolled || 0}</div>
         <div className="text-sm text-muted-foreground">Enrolled</div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold">3</div>
+        <div className="text-2xl font-bold">{insight?.wishlist || 0}</div>
         <div className="text-sm text-muted-foreground">Wishlist</div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold">5</div>
+        <div className="text-2xl font-bold">{insight?.completed || 0}</div>
         <div className="text-sm text-muted-foreground">Completed</div>
-      </div>
-      <div className="text-center">
-        <div className="text-2xl font-bold">2</div>
-        <div className="text-sm text-muted-foreground">Reviews</div>
       </div>
     </div>
   </motion.div>

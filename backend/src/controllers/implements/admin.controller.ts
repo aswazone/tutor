@@ -70,4 +70,16 @@ export class AdminController implements IAdminController {
             next(err);
         }
     }
+
+    getRevenue = async (req: Request, res:Response, next: NextFunction):Promise<void> => {
+        try {
+            const page = parseInt(req.params.page);
+            const limit = parseInt(req.params.limit);
+            const revenue = await this._adminService.getRevenue(page,limit);
+            res.status(HttpStatus.OK).json(revenue);
+            
+        } catch (err) {
+            next(err);
+        }
+    }
 }

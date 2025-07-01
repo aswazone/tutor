@@ -3,15 +3,17 @@ import { ICourseProgressRepository } from "@/repositories/interface/courseProgre
 import { IStudentCoursesRepository } from "@/repositories/interface/studentCourses.repository.interface";
 import { IInsightService } from "../interface/insight.service.interface";
 import { ICourseInsights } from "@/types/course.type";
+import { IUserRepository } from "@/repositories/interface/user.repository.interface";
 
 export class InsightService implements IInsightService {
   constructor(
     private readonly _courseRepository: ICourseRepository,
     private readonly _courseProgressRepository: ICourseProgressRepository,
-    private readonly _studentCourseRepository: IStudentCoursesRepository
+    private readonly _studentCourseRepository: IStudentCoursesRepository,
+    private readonly _userRepository: IUserRepository
   ) {}
 
-  getAllCoursesInsights = async (tutorId: string, courseId: string): Promise<ICourseInsights> => {
+  getSingleCourseInsights = async (tutorId: string, courseId: string): Promise<ICourseInsights> => {
     const course = await this._courseRepository.getById(courseId, { path: "tutor modules.chapters" });
     if (!course) throw new Error("Course not found");
 
@@ -30,7 +32,7 @@ export class InsightService implements IInsightService {
 
     const enrolledStudents = studentsForCourse.length;
     const totalRevenue = course.students.reduce((sum, s) => {
-        const amountForTutor = Number(s.paidAmount) - (Number(s.paidAmount) * 0.8);
+        const amountForTutor = Number(s.paidAmount) * 0.9;
         return sum + amountForTutor;
     }, 0);
 
@@ -137,4 +139,41 @@ export class InsightService implements IInsightService {
 
     return insight;
   };
+
+  getTutorDashboardInsights = async(tutorId: string):Promise<{noOfCourses: number, enrolledStudents: number, tutorRating: number}> => {
+    
+    console.log(tutorId,'===getTutorDashboardInsights');
+
+    const course = await this._courseRepository.getByInstructor(tutorId);
+    const noOfCourses = course.length;
+    const enrolledStudents = course.reduce((sum, c) => sum + c.students.length, 0);
+    const tutorRating = course.reduce((sum, c) => sum + (c.rating || 0), 0) / course.length;
+
+    return {
+      noOfCourses,
+      enrolledStudents,
+      tutorRating
+    };
+  };
+
+
+  getStudentDashboardInsights = async(studentId: string):Promise<{enrolled: number, wishlist: number, completed: number}> => {
+
+    const studentdata = await this._userRepository.findUserById(studentId);
+    const studentCourses = await this._studentCourseRepository.getStudentCourses(studentId);
+    const studentCourseProgress = await this._courseProgressRepository.getAllCourseProgress();
+
+    const enrolled = studentCourses?.courses?.length || 0;
+    const wishlist = studentdata?.wishlist?.length || 0;
+    const completed = studentCourseProgress.reduce((sum, progress) => sum + (progress.studentId === studentId && progress.completed ? 1 : 0), 0);
+    
+    console.log(studentId,'===getStudentDashboardInsights');
+    return {
+      enrolled,
+      wishlist,
+      completed
+    }
+    
+  };
+
 }

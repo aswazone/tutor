@@ -4,9 +4,8 @@ import {
   Users,
   GraduationCap,
   BookOpen,
-  Settings,
-  BarChart3,
   ListTree,
+  IndianRupee,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -69,14 +68,9 @@ export function Sidebar({ className, isCollapsed, setIsCollapsed }: SidebarProps
     },
     {
       label: "Analytics",
-      icon: BarChart3,
+      icon: IndianRupee,
       color: "text-emerald-500",
-      href: "/admin/analytics",
-    },
-    {
-      label: "Settings",
-      icon: Settings,
-      href: "/admin/settings",
+      href: "/admin/revenue",
     },
   ];
 

@@ -25,6 +25,7 @@ import AllCourses from "@/pages/courses";
 import CourseDetailsPage from "@/pages/courses/course";
 import MyCourses from "@/pages/courses/my-courses";
 import CourseProgressPage from "@/pages/courses/course-progress";
+import Revenue from "@/pages/admin/Revenue";
 
 
 export const router = createBrowserRouter([
@@ -85,7 +86,10 @@ export const router = createBrowserRouter([
             },
             {
                 path: "categories", element: <Categories />
-            }
+            },
+            {
+                path: "revenue", element: <Revenue />
+            },
         ]
     },
     {

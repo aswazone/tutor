@@ -21,7 +21,6 @@ export class CourseProgressService implements ICourseProgressService{
             throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course id');
         if (!Types.ObjectId.isValid(userId)) 
             throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid user id');
-
         
           const studentCourses = await this._studentCourseRepository.getStudentCourses(userId)
           const course = await this._courseRepository.getById(courseId,{path:'tutor'})

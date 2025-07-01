@@ -5,4 +5,5 @@ export interface IAdminController {
     getAllStudents: (req:Request, res:Response, next:NextFunction) => Promise<void>
     toggleUserStatus: (req:Request, res:Response, next:NextFunction) => Promise<void>
     toggleCourseStatus: (req:Request, res:Response, next:NextFunction) => Promise<void>
+    getRevenue: (req:Request, res:Response, next:NextFunction) => Promise<void>
 }

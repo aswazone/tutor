@@ -9,6 +9,11 @@ export class OrderRepository extends BaseRepository<IOrderModel> implements IOrd
         super(OrderModel);
     }
 
+    async findAllOrders(page=1, limit=4): Promise<IOrderModel[]> {
+        const result = await this.model.find().skip((page - 1) * limit).limit(limit).sort({ orderDate: -1 });
+        return result;
+    }
+
     async createOrder(data: Partial<ICreateOrderDTO>): Promise<IOrderModel | null> {
         return await super.create(data);
     }

@@ -7,10 +7,30 @@ export class InsightController {
         private readonly _insightService: IInsightService
     ) {}
 
-    getAllCoursesInsights = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    getSingleCourseInsights = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         try {
             const {tutorId,courseId} = req.params;
-            const insights = await this._insightService.getAllCoursesInsights(tutorId,courseId);
+            const insights = await this._insightService.getSingleCourseInsights(tutorId,courseId);
+            res.json(insights);
+        } catch (error) {
+            next(error);
+        }
+    }
+    getTutorDashboardInsights = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        try {
+            const {tutorId} = req.params;
+            console.log(tutorId);
+            const insights = await this._insightService.getTutorDashboardInsights(tutorId);
+            res.json(insights);
+        } catch (error) {
+            next(error);
+        }
+    }
+    getStudentDashboardInsights = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        try {
+            const {studentId} = req.params;
+            console.log(studentId);
+            const insights = await this._insightService.getStudentDashboardInsights(studentId);
             res.json(insights);
         } catch (error) {
             next(error);
