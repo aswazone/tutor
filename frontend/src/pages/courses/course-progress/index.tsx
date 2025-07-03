@@ -23,9 +23,10 @@ import { Award, BookOpen, Calendar, ChevronsUpDown, Download, GripIcon, Sparkles
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
 import GlassChatBot from "@/components/course/GlassChatBot";
 import { BlurFade } from "@/components/magicui/blur-fade";
+import Certificate from "@/components/course/Certificate";
+import { motion } from "framer-motion";
 
 const CourseProgressPage = () => {
 
@@ -42,7 +43,9 @@ const CourseProgressPage = () => {
   const [courseDetails, setCourseDetails] = useState<ICourse>();
   const [showConfetti, setShowConfetti] = useState(false);
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+  const [isCertificateOpen, setIsCertificateOpen] = useState(false);
   const [tab, setTab] = useState('modules');
+  const [botNotification, setBotNotification] = useState({show: false, message: ''});
 
   console.log(courseDetails,'--courseDetails--');
   
@@ -80,15 +83,17 @@ const CourseProgressPage = () => {
               console.log(response.data, 'response-progress');
               if(!response?.data?.isPurchased){
                 setLockCourse(true);
+                setBotNotification({show: true, message: `You're a sneaky one, aren't you ?  You can't access this course `});
               }else{
                 setProgressData(response?.data);
                 setCourseDetails(response?.data?.courseDetails);
                 if(response?.data?.progress?.completed){
-                  // setCurrentModule(response?.data?.courseDetails?.modules[0]);
-                  // setCurrentChapter(response?.data?.courseDetails?.modules[0].chapters[0]);
+                  setCurrentModule(response?.data?.courseDetails?.modules[0]);
+                  setCurrentChapter(response?.data?.courseDetails?.modules[0].chapters[0]);
                   console.log(response.data, 'response-after-completion');  
                   setShowCourseCompleteDialog(true);
                   setShowConfetti(true);
+                  setBotNotification({show: true, message: 'Rewatch it !'});
                   return
                 }
 
@@ -152,6 +157,12 @@ const CourseProgressPage = () => {
           console.log(response.data, 'progress-update-response');
           if(response?.data){
             fetchProgress();
+            if(!response?.data?.progress?.completed){
+              setBotNotification({show: true, message: 'Revise the Notes also !'});
+              setTimeout(() => {
+                setBotNotification({show: false, message: ''});
+              },5000);
+            }
           }
         }
       } catch (error) {
@@ -166,9 +177,10 @@ const CourseProgressPage = () => {
   // if(progressData && courseDetails) console.log(progressData,courseDetails,'progressData');
   // console.log(currentChapter,'currentChapter');
 
-  const handleDownloadCertificate = () => {
+  const handleCertificate = () => {
     console.log("Downloading certificate...");
-    toast.success("Certificate downloaded successfully");
+    setIsCertificateOpen(!isCertificateOpen);
+    handleBotMessageVisibility(true);
   };
 
   const handleNavigateToCourses = () => {
@@ -205,10 +217,26 @@ const CourseProgressPage = () => {
   const handleSetFreePreview = (chapter: Chapter) => {
     console.log(chapter); 
   }
+
+
+  const handleBotMessageVisibility = useCallback((show: boolean) => {
+    setBotNotification(prev => ({
+      ...prev,
+      show
+    }))
+  },[]);
   
 
   return (
     <div className="relative flex flex-col h-full bg-[#0a0f1d] text-white overflow-y-scroll">  
+    {botNotification.show && <motion.div
+      initial={{ opacity: 0, x: 10, y: 20 }}
+      animate={{ opacity: 1, x: -30, y: 20 }}
+      transition={{ duration: 0.3 }}
+      className="fixed bottom-[22%] right-[9%] z-60 px-2 border rounded-2xl rounded-br-none border-sky-600/30 hover:border-sky-600/80 flex items-center gap-1"
+    >
+      <span className="max-w-[300px] animate-fade-in text-sm font-semibold p-2 text-sky-300/80">{botNotification.message || "Hi! How can I help you today?"}</span>
+    </motion.div>}
     <GlassChatBot />
       <div className="flex items-center justify-between p-4 bg-gradient-to-b from-background to-[#0a0f1d] ">
         <div className="relative flex items-center space-x-4">
@@ -337,7 +365,7 @@ const CourseProgressPage = () => {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={showCourseCompleteDialog}>
+      <Dialog open={showCourseCompleteDialog ? isCertificateOpen ? false : true : false}>
         <DialogContent className="p-0 w-full max-w-lg overflow-hidden">
           <BlurFade delay={3}>
             <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
@@ -372,9 +400,9 @@ const CourseProgressPage = () => {
                 
                   <div className="text-center mb-6">
                     <h1 className="text-4xl font-bold text-center mb-2">
-                      <span className="bg-gradient-to-r from-[#0c7ea9] via-[#a1d9f8] to-[#0c7ea9] bg-clip-text text-transparent">
+                      <DialogTitle className="text-4xl inline-flex bg-gradient-to-r from-[#0c7ea9] via-[#a1d9f8] to-[#0c7ea9] bg-clip-text text-transparent">
                         Congratulations
-                      </span>
+                      </DialogTitle>
                       <span className="text-[#0c7ea9]">!</span>
                     </h1>
                     <div className="flex items-center justify-center gap-1 mt-2">
@@ -391,9 +419,9 @@ const CourseProgressPage = () => {
                   </div>
                 
                   <div className="text-center mb-6">
-                    <h2 className="text-sm text-white/90 mb-2">
+                    <DialogDescription className="text-sm text-white/90 mb-2">
                       You have completed
-                    </h2>
+                    </DialogDescription>
                     <div className="text-xl font-semibold text-[#0c7ea9] mb-4">
                       {courseDetails?.title ?? "Your Course"}
                     </div>
@@ -430,7 +458,10 @@ const CourseProgressPage = () => {
                   <div className="flex flex-col gap-3">
                     <div className="grid grid-cols-2 gap-3">
                       <ShinyButton
-                        onClick={handleDownloadCertificate}
+                        onClick={()=>{
+                          handleCertificate();
+                          handleBotMessageVisibility(false);
+                        }}
                       >
                         <div className="flex items-center justify-center">
                           <Download size={18} className="inline" />
@@ -467,7 +498,7 @@ const CourseProgressPage = () => {
         </DialogContent>
     </Dialog>
     <PopperConfetti showConfetti={showConfetti} />
-      
+    {isCertificateOpen && <Certificate course={courseDetails?.title} name={user?.name} onClose={handleCertificate}/>}
     </div>
   )
 }

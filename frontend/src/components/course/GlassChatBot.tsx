@@ -26,7 +26,7 @@ const GlassChatBot = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-8 z-50 flex flex-col items-end">
+    <div className="fixed bottom-6 right-8 z-60 flex flex-col items-end">
       {/* Toggle Button */}
       
       <button
@@ -93,13 +93,6 @@ const GlassChatBot = () => {
         </div>
       )}
       <style>{`
-        .animate-fade-in {
-          animation: fadeInUp 0.3s cubic-bezier(.4,0,.2,1);
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(40px);}
-          to { opacity: 1; transform: translateY(0);}
-        }
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
