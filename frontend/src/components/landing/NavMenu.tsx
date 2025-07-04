@@ -29,7 +29,7 @@ export function NavMenu() {
               <AvatarFallback className='bg-black text-white font-extrabold'>{user?.userName[0].toUpperCase()}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className='fixed top-4 w-40 p-2 bg-background dark:bg-background/90' align='start'>
+          <DropdownMenuContent className='' align='start'>
             <DropdownMenuLabel className='px-2 py-1.5'>
               <span className='text-xs text-muted-foreground'>Logged in as</span>
               <p className='font-medium'>{(user?.userName as string).slice(0,1).toUpperCase() + user?.userName.slice(1)}</p>

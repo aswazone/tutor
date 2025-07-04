@@ -202,6 +202,7 @@ const CourseProgressPage = () => {
         setCurrentModule(undefined);
         setShowConfetti(false);
         fetchProgress();
+        setBotNotification({show: false, message: ''});
       }
 
       console.log(response.data, 'progress-update-reset');

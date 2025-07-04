@@ -2,7 +2,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const springSettings = {
-  stiffness: 300,
+  stiffness: 150,
   damping: 30,
   mass: 1,
 };
@@ -61,20 +61,21 @@ export const CustomCursor = () => {
         style={{
           x: mouseX,
           y: mouseY,
-          width: 6,
-          height: 6,
-          backgroundColor: isIdle ? "#f43f5e" : "white", // red when idle
+          width: 3,
+          height: 3,
+          // backgroundColor: isIdle ? "white" :"#f43f5e" , // red when idle
           borderRadius: "50%",
           position: "fixed",
-          top: 0,
-          left: 0,
+          top: -5,
+          left: -1,
           pointerEvents: "none",
           zIndex: 9999,
+          fontSize: isIdle ? "10px" : "10px",
         }}
-      />
+      >✧</motion.div>
 
       {/* Ring 1 */}
-      <motion.div
+      {/* <motion.div
         style={{
           x: ring1X,
           y: ring1Y,
@@ -88,20 +89,20 @@ export const CustomCursor = () => {
           pointerEvents: "none",
           zIndex: 9998,
         }}
-      />
+      /> */}
 
       {/* Ring 2 */}
       <motion.div
         style={{
           x: ring2X,
           y: ring2Y,
-          width: 32,
-          height: 32,
+          width: 20,
+          height: 20,
           border: "2px solid #d946ef",
           borderRadius: "50%",
           position: "fixed",
-          top: -13,
-          left: -13,
+          top: -7,
+          left: -7,
           pointerEvents: "none",
           zIndex: 9997,
         }}
@@ -112,13 +113,13 @@ export const CustomCursor = () => {
         style={{
           x: ring3X,
           y: ring3Y,
-          width: 44,
-          height: 44,
+          width: 32,
+          height: 32,
           border: "2px solid #5c6ff6",
           borderRadius: "50%",
           position: "fixed",
-          top: -19,
-          left: -19,
+          top: -14,
+          left: -14,
           pointerEvents: "none",
           zIndex: 9996,
         }}
@@ -129,13 +130,13 @@ export const CustomCursor = () => {
         style={{
           x: ring4X,
           y: ring4Y,
-          width: 60,
-          height: 60,
+          width: 40,
+          height: 40,
           border: "4px dotted #59cef3",
           borderRadius: "50%",
           position: "fixed",
-          top: -27,
-          left: -27,
+          top: -18,
+          left: -18,
           pointerEvents: "none",
           zIndex: 9995,
         }}

@@ -1,9 +1,7 @@
+import { UploadResponse } from '@/types/services.types';
 import axiosInstance from '../config/axios.config';
 
-export interface UploadResponse {
-  url: string;
-  key: string;
-}
+
 
 class UploadService {
   async getPresignedUrl(fileName: string, fileType: string, folder?: string): Promise<UploadResponse> {

@@ -83,7 +83,7 @@ export const Navbar = () => {
           <NavigationMenuItem className="font-bold flex items-center">
             <a
               rel="noreferrer noopener"
-              href="/"
+              href="/home"
               className="ml-2 font-bold text-xl flex items-center"
             >
               <LogoIcon />
