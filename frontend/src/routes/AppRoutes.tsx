@@ -26,6 +26,7 @@ import CourseDetailsPage from "@/pages/courses/course";
 import MyCourses from "@/pages/courses/my-courses";
 import CourseProgressPage from "@/pages/courses/course-progress";
 import Revenue from "@/pages/admin/Revenue";
+import Chat from "@/pages/chat";
 
 
 export const router = createBrowserRouter([
@@ -66,6 +67,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: "course-progress/:id", element: <ProtectedRoutes><CourseProgressPage /></ProtectedRoutes>
+            },
+            {
+                path: "chat", element: <ProtectedRoutes><Chat /></ProtectedRoutes>
             },
         ]
     },

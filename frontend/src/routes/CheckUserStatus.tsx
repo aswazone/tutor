@@ -26,7 +26,7 @@ export const CheckUserStatus = ({ children }: CheckUserStatusProps): JSX.Element
       console.error('User status check failed:', message);
       
       
-      if (!toastShown.current) {
+      if (!toastShown.current && message.toLowerCase().includes("blocked")) {
         toast.error("Account is blocked by admin!", {
           position: 'top-center',
           closeButton: true,
@@ -46,7 +46,7 @@ export const CheckUserStatus = ({ children }: CheckUserStatusProps): JSX.Element
   }, [dispatch]);
 
   useEffect(() => {
-    if (auth.isAuthenticated && auth.user) {
+    if (auth.isAuthenticated && auth.user && localStorage.getItem('accessToken')) {
       checkUserIsActive();
     }
     
