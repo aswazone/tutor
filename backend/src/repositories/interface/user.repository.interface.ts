@@ -13,4 +13,5 @@ export interface IUserRepository {
     findOneByEmailOrUsername(identifier: string): Promise<IUserModel | null>;
     findByIdAndUpdate(id: string, update: UpdateQuery<IUserModel>, options?: { new: boolean; }): Promise<IUserModel | null>;
     findByIdAndPopulateWishlist(id: string): Promise<IUserModel | null>;
+    findTutorsByIds(ids: string[]): Promise<IUserModel[]>
 }

@@ -44,9 +44,14 @@ export class UserRepository extends BaseRepository<IUserModel> implements IUserR
         });
     }
 
-    findByIdChangeStatus(id: string, status: string): Promise<IUserModel | null> {
+    async findByIdChangeStatus(id: string, status: string): Promise<IUserModel | null> {
         return super.findOneAndUpdate({ _id: id }, { $set: { isVerified: status } });
-    }    async updateUser(id: string, update: Partial<IUserModel>): Promise<IUserModel | null> {
+    }    
+    async updateUser(id: string, update: Partial<IUserModel>): Promise<IUserModel | null> {
         return super.findOneAndUpdate({ _id: id }, { $set: update });
+    }
+
+    async findTutorsByIds(ids: string[]): Promise<IUserModel[]> {
+        return await super.find({ _id: { $in: ids }, role: UserRole.TUTOR });
     }
 }
