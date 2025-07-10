@@ -13,6 +13,13 @@ export class StudentCoursesRepository extends BaseRepository<IStudentCoursesMode
     }
 
     async getStudentCourses(userId: string): Promise<IStudentCoursesModel | null> {
-        return this.model.findOne({studentId:userId});
+        const studentCourses = await this.model.findOne({ studentId: userId });
+        if (!studentCourses) return null;
+    
+        studentCourses.courses.sort(
+            (a, b) => new Date(b.dateOfPurchase).getTime() - new Date(a.dateOfPurchase).getTime()
+        );
+    
+        return studentCourses;
     }
 }

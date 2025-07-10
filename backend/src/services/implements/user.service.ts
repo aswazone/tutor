@@ -5,7 +5,7 @@ import { createHttpError } from "@/utils/http-error.utils";
 import { HttpStatus } from "@/constants/status.constant";
 import { HttpResponse } from "@/constants/response.constant";
 import { generateOtp } from "@/utils/otp-generate.utils";
-import { sendOtpEmail, sendResetPasswordEmail } from "@/utils/send-email.utils";
+import { sendOtpEmail, sendResetPasswordEmail, sendTutorRejectEmail } from "@/utils/send-email.utils";
 import { redisClient } from "@/config/redis.config";
 import { generateUniqueUsername } from "@/utils/generate-unique-username.utils";
 import {generateAccessToken,generateRefreshToken, verifyRefreshToken} from "@/utils";
@@ -265,6 +265,7 @@ export class AuthService implements IAuthService {
                         rejectReason: tutorDetails.rejectReason || ''
                     } : undefined
                 };
+                await sendTutorRejectEmail(user.userEmail, tutorDetails?.rejectReason || '');
             }else{
                 update = { 
                     isVerified: status,

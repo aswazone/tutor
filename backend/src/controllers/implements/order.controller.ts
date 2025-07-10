@@ -7,6 +7,17 @@ import { IOrderService } from "@/services/interface/order.service.interface";
 export class OrderController implements IOrderController {
     constructor (private readonly _orderService:IOrderService) {}
 
+    getAllOrders = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 4;
+            const orders = await this._orderService.findAllOrders(page,limit,req.user?.id);
+            res.status(200).json(orders);
+        } catch (error) {
+            next(error);
+        }
+    };
+
     createOrder = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> =>{
         try {
 

@@ -75,66 +75,6 @@ export class AdminService implements IAdminService {
         console.log(insight, 'insight');
         return insight;
 
-        //{
-        //   courseTitle: course.title,
-        //   tutorName,
-        //   tutorEmail,
-        //   studentName: student.studentName || '',
-        //   studentEmail: student.studentEmail || '',
-        //   amount: Number(student.paidAmount) || 0,
-        //   paymentDate: course.createdAt || '',
-        //   status: 'completed',
-        //}
-
-        // const { result: coursesArr } = await this._courseRepository.findAllCourses(
-        //     { isDeleted: false },
-        //     {
-        //         path: 'tutor',
-        //         select: 'userName userEmail',
-        //     }
-        // );
-
-        // const revenueData = [];
-        // for (const course of coursesArr) {
-            
-        //     if (!course.students || !Array.isArray(course.students)) continue;
-        //     // Tutor may be populated or just an ObjectId
-        //     let tutorName = 'Unknown Tutor';
-        //     let tutorEmail = '';
-        //     if (
-        //         course.tutor &&
-        //         typeof course.tutor === 'object' &&
-        //         'userName' in course.tutor &&
-        //         typeof (course.tutor).userName === 'string'
-        //     ) {
-        //         tutorName = (course.tutor).userName;
-        //     }
-        //     if (
-        //         course.tutor &&
-        //         typeof course.tutor === 'object' &&
-        //         'userEmail' in course.tutor &&
-        //         typeof (course.tutor).userEmail === 'string'
-        //     ) {
-        //         tutorEmail = (course.tutor).userEmail;
-        //     }
-        //     for (const student of course.students) {
-        //         revenueData.push({
-        //             courseTitle: course.title,
-        //             tutorName,
-        //             tutorEmail,
-        //             studentName: student.studentName || '',
-        //             studentEmail: student.studentEmail || '',
-        //             amount: Number(student.paidAmount) || 0,
-        //             paymentDate: course.createdAt || '',
-        //             status: 'completed',
-        //         });
-        //     }
-        
-        // }
-
-        // console.log(revenueData,'revenueData');
-        // return revenueData;
-        // You can return or send this data as needed
     }
     
 }

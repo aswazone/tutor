@@ -9,10 +9,13 @@ import { CourseStatus } from '@/models/interface/course.model.interface';
 import { QueryFilter, QueryOptions } from '@/utils/queryToFilter.utils';
 import { IStudentCoursesRepository } from '@/repositories/interface/studentCourses.repository.interface';
 import { IStudentCoursesModel } from '@/models/interface/studentCourses.model.interface';
+import { sendCourseRejectEmail } from '@/utils/send-email.utils';
+import { IUserRepository } from '@/repositories/interface/user.repository.interface';
 
 export class CourseService implements ICourseService {
   constructor(
     private readonly _courseRepository: ICourseRepository,
+    private readonly _userRepository: IUserRepository,
     private readonly _studentCourseRepository: IStudentCoursesRepository
   ) {}
 
@@ -138,10 +141,19 @@ export class CourseService implements ICourseService {
       throw new HttpError(HttpStatus.NOT_FOUND, 'Course not found');
     }
 
+    const tutorIdentified = await this._userRepository.findUserById(course?.tutor.toString());
+    if (!tutorIdentified) {
+      throw new HttpError(HttpStatus.NOT_FOUND, 'Tutor not found');
+    }
+
     await this._courseRepository.findByIdAndUpdate(
       courseId,
       { isVerified , rejectReason: rejectReason ? rejectReason : '' },
       { new: true }
     );
+
+    if(isVerified === 'rejected' ){
+      await sendCourseRejectEmail(tutorIdentified.userEmail,course.title);
+    }
   }
 }
