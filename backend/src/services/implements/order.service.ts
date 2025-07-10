@@ -17,6 +17,7 @@ export class OrderService implements IOrderService {
         private readonly _studentCourseRepository: IStudentCoursesRepository,
         private readonly _courseRepository: ICourseRepository
     ){}
+    findAllOrders = async (page: number, limit: number,userId?: string): Promise<IOrderModel[]> => this._orderRepository.findAllOrders(page,limit,userId);
 
     createOrder = async (userId: string, orderData: IOrderDataDTO): Promise<{paypalId: string, orderId: string}> => {
 

@@ -167,7 +167,7 @@ export class InsightService implements IInsightService {
     const wishlist = studentdata?.wishlist?.length || 0;
     const completed = studentCourseProgress.reduce((sum, progress) => sum + (progress.studentId === studentId && progress.completed ? 1 : 0), 0);
     
-    console.log(studentId,'===getStudentDashboardInsights');
+    // console.log(studentId,'===getStudentDashboardInsights');
     return {
       enrolled,
       wishlist,

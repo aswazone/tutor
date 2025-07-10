@@ -38,6 +38,7 @@ import CustomAlert from '@/components/common/CustomAlert'
 import { LightbulbIcon } from 'lucide-react'
 import { User } from '@/types/profile.type'
 import { GridLineHorizontal, GridLineVertical } from '@/components/common/GridLines'
+import PurchasesHistoryTab from './tabs/PurchasesHistoryTab'
 
 const getTabs = (role: UserRole) => {
   switch (role) {
@@ -55,6 +56,7 @@ const getTabs = (role: UserRole) => {
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: StudentsOverviewTab },
         { id: 'wishlist', name: 'Wishlist', icon: <AcademicCapIcon className="h-5 w-5 md:hidden" />, component: WishlistTab },
         { id: 'teachers', name: 'Teachers', icon: <UserIcon className="h-5 w-5 md:hidden" />, component: TeachersTab },
+        { id: 'purchases', name: 'Purchases', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: PurchasesHistoryTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: StudentsSettingsTab },
       ]
     default:

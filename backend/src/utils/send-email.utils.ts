@@ -85,3 +85,86 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
     throw new Error("Error sending reset password email");
   }
 };
+
+export const sendCourseRejectEmail = async (email: string, courseName: string) => {
+  try {
+    const mailOptions = {
+      from: `"Tutor" <${SENDER_EMAIL}>`,
+      to: email,
+      subject: "Course Rejected - Tutor",
+      html: `
+        <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; background-color: #f9f7ff; padding: 40px 20px;">
+          <div style="background-color: #fff; border-radius: 12px; padding: 40px 30px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <img src="https://static.vecteezy.com/system/resources/previews/003/659/087/non_2x/t-white-alphabet-letter-black-circle-company-business-logo-icon-design-corporate-vector.jpg" alt="Tutor" style="width: 48px; margin-bottom: 20px; border-radius: 50%;" />
+            <h2 style="margin-bottom: 10px; color: #c00;">Course Submission Rejected</h2>
+            <p style="color: #555; font-size: 15px; line-height: 1.5;">
+              Dear Tutor,<br/><br/>
+              We appreciate your effort in submitting the course <strong>${courseName}</strong> for review.<br/><br/>
+              Unfortunately, your course did not meet our platform's requirements and has been rejected by the admin.
+            </p>
+            <p style="font-size: 13px; color: #888;">
+              If you would like more information about the reason for rejection or wish to revise and resubmit your course, please contact our support team.<br/>
+              Thank you for your understanding and continued contributions to Tutor.
+            </p>
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
+            <p style="font-size: 12px; color: #aaa;">Tutor, an effortless identity solution with all the features you need.</p>
+            <div style="margin-top: 10px;">
+              <a href="#" style="margin: 0 5px;"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" width="20" /></a>
+              <a href="#" style="margin: 0 5px;"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" width="20" /></a>
+              <a href="#" style="margin: 0 5px;"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Email" width="20" /></a>
+            </div>
+            <p style="margin-top: 20px; font-size: 11px; color: #bbb;">© 2025 Tutor. All rights reserved.</p>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending course rejection email", error);
+    throw new Error("Error sending course rejection email");
+  }
+};
+export const sendTutorRejectEmail = async (email: string, reason: string) => {
+  try {
+    const mailOptions = {
+      from: `"Tutor" <${SENDER_EMAIL}>`,
+      to: email,
+      subject: "Course Rejected - Tutor",
+      html: `
+        <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; background-color: #f9f7ff; padding: 40px 20px;">
+          <div style="background-color: #fff; border-radius: 12px; padding: 40px 30px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <img src="https://static.vecteezy.com/system/resources/previews/003/659/087/non_2x/t-white-alphabet-letter-black-circle-company-business-logo-icon-design-corporate-vector.jpg" alt="Tutor" style="width: 48px; margin-bottom: 20px; border-radius: 50%;" />
+            <h2 style="margin-bottom: 10px; color: #c00;">Course Submission Rejected</h2>
+            <p style="color: #555; font-size: 15px; line-height: 1.5;">
+              Dear Tutor,<br/><br/>
+              We appreciate your effort in applying for the tutor role on our platform.<br/><br/>
+              Unfortunately, your application did not meet our platform's requirements and has been rejected by the admin.
+            </p>
+            <p style="font-size: 13px; color: #888;">
+              If you would like more information about the reason for rejection or wish to revise and resubmit your application, please contact our support team.<br/>
+              Thank you for your understanding and continued interest in contributing to Tutor.
+            </p>
+            <h3 style="margin-top: 20px; font-weight: bold; font-size: 16px; color: #888;">Reason for Rejection</h3>
+            <ul style="list-style: disc; margin: 20px 0 0 20px; font-size: 13px; color: #888;">
+              <li>${reason}</li>
+            </ul>
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
+            <p style="font-size: 12px; color: #aaa;">Tutor, an effortless identity solution with all the features you need.</p>
+            <div style="margin-top: 10px;">
+              <a href="#" style="margin: 0 5px;"><img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" width="20" /></a>
+              <a href="#" style="margin: 0 5px;"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" width="20" /></a>
+              <a href="#" style="margin: 0 5px;"><img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Email" width="20" /></a>
+            </div>
+            <p style="margin-top: 20px; font-size: 11px; color: #bbb;">© 2025 Tutor. All rights reserved.</p>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending course rejection email", error);
+    throw new Error("Error sending course rejection email");
+  }
+};
