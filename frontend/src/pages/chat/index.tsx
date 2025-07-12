@@ -6,14 +6,17 @@ import { useSelector } from "react-redux";
 
 const Chat = () => {
 
-    const {user} = useSelector((state:RootState) => state.auth);
-
+    const {selectedChatData,selectedChatType} = useSelector((state:RootState) => state.chat);
+    console.log(selectedChatData,selectedChatType);
 
     return (
         <div className="flex h-[43rem] overflow-hidden">
             <ContactsContainer />
-            {/* <EmptyChatContainer /> */}
-            <ChatContainer />
+            {
+                selectedChatType === undefined 
+                ? <EmptyChatContainer />
+                : <ChatContainer />
+            }
         </div>
     )
 }

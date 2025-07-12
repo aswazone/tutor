@@ -14,7 +14,7 @@ const ProfileInfo = () => {
       setIsLoading(true);
       try {
         const response = await axiosInstance.get('/api/v1/auth');
-        console.log(response.data);
+        // console.log(response.data);
         setUserData(response.data);
       } catch (error) {
         console.error('Error fetching user data:', error);

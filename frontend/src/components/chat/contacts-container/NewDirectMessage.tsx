@@ -5,14 +5,18 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import axiosInstance from "@/config/axios.config"
+import { setSelectedChatData, setSelectedChatType } from "@/store/chat"
 import { Plus } from "lucide-react"
 import { useRef, useState } from "react"
+import { useDispatch } from "react-redux"
 
 const NewDirectMessage = () => {
+
     const [isLoading, setIsLoading] = useState(false)
     const [openSelectContactModal, setOpenSelectContactModal] = useState(false)
     const [searchedContacts, setSearchedContacts] = useState([])
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
+    const dispatch = useDispatch()
 
     const searchContacts = (searchTerm: string) => {
 
@@ -40,6 +44,8 @@ const NewDirectMessage = () => {
     async function selectNewContact(contact:any) {
         setOpenSelectContactModal(false);
         setSearchedContacts([]);
+        dispatch(setSelectedChatType("contact"));
+        dispatch(setSelectedChatData(contact));
     }
 
     const userRole = "student"
@@ -59,12 +65,9 @@ const NewDirectMessage = () => {
         <DialogHeader>
           <DialogTitle>Please select a contact</DialogTitle>
           <DialogDescription>
-            {
-              userRole === "student" ? (
-                <p>Select one of your enrolled tutors.</p>
-              ) : (
-                <p>Select one of your students.</p>
-              )
+            {userRole === "student"
+              ? "Select one of your enrolled tutors."
+              : "Select one of your students."
             }
           </DialogDescription>
         </DialogHeader>
@@ -82,7 +85,8 @@ const NewDirectMessage = () => {
                 {
                 
                   searchedContacts.map((contact: any) => (
-                    <div 
+                    <div
+                        key={contact._id}
                         onClick={()=> selectNewContact(contact)}
                         className="flex gap-3 items-center justify-start cursor-pointer">
                         <Avatar className="h-12 w-12">
