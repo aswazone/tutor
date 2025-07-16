@@ -23,4 +23,6 @@ export interface IUserModel extends Document {
     createdAt: Date;
     updatedAt: Date;
     wishlist: string[];
+    onlineStatus: boolean;
+    lastSeen: Date;
 }

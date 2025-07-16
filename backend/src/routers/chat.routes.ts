@@ -5,5 +5,8 @@ import { Router } from "express";
 const chatRouter = Router();
 
 chatRouter.post('/search', authenticateToken, chatController.searchContacts);
+chatRouter.get('/rooms', authenticateToken, chatController.getAllChatRooms);
+chatRouter.get('/rooms/:roomId/messages', authenticateToken, chatController.getMessagesOfChatRoom);
+chatRouter.post('/rooms/direct', authenticateToken, chatController.getOrCreateChatRoom);
 
 export default chatRouter;

@@ -54,4 +54,8 @@ export class UserRepository extends BaseRepository<IUserModel> implements IUserR
     async findTutorsByIds(ids: string[]): Promise<IUserModel[]> {
         return await super.find({ _id: { $in: ids }, role: UserRole.TUTOR });
     }
+
+    async findStudentsByIds(ids: string[]): Promise<IUserModel[]> {
+        return await super.find({ _id: { $in: ids }, role: UserRole.STUDENT });
+    }
 }

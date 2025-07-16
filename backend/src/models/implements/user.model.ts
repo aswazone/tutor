@@ -61,6 +61,14 @@ const UserSchema = new Schema<IUserModel>({
         type:Schema.Types.ObjectId,
         ref:'Course'
     }],
+    onlineStatus: {
+        type: Boolean,
+        default: false
+    },
+    lastSeen: {
+        type: Date,
+        default: Date.now
+    }
 
 },{timestamps:true});
 

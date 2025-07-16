@@ -344,4 +344,18 @@ html {
   will-change: transform, box-shadow;
 }
 
+.bg-chat-online {
+  background: radial-gradient(ellipse at left, #53d482, #16a34a, #03411add);
+}
+
+.bg-chat-offline {
+  background: radial-gradient(ellipse at left, #fb8f24, #931602, #1f0c01);
+}
+
+.bg-chat-message-own {
+  background: linear-gradient(to right, #02224cdb, #012553b7, #052652db);
+}
+.bg-chat-message-bg {
+  background: linear-gradient(to right, #151b1d9e, #28436541, #01314d56);
+}
 

@@ -4,6 +4,7 @@ import app from '@/app';
 import http from 'http';
 import { connectRedis } from './config/redis.config';
 import setupSocket from './socket';
+import { initializeSocket } from './socket/socketHandler';
 
 
 const startServer = async () => {
@@ -12,7 +13,8 @@ const startServer = async () => {
         connectRedis(); 
 
         const server = http.createServer(app);
-        setupSocket(server);
+        const io = setupSocket(server);
+        initializeSocket(io);
 
         server.listen(PORT, () => {
             console.log(`🚀 Tutor App running on ${SERVER_URL} !`);
