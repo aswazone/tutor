@@ -18,6 +18,7 @@ export class UserRepository extends BaseRepository<IUserModel> implements IUserR
     }
 
     async findUserById(id: string): Promise<IUserModel | null> {
+        console.log(id,'reached-user-repo');
         return await super.findById(id)
     }
 

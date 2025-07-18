@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from '@/store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {  useCallback, useEffect, useState} from 'react';
 import { setActiveTab } from '@/store/auth/authSlice';
 import CardSkeleton from '@/components/common/CardSkeleton';
@@ -33,10 +33,19 @@ export const TutorCoursesTab = () => {
   const [tooltipStates, setTooltipStates] = useState<{ [key: string]: boolean }>({});
   const [courseInsight, setCourseInsight] = useState<ICourseInsights | null>(null);
   const [isDataFetching, setIsDataFetching] = useState(false);
+  const [isPeek, setIsPeek] = useState(false);
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get('id');
 
   useEffect(() => {
-    dispatch(fetchTutorCourses());
-  }, [dispatch]);
+    if(id !== null && id !== user?._id){
+      setIsPeek(true);
+    }
+    dispatch(fetchTutorCourses(id ?? '')).unwrap();
+  }, [dispatch,id,user]);
 
   const getAllStudentsProgress = async (courseId: string, tutorId: string) => {
     
@@ -51,13 +60,12 @@ export const TutorCoursesTab = () => {
 };
 
   const { items: courses, isLoading } = useSelector((state:RootState ) => state.fetch);
-  const { user } = useSelector((state: RootState) => state.auth);
   const handleToggleStatus = useCallback(async (courseId: string, currentStatus: boolean) => {
     try {
       setToggleLoading(courseId);
     
       await dispatch(toggleCourseStatus({ courseId, status: !currentStatus })).unwrap();
-      await dispatch(fetchTutorCourses()).unwrap();
+      await dispatch(fetchTutorCourses('')).unwrap();
       
       toast.success(`Course ${!currentStatus ? 'published' : 'drafted'} successfully`);
     } catch (error) {
@@ -73,7 +81,7 @@ export const TutorCoursesTab = () => {
       setToggleLoading(courseId);
     
       await dispatch(deleteCourse(courseId)).unwrap();
-      await dispatch(fetchTutorCourses()).unwrap();
+      await dispatch(fetchTutorCourses('')).unwrap();
       
       toast.success(`Course deleted successfully`);
     } catch (error) {
@@ -119,7 +127,7 @@ export const TutorCoursesTab = () => {
     try {
       toast('Requested..');
       await axiosInstance.patch(`/api/v1/courses/${courseId}/verify/${isVerified}`, { rejectReason });
-      await dispatch(fetchTutorCourses()).unwrap();
+      await dispatch(fetchTutorCourses('')).unwrap();
     } catch (error) {
       toast.error('Failed to update course status');
       console.error('Toggle status error:', error);
@@ -184,7 +192,7 @@ export const TutorCoursesTab = () => {
               className="group relative"
             >
               
-              <motion.div
+              {!isPeek && <motion.div
                 
                 onClick={(e) => {
                   e.stopPropagation();
@@ -223,7 +231,7 @@ export const TutorCoursesTab = () => {
                       : <FileClock size={15} />
                     : <ShieldAlert size={15} />
                 )}
-              </motion.div>
+              </motion.div>}
               <Card className={
                 course.isVerified === 'verified' && course.isActive
                 ? `pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-500/20 transition-all duration-300`
@@ -236,7 +244,7 @@ export const TutorCoursesTab = () => {
                     onClose={() => setOpenDailog(false)}
                 />
                 <div className="relative aspect-video overflow-hidden">
-                  {course?.isScheduled && course?.publishDate && (
+                  {!isPeek && course?.isScheduled && course?.publishDate && (
                     <div className='flex items-center justify-between absolute z-20 top-23 left-16 bg-black/50 text-white text-[10px] px-2 py-1 rounded gap-3'>
                       <Clock size={16} />
                       <div className='w-[80px]'>Scheduled on {format(course?.publishDate, 'MMMM d, yyyy')}</div>
@@ -258,7 +266,7 @@ export const TutorCoursesTab = () => {
                               
                               <div className="flex-col justify-between space-x-4">
                                 <div className="space-y-2">
-                                    {course?.isVerified === 'rejected' && course?.rejectReason && <CustomAlert 
+                                    {!isPeek && course?.isVerified === 'rejected' && course?.rejectReason && <CustomAlert 
                                       className="bg-red-950/10 text-red-400/50 hover:text-red-400/60 hover:bg-red-950/30"
                                       title="Admin Rejected !" 
                                       description={course?.rejectReason || "No reason provided."} 
@@ -284,8 +292,8 @@ export const TutorCoursesTab = () => {
                           </HoverCard>
                         )
                     }
-                  {!course.isActive && <Badge variant={'destructive'} className='absolute z-20 top-20 left-23 bg-black/50 text-white'>Blocked</Badge>}
-                  {course.isVerified !== 'pending' && 
+                  {!isPeek && !course.isActive && <Badge variant={'destructive'} className='absolute z-20 top-20 left-23 bg-black/50 text-white'>Blocked</Badge>}
+                  {!isPeek && course.isVerified !== 'pending' && 
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -298,7 +306,7 @@ export const TutorCoursesTab = () => {
                     
                     <Trash size={16}/>
                   </Button>}             
-                  {course.isVerified !== 'pending' && 
+                  {!isPeek && course.isVerified !== 'pending' && 
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -310,7 +318,7 @@ export const TutorCoursesTab = () => {
                   >
                     <Edit size={16}/>
                   </Button>}
-                  {course.isVerified !== 'pending' && 
+                  {!isPeek && course.isVerified !== 'pending' && 
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();

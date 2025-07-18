@@ -104,9 +104,27 @@ export class AuthController implements IAuthController{
 
     getUser = async (req:AuthenticatedRequest, res:Response, next:NextFunction):Promise<void> =>{
         try {
+            let { id } = req.query;
             const userId = req.user?.id;
-            const user = await this._authService.getUserById(userId as string);
-            res.status(HttpStatus.OK).json(user);
+
+            if (id === 'null' || id === 'undefined' || !id) {
+                id = undefined;
+            }
+
+            const isCurrentUser = userId === id || !id;
+            const lastId = id !== undefined ? id : userId;
+            
+            if (!lastId) {
+                // No valid user id available
+                res.status(HttpStatus.BAD_REQUEST).json({ error: "User ID is required" });
+                return;
+            }
+
+
+            console.log({ id, userId, lastId, isCurrentUser });
+
+            const user = await this._authService.getUserById(lastId as string);
+            res.status(HttpStatus.OK).json({ user, isCurrentUser });
         } catch (err) {
             next(err);
         }

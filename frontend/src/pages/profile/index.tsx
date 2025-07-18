@@ -4,7 +4,6 @@ import {
   AcademicCapIcon,
   HomeIcon,
   BookOpenIcon,
-  UserGroupIcon,
   StarIcon,
   Cog6ToothIcon,
   UserIcon,
@@ -16,7 +15,6 @@ import { AppDispatch, RootState } from '@/store'
 import { UserRole } from '@/types'
 
 import { TutorCoursesTab } from './tabs/TutorCoursesTab'
-import { StudentsTab } from './tabs/StudentsTab'
 import { ReviewsTab } from './tabs/ReviewsTab'
 import { TeachersTab } from './tabs/TeachersTab'
 import { TeachersOverviewTab } from './tabs/TeachersOverviewTab'
@@ -35,19 +33,20 @@ import Loader from '@/components/ui/loader'
 import { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '@/config/axios.config'
 import CustomAlert from '@/components/common/CustomAlert'
-import { LightbulbIcon } from 'lucide-react'
+import { LightbulbIcon, MessageCircleMore } from 'lucide-react'
 import { User } from '@/types/profile.type'
 import { GridLineHorizontal, GridLineVertical } from '@/components/common/GridLines'
 import PurchasesHistoryTab from './tabs/PurchasesHistoryTab'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const getTabs = (role: UserRole) => {
   switch (role) {
     case UserRole.TUTOR:
       return [
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: TeachersOverviewTab },
-        { id: 'courses', name: 'My Courses', icon: <BookOpenIcon className="h-5 w-5 md:hidden" />, component: TutorCoursesTab },
+        { id: 'courses', name: 'Courses', icon: <BookOpenIcon className="h-5 w-5 md:hidden" />, component: TutorCoursesTab },
         { id: 'create-course', name: 'Manage Course', icon: <PlusIcon className="h-5 w-5 md:hidden" />, component: CreateCourseTab },
-        { id: 'students', name: 'My Students', icon: <UserGroupIcon className="h-5 w-5 md:hidden" />, component: StudentsTab },
+        // { id: 'students', name: 'My Students', icon: <UserGroupIcon className="h-5 w-5 md:hidden" />, component: StudentsTab },
         { id: 'reviews', name: 'Reviews', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: ReviewsTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: TeachersSettingsTab },
       ]
@@ -84,24 +83,30 @@ const Profile = () => {
   const [userData, setUserData] = useState<User | null>(null)
   const [tutorInsight, setTutorInsight] = useState<TeachersCardProps|null>();
   const [studentInsight, setStudentInsight] = useState<StudentsCardProps|null>();
+  const [isPeek, setIsPeek] = useState(false);
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get('id');
+  const navigate = useNavigate();
 
   const fetchInsight = useCallback(async () => {
     try {
-      if(user?.role === 'tutor'){
-        console.log(user._id);
+      if(userData?.role === 'tutor'){
+        console.log(userData._id);
         // return
-        const response = await axiosInstance.get(`/api/v1/insights/dashboard/${user._id}/tutor`);
+        const response = await axiosInstance.get(`/api/v1/insights/dashboard/${userData._id}/tutor`);
         setTutorInsight(response.data);
         console.log(response.data, 'insight');
       }else{
-        const response = await axiosInstance.get(`/api/v1/insights/dashboard/${user?._id}/student`);
+        const response = await axiosInstance.get(`/api/v1/insights/dashboard/${userData?._id}/student`);
         setStudentInsight(response.data);
         console.log(response.data, 'insight-student');
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
-  },[user])
+  },[userData]);
 
   useEffect(() => {
     fetchInsight();
@@ -109,26 +114,30 @@ const Profile = () => {
 
   console.log(userData)
 
-    const fetchUserData = async () => {
+    const fetchUserData = useCallback(async () => {
       setIsLoading(true);
       try {
-        const response = await axiosInstance.get('/api/v1/auth');
-        setUserData(response.data);
+        const response = await axiosInstance.get(`/api/v1/auth?id=${id!}`);
+        setUserData(response.data.user);
+        if(!response.data.isCurrentUser){
+          setIsPeek(true);
+        }
+        dispatch(setActiveTab('overview'));
       } catch (error) {
         console.error('Error fetching user data:', error);
       }finally{
         setIsLoading(false);
       }
-    };
+    }, [id, dispatch]);
 
   useEffect(() => {
     if (user) {
       fetchUserData();
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, fetchUserData]);
 
 
-  console.log("User Data:", userData)
+  // console.log("User Data:", userData)
   
   const tabs = userData ? getTabs(userData.role) : []
 
@@ -172,6 +181,20 @@ const Profile = () => {
     }
   }
 
+  const handleShowTheTab = (tabId: string, userRole: UserRole | undefined) => {
+    if(userRole === undefined) return false
+    if(userRole === UserRole.TUTOR){
+      if(tabId === 'courses' || tabId === 'overview' ){
+        return true
+      }
+    }else{
+      if(tabId === 'overview'){
+        return true
+      }
+      return false
+    }
+  }
+
   if(isLoading) return <Loader className='w-7 h-7'/>
   return (
     <div className="min-h-screen bg-background">
@@ -196,6 +219,7 @@ const Profile = () => {
                     {userData?.userName ? userData.userName.slice(0, 2).toUpperCase() : 'U'}
                   </AvatarFallback>
                 </Avatar>
+                
               </div>
             </div>
             <div className="md:mt-8 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
@@ -266,7 +290,9 @@ const Profile = () => {
                 onSuccess={handleVerifySuccess}
               />
               </div>
-              {userData?.role === UserRole.STUDENT && ( 
+              <div>
+              <MessageCircleMore onClick={()=> navigate('/chat')} className={`cursor-pointer absolute ${userData?.role === UserRole.STUDENT ? 'right-15' : 'right-5'} top-6 h-8 w-8 text-sky-300`}/>
+              {!isPeek && userData?.role === UserRole.STUDENT && ( 
                  userData?.isVerified === 'pending' 
                     ? <Loader className='h-5 w-5 ml-1 mt-3'/> 
                     : (
@@ -322,6 +348,7 @@ const Profile = () => {
                         </HoverCard>
                       ))
                   }
+              </div>
             </div>
         <GridLineVertical className='right-2'/>
           </div>
@@ -347,7 +374,7 @@ const Profile = () => {
                   <button
                     key={tab.id}
                     onClick={() => dispatch(setActiveTab(tab.id))}
-                    className={` px-3 py-1 my-3 rounded-bl-lg rounded-tr-lg transition-colors ${
+                    className={`${isPeek && !handleShowTheTab(tab.id, userData?.role) && 'hidden'} px-3 py-1 my-3 rounded-bl-lg rounded-tr-lg transition-colors ${
                       activeTab === tab.id
                         ? 'bg-gradient-to-br border-2 border-sky-800/30 from-sky-900/30 to-sky-9from-sky-900/60 text-primary-background'
                         : 'text-muted-foreground hover:text-foreground'

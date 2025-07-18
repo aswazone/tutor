@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', courseController.getAllCourses);
 router.post('/', authenticateToken,checkRole("tutor"), courseController.createCourse);
 router.put('/:courseId', authenticateToken,checkRole("tutor"), courseController.updateCourse);
-router.get('/tutor', authenticateToken,checkRole("tutor"), courseController.getInstructorCourses);
+router.get('/tutor', authenticateToken, courseController.getInstructorCourses);
 router.get('/student', authenticateToken, courseController.getStudentCourses);
 router.get('/:courseId', courseController.getCourse);
 router.get('/check-purchased/:courseId/:userId', courseController.checkIfCoursePurchased);

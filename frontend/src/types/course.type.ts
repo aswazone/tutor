@@ -50,7 +50,7 @@ export interface ICourse {
   updatedAt: string;
 }
 export interface ITutor {
-  id: string
+  _id: string
   userName: string
   userEmail: string
   isActive: boolean

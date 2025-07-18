@@ -30,8 +30,17 @@ export class CourseController implements ICourseController {
         res.status(401).json({ message: 'Unauthorized' });
         return;
       }
+            let { id } = req.query;
+            const userId = req.user?.id;
 
-      const courses = await this._courseService.getCoursesByInstructor(req.user.id);
+            if (id === 'null' || id === 'undefined' || !id) {
+                id = undefined;
+            }
+
+            const lastId = id || userId;
+            console.log('check is it undefined', lastId);
+
+      const courses = await this._courseService.getCoursesByInstructor(lastId as string);
       res.json(courses);
     } catch (error) {
       next(error);

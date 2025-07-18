@@ -45,11 +45,11 @@ export const fetchCourse = createAsyncThunk(
 export const fetchTutorCourses = createAsyncThunk(
 
   'courses/fetchTutorItems',
-  async (_, { rejectWithValue }) => {
+  async (id: string, { rejectWithValue }) => {
     try {
     console.log('fetching tutor courses');
 
-      const response = await axiosInstance.get('/api/v1/courses/tutor');
+      const response = await axiosInstance.get(`/api/v1/courses/tutor?id=${id}`);
       return response.data;
     } catch (err) {
       return rejectWithValue(axiosErrorMessage(err));

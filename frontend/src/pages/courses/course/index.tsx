@@ -138,7 +138,7 @@ const CourseDetailsPage = () => {
                     </h1>
                     <p className="text-sm text-gray-300 mb-6">{courses[0]?.subtitle}</p>
                     <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
-                        <span className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
+                        <span onClick={() => navigate(`/profile?id=${courses[0]?.tutor?._id}`)} className="cursor-pointer flex items-center gap-2 bg-white/5 px-3 py-1 rounded-full">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
                             </svg>
