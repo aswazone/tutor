@@ -95,6 +95,20 @@ export class CourseController implements ICourseController {
       next(error);
     }
   };
+  getWishlistedCourses = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user?.id) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
+      const courses = await this._courseService.getAllCoursesWishlist();
+
+      console.log(courses, 'wishlist');
+      res.json(courses);
+    } catch (error) {
+      next(error);
+    }
+  };
 
   toggleCourseStatus = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {

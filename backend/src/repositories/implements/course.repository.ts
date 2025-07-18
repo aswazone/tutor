@@ -89,5 +89,14 @@ export class CourseRepository extends BaseRepository<ICourseModel> implements IC
           if (error instanceof HttpError) throw error;
           throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');
       }
+      
   }
+      async getAllCoursesWishlist(): Promise<ICourseModel[]> {
+          try {
+              return await this.find({ isDeleted: false, isPublished: true });
+          } catch (error) {
+              if (error instanceof HttpError) throw error;
+              throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');
+          }
+      }
 }

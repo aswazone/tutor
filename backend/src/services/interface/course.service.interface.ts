@@ -12,7 +12,8 @@ export interface ICourseService {
   getAllCourses(query: {
     filter: QueryFilter;
     options: QueryOptions;
-}): Promise<{ courses: ICourse[]; count: number }>;
+  }): Promise<{ courses: ICourse[]; count: number }>;
+  getAllCoursesWishlist(): Promise<ICourse[]>;
   toggleCourseStatus(courseId: string, isPublished: boolean): Promise<void>;
   updateCourse(courseId: string, courseData: Partial<ICreateCourseDTO>): Promise<ICourse>;
   deleteCourse(courseId: string): Promise<void>;

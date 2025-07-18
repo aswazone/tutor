@@ -91,6 +91,11 @@ export class CourseService implements ICourseService {
     return {courses: courses.result, count: courses.resultCount};
   }
 
+  getAllCoursesWishlist = async (): Promise<ICourse[]> => {
+    const courses = await this._courseRepository.getAllCoursesWishlist();
+    return courses;
+  }
+
   toggleCourseStatus = async (courseId: string, status: boolean): Promise<void> => {
     await this._courseRepository.findByIdAndUpdate(courseId, {isPublished: status});
   }

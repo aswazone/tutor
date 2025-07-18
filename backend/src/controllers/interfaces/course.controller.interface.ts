@@ -8,6 +8,7 @@ export interface ICourseController {
   getStudentCourses: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
   getCourse: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
   getAllCourses: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
+  getWishlistedCourses: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
   toggleCourseStatus: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
   deleteCourse: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;
   verifyCourse: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>;

@@ -7,6 +7,7 @@ import { checkRole } from '@/middlewares/checkrole.middleware';
 const router = Router();
 
 router.get('/', courseController.getAllCourses);
+router.get('/wishlist', authenticateToken, courseController.getWishlistedCourses);
 router.post('/', authenticateToken,checkRole("tutor"), courseController.createCourse);
 router.put('/:courseId', authenticateToken,checkRole("tutor"), courseController.updateCourse);
 router.get('/tutor', authenticateToken, courseController.getInstructorCourses);

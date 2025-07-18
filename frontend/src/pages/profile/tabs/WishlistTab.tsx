@@ -126,8 +126,9 @@ export const WishlistTab = () => {
       const fetchCourses = async () => {
         setLoading(true);
         try {        
-          const response = await axiosInstance.get<{ courses: ICourse[]}>('/api/v1/courses');
-          setCourses(response.data.courses);  
+          const response = await axiosInstance.get('/api/v1/courses/wishlist');
+          setCourses(response.data);
+          console.log(response.data,'wishlist');
           setLoading(false);  
       } catch (error) {
         setLoading(false);
@@ -146,11 +147,10 @@ export const WishlistTab = () => {
       dispatch(fetchWishlist());
     }, [dispatch]);
 
-    const wishlistedCourses = courses.filter((course) => 
-    wishlist.some((wishlistItem) => wishlistItem._id === course._id)
+    const wishlistedCourses = (courses ?? []).filter((course) =>
+      (wishlist ?? []).some((wishlistItem) => wishlistItem._id === course._id)
     );
-
-    // console.log(wishlistedCourses,'wishlistedCourses');
+    console.log(wishlistedCourses,'wishlistedCourses');
     
 
   const handleNavigation = async (courseId: string) => {
@@ -229,7 +229,7 @@ export const WishlistTab = () => {
       className="space-y-6"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {wishlistedCourses.map((course) => (
+        {wishlistedCourses && wishlistedCourses.map((course) => (
           <CourseCard
             key={course._id}
             course={course}
