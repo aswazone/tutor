@@ -17,6 +17,11 @@ export interface IUserModel extends Document {
         resume?: string;
         rejectReason?: string;
     }
+    studentDetails?:{
+        qualification?: string;
+        about?: string;
+        expertise?: string;
+    }
     profileImage?: string;
     rating?: number;
     role: UserRole;

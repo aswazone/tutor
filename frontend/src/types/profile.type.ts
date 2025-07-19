@@ -23,6 +23,11 @@ export interface User {
     resume?: string
     rejectReason?: string
   }
+  studentDetails?: {
+    qualification?: string
+    about?: string
+    expertise?: string
+  }
   createdAt?: Date
 }
 

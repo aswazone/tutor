@@ -291,7 +291,7 @@ const Profile = () => {
               />
               </div>
               <div>
-              <MessageCircleMore onClick={()=> navigate('/chat')} className={`cursor-pointer absolute ${userData?.role === UserRole.STUDENT ? 'right-15' : 'right-5'} top-6 h-8 w-8 text-sky-300`}/>
+              <MessageCircleMore onClick={()=> navigate('/chat')} className={`cursor-pointer absolute ${userData?.role === UserRole.STUDENT ? 'right-15' : 'right-5'} top-12 md:top-6 h-8 w-8 text-sky-300`}/>
               {!isPeek && userData?.role === UserRole.STUDENT && ( 
                  userData?.isVerified === 'pending' 
                     ? <Loader className='h-5 w-5 ml-1 mt-3'/> 
@@ -402,17 +402,17 @@ const ProfileCard = ({ userData }: { userData: User }) => (
   >
     <h2 className="text-xl font-semibold mb-4">About</h2>
     <p className="text-muted-foreground">
-      {userData?.tutorDetails?.about || `Frontend developer passionate about creating beautiful user experiences.
+      {userData?.role === UserRole.TUTOR ? userData?.tutorDetails?.about : userData?.studentDetails?.about || `Frontend developer passionate about creating beautiful user experiences.
       Learning and sharing knowledge through teaching.`}
     </p>
     <div className="mt-4 space-y-2">
       <div className="flex items-center text-sm">
         <LightbulbIcon className="h-5 w-5 mr-4 text-primary" />
-        <span>{(userData?.tutorDetails?.expertise as string) || "Frontend Development, UI/UX Design"}</span>
+        <span>{userData?.role === UserRole.TUTOR ? (userData?.tutorDetails?.expertise as string) : userData?.studentDetails?.expertise || "Frontend Development, UI/UX Design"}</span>
       </div>
       <div className="flex items-center text-sm">
         <AcademicCapIcon className="h-5 w-5 mr-4 text-primary" />
-        <span>{userData?.tutorDetails?.qualification || "Bachelor's degree in Computer Science"}</span>
+        <span>{userData?.role === UserRole.TUTOR ? (userData?.tutorDetails?.qualification as string) : userData?.studentDetails?.qualification || "Bachelor's degree in Computer Science"}</span>
       </div>
       <div className="flex items-center text-sm">
         <CalendarIcon className="h-5 w-5 mr-4 text-primary" />

@@ -12,9 +12,11 @@ authRouter.post("/resend-otp", authController.resendOtp);
 authRouter.post("/google-signin", authController.googleSignin);
 authRouter.post("/forgot-password", authController.forgotPassword);
 authRouter.post("/reset-password", authController.resetPassword);
+authRouter.post("/update-password", authenticateToken, authController.updatePassword);
 authRouter.post("/refresh-token", authController.refreshAccessToken);
 authRouter.post("/check-user-blocked", authenticateToken, authController.checkUserBlocked);
 authRouter.get("/", authenticateToken, authController.getUser);
+authRouter.patch("/profile-update", authenticateToken, authController.profileContentUpdate);
 authRouter.patch("/tutor-verify/:tutorId/:status", authenticateToken, authController.tutorVerify);
 
 

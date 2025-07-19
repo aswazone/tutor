@@ -112,6 +112,20 @@ export const resetPassword = createAsyncThunk<
     }
 })
 
+export const updatePassword = createAsyncThunk<
+    { message: string },
+    { currentPassword: string; newPassword: string },
+    { rejectValue: string }
+>('/auth/update-password', async ({ currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+        const response = await axiosInstance.post('api/v1/auth/update-password', { currentPassword, newPassword });
+        return response.data;
+    } catch (err: unknown) {
+        const message = axiosErrorMessage(err);
+        return rejectWithValue(message);
+    }
+})
+
 const authSlice = createSlice({
     name: "auth",
     initialState,

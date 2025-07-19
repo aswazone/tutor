@@ -56,6 +56,14 @@ const UserSchema = new Schema<IUserModel>({
         },
         default: null
     },
+    studentDetails: {
+        type: {
+            qualification: {type: String, default: ''},
+            about: {type: String, default: ''},
+            expertise: {type: String, default: ''},
+        },
+        default: null
+    },
     profileImage: {type: String, default: ''},
     wishlist:[{
         type:Schema.Types.ObjectId,

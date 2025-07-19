@@ -1,6 +1,6 @@
 import { IAuthService } from "@/services/interface/user.service.inteface";
 import { IAuthController } from "../interfaces/auth.controller.interface";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction} from "express";
 import { HttpStatus } from "@/constants/status.constant";
 import { setCookie } from "@/utils/cookies.utils";
 import { AuthenticatedRequest } from "@/types/auth.type";
@@ -45,6 +45,18 @@ export class AuthController implements IAuthController{
         try {
             const result = await this._authService.resendOtp(req.body.email);
             res.status(HttpStatus.CREATED).json(result);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    updatePassword = async (req:AuthenticatedRequest, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const userId = req.user?.id;
+            const {currentPassword,newPassword} = req.body;
+
+            const response = await this._authService.updatePassword(userId as string,currentPassword,newPassword);
+            res.status(HttpStatus.OK).json(response);
         } catch (err) {
             next(err);
         }
@@ -135,6 +147,16 @@ export class AuthController implements IAuthController{
             const extraData = req.body;
             console.log(extraData);
             const {message} = await this._authService.tutorVerify({userId:req.params.tutorId,status:req.params.status as UserStatus                         ,tutorDetails:{...extraData}});
+            res.status(HttpStatus.OK).json({message});
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    profileContentUpdate = async (req:AuthenticatedRequest, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const userId = req.user?.id;
+            const {message} = await this._authService.profileContentUpdate(userId as string,req.body);
             res.status(HttpStatus.OK).json({message});
         } catch (err) {
             next(err);

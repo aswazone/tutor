@@ -1,14 +1,9 @@
 import { z } from "zod";
 
-export const teacherSettingsSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters long"),
-  bio: z.string().min(20, "Bio must be at least 20 characters long").max(500, "Bio must not exceed 500 characters"),
+export const profileSettingsSchema = z.object({
+  qualification: z.string().min(3, "Title must be at least 3 characters long"),
+  about: z.string().min(20, "Bio must be at least 20 characters long").max(500, "Bio must not exceed 500 characters"),
   expertise: z.string().min(3, "Please specify at least one area of expertise"),
-  acceptNewStudents: z.boolean(),
-  automaticConfirmation: z.boolean(),
-  maxStudents: z.number().min(1, "Must accept at least 1 student").max(100, "Cannot exceed 100 students"),
-  emailNotifications: z.boolean(),
-  courseUpdates: z.boolean(),
 });
 
 export const studentSettingsSchema = z.object({
@@ -22,5 +17,21 @@ export const studentSettingsSchema = z.object({
   learningProgress: z.boolean(),
 });
 
-export type TeacherSettingsFormData = z.infer<typeof teacherSettingsSchema>;
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(8, "Password must be at least 8 characters long"),
+  newPassword: z
+    .string()
+    .min(8, "Password must be at least 8 characters long")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one digit")
+    .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character"),
+  confirmPassword: z.string().min(8, "Password must be at least 8 characters long"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords must match",
+  path: ["confirmPassword"],
+});
+
+export type ProfileSettingsFormData = z.infer<typeof profileSettingsSchema>;
 export type StudentSettingsFormData = z.infer<typeof studentSettingsSchema>;
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;

@@ -7,6 +7,7 @@ export const HttpResponse = {
     PAGE_NOT_FOUND: "Route not found",
     USER_NOT_FOUND: "User not found",
     PASSWORD_INCORRECT: "Incorrect password, try again",
+    PASSWORD_SAME: "New password cannot be same as old password",
     NO_TOKEN: "Token not provided",
     OTP_INCORRECT: "Incorrect otp, try again",
     OTP_NOT_FOUND: "Otp not found",

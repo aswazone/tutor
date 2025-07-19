@@ -134,6 +134,29 @@ export class AuthService implements IAuthService {
         return { status: HttpStatus.OK, message: 'Otp resent successfully' };
     }
 
+    updatePassword = async (userId:string,currentPassword:string,newPassword:string): Promise<{message:string}>=> {
+
+        console.log(userId,currentPassword,newPassword);
+        // return
+
+        const userExist = await this._userRepository.findUserById(userId);
+        if(!userExist) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+        if(!userExist.isActive) throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.USER_BLOCKED);
+
+        const isMatch = await comparePassword(currentPassword,userExist?.password);
+        if(!isMatch) throw createHttpError(HttpStatus.UNAUTHORIZED, 'Current password incorrect');
+
+        if(currentPassword === newPassword) throw createHttpError(HttpStatus.BAD_REQUEST, HttpResponse.PASSWORD_SAME);
+
+        const hashedPassword = await hashPassword(newPassword);
+
+        
+        const updatedUser = await this._userRepository.updatePassword(userExist.userEmail,hashedPassword);
+        console.log(hashedPassword,userId,{user:updatedUser});
+        if(!updatedUser) throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, HttpResponse.SERVER_ERROR);
+        return {message:HttpResponse.PASSWORD_CHANGE_SUCCESS};
+    }
+
     forgotPassword = async (email:string)=> {
 
         const userExist = await this._userRepository.findUserByEmail(email);
@@ -290,6 +313,36 @@ export class AuthService implements IAuthService {
         }
 
         return { message:'no change' };
+    }
+
+    profileContentUpdate = async (userId: string, update: Partial<IUserModel>) => {
+        const user = await this._userRepository.findUserById(userId);
+        if(!user) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+
+        let convertedData: Partial<IUserModel> = {};
+        if(user.role === UserRole.TUTOR) {
+            convertedData = {
+                tutorDetails: {
+                    qualification: update.tutorDetails?.qualification || user.tutorDetails?.qualification || '',
+                    expertise: update.tutorDetails?.expertise || user.tutorDetails?.expertise || '',
+                    about: update.tutorDetails?.about || user.tutorDetails?.about || '',
+                }
+            }
+        }
+
+        if(user.role === UserRole.STUDENT) {
+            convertedData = {
+                studentDetails: {
+                    qualification: update.studentDetails?.qualification || user.studentDetails?.qualification || '',
+                    expertise: update.studentDetails?.expertise || user.studentDetails?.expertise || '',
+                    about: update.studentDetails?.about || user.studentDetails?.about || '',
+                }
+            }
+        }
+
+        const updatedUser = await this._userRepository.updateUser(userId, convertedData);
+        if(!updatedUser) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+        return { message: HttpResponse.RESOURCE_UPDATED };
     }
 
 }
