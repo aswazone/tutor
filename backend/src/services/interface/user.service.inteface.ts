@@ -2,6 +2,7 @@ import { IUserModel } from "@/models/interface/user.model.interface";
 import { UserRole, UserStatus } from "@/types/user.type";
 
 export interface IAuthService {
+    profileImageUpdate(userId: string, profileImage: string): Promise<{ message: string }>;
     profileContentUpdate(userId: string, update: Partial<IUserModel>): Promise<{ message: string }>;
     tutorVerify({userId,status,tutorDetails}: {userId:string,status:UserStatus,tutorDetails?:Partial<IUserModel>['tutorDetails']}): Promise<{ message: string}>
     getUserById(id: string): Promise<IUserModel | null>;

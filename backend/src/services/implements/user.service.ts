@@ -345,4 +345,16 @@ export class AuthService implements IAuthService {
         return { message: HttpResponse.RESOURCE_UPDATED };
     }
 
+    profileImageUpdate = async (userId: string, profileImage: string) => {
+
+        console.log(userId,profileImage,'test---')
+        // return
+
+        const user = await this._userRepository.findUserById(userId);
+        if(!user) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+        const updatedUser = await this._userRepository.updateUser(userId, { profileImage });
+        if(!updatedUser) throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+        return { message: HttpResponse.RESOURCE_UPDATED };
+    }
+
 }

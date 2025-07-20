@@ -53,7 +53,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           
           <Avatar className="h-10 w-10">
             <AvatarImage 
-              src={room.type === 'direct' ? otherParticipant?.avatar : undefined} 
+              src={room.type === 'direct' ? otherParticipant?.profileImage : undefined} 
             />
             <AvatarFallback className="bg-primary text-primary-foreground">
               {room.type === 'direct' 

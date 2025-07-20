@@ -69,7 +69,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (!selectedRoomId) return;
 
     const newMessage: Message = {
-      id: `msg-${Date.now()}`,
+      _id: `msg-${Date.now()}`,
       content,
       senderId: currentUser._id,
       senderName: currentUser.name,

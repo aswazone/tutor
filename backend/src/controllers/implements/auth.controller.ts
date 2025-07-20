@@ -162,5 +162,15 @@ export class AuthController implements IAuthController{
             next(err);
         }
     }
+
+    profileImageUpdate = async (req:AuthenticatedRequest, res:Response, next:NextFunction):Promise<void> =>{
+        try {
+            const userId = req.user?.id;
+            const {message} = await this._authService.profileImageUpdate(userId as string,req.body.profileImage);
+            res.status(HttpStatus.OK).json({message});
+        } catch (err) {
+            next(err);
+        }
+    }
     
 }

@@ -6,7 +6,6 @@ import {
   BookOpenIcon,
   StarIcon,
   Cog6ToothIcon,
-  UserIcon,
   PlusIcon,
 } from '@heroicons/react/24/outline'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -16,7 +15,6 @@ import { UserRole } from '@/types'
 
 import { TutorCoursesTab } from './tabs/TutorCoursesTab'
 import { ReviewsTab } from './tabs/ReviewsTab'
-import { TeachersTab } from './tabs/TeachersTab'
 import { TeachersOverviewTab } from './tabs/TeachersOverviewTab'
 import { StudentsOverviewTab } from './tabs/StudentsOverviewTab'
 import { TeachersSettingsTab } from './tabs/TeachersSettingsTab'
@@ -33,11 +31,15 @@ import Loader from '@/components/ui/loader'
 import { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '@/config/axios.config'
 import CustomAlert from '@/components/common/CustomAlert'
-import { LightbulbIcon, MessageCircleMore } from 'lucide-react'
+import { Check, LightbulbIcon, MessageCircleMore, Plus, X } from 'lucide-react'
 import { User } from '@/types/profile.type'
 import { GridLineHorizontal, GridLineVertical } from '@/components/common/GridLines'
 import PurchasesHistoryTab from './tabs/PurchasesHistoryTab'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { Input } from '@/components/ui/input'
+import { uploadSingleImageFile } from '@/store/course'
+import { toast } from 'sonner'
+import { env } from '@/config/env.config'
 
 const getTabs = (role: UserRole) => {
   switch (role) {
@@ -54,7 +56,7 @@ const getTabs = (role: UserRole) => {
       return [
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: StudentsOverviewTab },
         { id: 'wishlist', name: 'Wishlist', icon: <AcademicCapIcon className="h-5 w-5 md:hidden" />, component: WishlistTab },
-        { id: 'teachers', name: 'Teachers', icon: <UserIcon className="h-5 w-5 md:hidden" />, component: TeachersTab },
+        // { id: 'teachers', name: 'Teachers', icon: <UserIcon className="h-5 w-5 md:hidden" />, component: TeachersTab },
         { id: 'purchases', name: 'Purchases', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: PurchasesHistoryTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: StudentsSettingsTab },
       ]
@@ -84,6 +86,9 @@ const Profile = () => {
   const [tutorInsight, setTutorInsight] = useState<TeachersCardProps|null>();
   const [studentInsight, setStudentInsight] = useState<StudentsCardProps|null>();
   const [isPeek, setIsPeek] = useState(false);
+  const [newPreviewUrl, setNewPreviewUrl] = useState<string>('');
+  const [imageData, setImageData] = useState<File | null>(null);
+
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -195,6 +200,38 @@ const Profile = () => {
     }
   }
 
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setNewPreviewUrl(imageUrl);
+      setImageData(file);
+    }
+  }
+
+  const handleImageUpdate = async () => {
+    try {
+      if(imageData !== null && imageData instanceof File){
+        const uploadedImage = await dispatch(uploadSingleImageFile({ courseImage: imageData! })).unwrap()
+        console.log(uploadedImage,'uploaded--')
+        // return
+        const response = await axiosInstance.patch('/api/v1/auth/profile-image-update',{
+          profileImage: uploadedImage.thumbnailKey
+        })
+        if(response.data){
+          toast.success("Profile image updated successfully !");
+          setNewPreviewUrl('');
+          setImageData(null);
+          await fetchUserData();
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
   if(isLoading) return <Loader className='w-7 h-7'/>
   return (
     <div className="min-h-screen bg-background">
@@ -209,7 +246,7 @@ const Profile = () => {
               <div className="relative rotate-hor-center-normal flip-coin h-18 w-18 md:h-24 md:w-24 rounded-full border-1 shadow-[inset_0px_0px_25px_7px_rgba(2,_13,_19,_0.94)] border-black overflow-hidden">
                 <Avatar className="h-18 w-18 md:h-24 md:w-24">
                   <AvatarImage
-                    src={userData?.profileImage || "https://i.pravatar.cc/150?img=67"}
+                    src={newPreviewUrl as string || `${env.AMZ_BUCKET_NAME}/${userData?.profileImage}` || "https://i.pravatar.cc/150?img=67"}
                     alt={userData?.userName || "User Avatar"}
                     className="object-cover shadow-[inset_0px_0px_25px_7px_rgba(9,_2,_9,_0.94)]"
                   />
@@ -219,8 +256,26 @@ const Profile = () => {
                     {userData?.userName ? userData.userName.slice(0, 2).toUpperCase() : 'U'}
                   </AvatarFallback>
                 </Avatar>
-                
               </div>
+                {newPreviewUrl 
+                ? (<div className='bg-sky-200/30 relative'>
+                    <label className='cursor-pointer absolute top-4 -left-2 -translate-x-1/2 -translate-y-1/2 text-white p-1 bg-green-500/20 hover:bg-green-600/40 rounded-full shadow-[0px_0px_8px_3px] shadow-black backdrop-blur-xl'>
+                      <Check className="h-5 w-5" onClick={handleImageUpdate}/>
+                    </label>
+                    <label className='cursor-pointer absolute bottom-0 -left-2 -translate-x-1/2 -translate-y-1/2 text-white p-1 bg-red-500/20 hover:bg-red-600/40 rounded-full shadow-[0px_0px_8px_3px] shadow-black backdrop-blur-xl'>
+                      <X className="h-5 w-5" onClick={() => {
+                        setNewPreviewUrl('')
+                        setImageData(null)
+                      }} />
+                    </label>
+                  </div>)
+                :(
+                <label htmlFor="addImage" className='opacity-0 hover:opacity-100 cursor-pointer absolute z-1 top-6 left-11 text-white m-2 p-1 bg-sky-200/30 rounded-full shadow-[0px_0px_8px_3px] shadow-black backdrop-blur-xl'>
+                  <Plus className="h-5 w-5" />
+                </label>
+                )
+                }
+                <Input onChange={handleImageChange} id='addImage' name='addImage' type="file" accept="image/*" className="hidden" />
             </div>
             <div className="md:mt-8 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
               <div className="sm:hidden md:flex md:items-start mt-6 min-w-0 flex-1">

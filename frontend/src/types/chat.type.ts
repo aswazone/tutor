@@ -4,14 +4,14 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  avatar?: string;
+  profileImage?: string;
   role: UserRole;
   onlineStatus: boolean;
   lastSeen: Date;
 }
 
 export interface Message {
-  _id: string;
+  _id?: string;
   content: string;
   senderId: string;
   senderName: string;

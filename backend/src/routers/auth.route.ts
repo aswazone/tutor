@@ -17,6 +17,7 @@ authRouter.post("/refresh-token", authController.refreshAccessToken);
 authRouter.post("/check-user-blocked", authenticateToken, authController.checkUserBlocked);
 authRouter.get("/", authenticateToken, authController.getUser);
 authRouter.patch("/profile-update", authenticateToken, authController.profileContentUpdate);
+authRouter.patch("/profile-image-update", authenticateToken, authController.profileImageUpdate);
 authRouter.patch("/tutor-verify/:tutorId/:status", authenticateToken, authController.tutorVerify);
 
 

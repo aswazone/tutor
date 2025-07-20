@@ -101,7 +101,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                 <div className="relative">
                   <Avatar className="h-12 w-12">
                     <AvatarImage 
-                      src={room.type === 'direct' ? otherParticipant?.avatar : undefined} 
+                      src={room.type === 'direct' ? otherParticipant?.profileImage : undefined} 
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground">
                       {room.type === 'direct' 
