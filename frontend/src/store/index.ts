@@ -5,6 +5,7 @@ import fetchReducer from './fetch';
 import wishlistReducer from './wishlist';
 import adminReducer from './admin/adminSlice';
 import chatReducer from './chat';
+import noteReducer from './note';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 
@@ -21,7 +22,8 @@ const rootReducer = combineReducers({
     fetch: fetchReducer,
     wishlist: wishlistReducer,
     admin: adminReducer,
-    chat: chatReducer
+    chat: chatReducer,
+    note: noteReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

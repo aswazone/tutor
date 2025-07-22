@@ -10,7 +10,6 @@ import SimpleLoader from "@/components/common/SimpleLoader";
 import { CourseProgressModules } from "@/components/course/CourseProgressModules";
 import VideoPlayer from "@/components/course/VideoPlayer";
 import { BorderBeam } from "@/components/magicui/border-beam";
-// import { BoxReveal } from "@/components/magicui/box-reveal";
 import { ShinyButton } from "@/components/magicui/shiny-button";
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -21,18 +20,20 @@ import { RootState } from "@/store";
 import { Chapter, ICourse, IProgressData, Module } from "@/types/course.type";
 import { Award, BookOpen, Calendar, ChevronsUpDown, Download, GripIcon, Sparkles, Star, Trophy, UserRound } from "lucide-react"
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import GlassChatBot from "@/components/course/GlassChatBot";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import Certificate from "@/components/course/Certificate";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { setNotes } from "@/store/note";
 
 const CourseProgressPage = () => {
 
   const {id} = useParams();
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const {user} = useSelector((state:RootState) => state.auth);
   const [progressData, setProgressData] = useState<IProgressData>();
   const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +47,6 @@ const CourseProgressPage = () => {
   const [isCertificateOpen, setIsCertificateOpen] = useState(false);
   const [tab, setTab] = useState('modules');
   const [botNotification, setBotNotification] = useState({show: false, message: ''});
-
-  console.log(courseDetails,'--courseDetails--');
   
 
   const getLastViewedModuleAndChapter = useCallback((courseProgress: IProgressData['progress']) => {
@@ -80,7 +79,7 @@ const CourseProgressPage = () => {
           try {
               setIsLoading(true);
               const response = await axiosInstance.get(`/api/v1/course-progress/${user?._id}/${id}`);
-              console.log(response.data, 'response-progress');
+              // console.log(response.data, 'response-progress');
               if(!response?.data?.isPurchased){
                 setLockCourse(true);
                 setBotNotification({show: true, message: `You're a sneaky one, aren't you ?  You can't access this course `});
@@ -98,8 +97,8 @@ const CourseProgressPage = () => {
                 }
 
                 if(response?.data?.progress?.moduleProgress?.length === 0){
-                  console.log('setting current module');
-                  console.log(response?.data?.courseDetails,'---response---');
+                  // console.log('setting current module');
+                  // console.log(response?.data?.courseDetails,'---response---');
                   setCurrentModule(response?.data?.courseDetails?.modules[0]);
                   setCurrentChapter(response?.data?.courseDetails?.modules[0].chapters[0]);
                 }else{
@@ -138,6 +137,18 @@ const CourseProgressPage = () => {
           }
       }, [id,user,getLastViewedModuleAndChapter]);
 
+  const fetchNotes = useCallback(async () => {
+    try {
+      console.log('Fetching notes...');
+      const response = await axiosInstance.get(`/api/v1/notes/${id}/${currentChapter?.id}`);
+      console.log(response.data, 'response-notes');
+      dispatch(setNotes(response.data));
+      
+    }catch (error) {
+      console.error('Error fetching notes:', error);
+    }
+  },[currentChapter?.id,id,dispatch]);    
+
   useEffect(()=>{
     if(user && id){
       fetchProgress();
@@ -154,7 +165,7 @@ const CourseProgressPage = () => {
             chapterId: currentChapter?.id,
             moduleId: currentModule?.id,
           });
-          console.log(response.data, 'progress-update-response');
+          // console.log(response.data, 'progress-update-response');
           if(response?.data){
             fetchProgress();
             if(!response?.data?.progress?.completed){
@@ -171,8 +182,11 @@ const CourseProgressPage = () => {
     };
 
     if (currentChapter?.progressValue === 1) updateCourseProgress();
-}, [currentChapter, currentModule, user, courseDetails, fetchProgress]);
+  }, [currentChapter, currentModule, user, courseDetails, fetchProgress]);
 
+  useEffect(()=>{
+    fetchNotes();
+  },[fetchNotes]);
 
   // if(progressData && courseDetails) console.log(progressData,courseDetails,'progressData');
   // console.log(currentChapter,'currentChapter');
@@ -226,7 +240,30 @@ const CourseProgressPage = () => {
       show
     }))
   },[]);
-  
+
+
+  const handleAddNote = async (timestamp: number, text: string) => {
+    try {
+      console.log(timestamp, text);
+      toast("Note adding..");
+      const response = await axiosInstance.post(`/api/v1/notes`, {
+        userId: user?._id,
+        courseId: courseDetails?._id,
+        chapterId: currentChapter?.id,
+        timestamp,
+        text
+      })
+      console.log(response.data, 'note-added-response');
+
+      if(response?.data){
+        toast("Note added successfully");
+        fetchNotes();
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <div className="relative flex flex-col h-full bg-[#0a0f1d] text-white overflow-y-scroll">  
@@ -256,7 +293,9 @@ const CourseProgressPage = () => {
           <VideoPlayer 
               width="100%" height="500px" 
               url={`${env.AMZ_BUCKET_NAME}/${currentChapter?.videoKey}`} 
-              onProgressUpdate={setCurrentChapter} progressData={currentChapter}
+              onProgressUpdate={setCurrentChapter} 
+              progressData={currentChapter}
+              onAddNote={handleAddNote}
           />
           <GridLineHorizontal className="-bottom-1" offset="20px" />
           <GlowingEffect
