@@ -25,4 +25,14 @@ export class NoteController {
         const note = await this._noteService.addNote(req.body);
         res.status(201).json(note);
     }
+
+    deleteNote = async (req: AuthenticatedRequest, res: Response) => {
+        if(!req.user?.id) {
+            res.status(401).json({ message: 'Unauthorized' });
+            return;
+        }
+
+        const note = await this._noteService.deleteNote(req.user.id, req.params.noteId);
+        res.status(200).json(note);
+    }
 }

@@ -58,8 +58,6 @@ const CourseDetailsPage = () => {
     }
 
 
-    console.log(courses,'test-----------------');
-
     useEffect(()=>{
         return () => {
             setCurrentCourseId('');
@@ -72,7 +70,7 @@ const CourseDetailsPage = () => {
     }, [id]);
 
     useEffect(()=>{
-        if(currentCourseId){
+        if(currentCourseId && user?._id){
             const checkPurchased =  async (courseId: string) => {
                 const isPurchased = await axiosInstance.get(`/api/v1/courses/check-purchased/${courseId}/${user?._id}`);
                 console.log('isPurchased:', isPurchased.data);

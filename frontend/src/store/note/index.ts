@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 export interface ChapterNote {
-    id: string;
+    _id: string;
     userId: string;
     courseId: string;
     chapterId: string;
@@ -26,14 +26,8 @@ export const noteSlice = createSlice({
         setNotes: (state, action) => {
             state.notes = action.payload
         },
-        addNote: (state, action) => {
-            state.notes = [...state.notes, ...action.payload];
-        },
-        deleteNote: (state, action) => {
-            state.notes = state.notes.filter((note) => note.id !== action.payload);
-        },
-    },
+    }, 
 })
 
-export const { setNotes, addNote, deleteNote } = noteSlice.actions
+export const { setNotes } = noteSlice.actions
 export default noteSlice.reducer;

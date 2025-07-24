@@ -234,7 +234,7 @@ const CourseProgressPage = () => {
   }
 
 
-  const handleBotMessageVisibility = useCallback((show: boolean) => {
+    const handleBotMessageVisibility = useCallback((show: boolean) => {
     setBotNotification(prev => ({
       ...prev,
       show
@@ -296,6 +296,8 @@ const CourseProgressPage = () => {
               onProgressUpdate={setCurrentChapter} 
               progressData={currentChapter}
               onAddNote={handleAddNote}
+              fetchNotes={fetchNotes}
+              showNotes={true}
           />
           <GridLineHorizontal className="-bottom-1" offset="20px" />
           <GlowingEffect

@@ -4,8 +4,9 @@ import { Router } from "express";
 
 const noteRouter = Router();
 
-noteRouter.post("/",authenticateToken, noteController.addNote);
 noteRouter.get("/:courseId/:chapterId",authenticateToken, noteController.getNotes);
+noteRouter.post("/",authenticateToken, noteController.addNote);
+noteRouter.delete("/:noteId",authenticateToken, noteController.deleteNote);
 
 
 export default noteRouter;

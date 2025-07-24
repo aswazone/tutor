@@ -38,11 +38,11 @@ interface VideoPlayerProps {
   width?: string;
   height?: string;
   url: string;
-  onProgressUpdate: (data: Chapter) => void;
-  progressData: Chapter | undefined;
-  // notes: ChapterNote[];
-  onAddNote: (timestamp: number, text: string) => void;
-  // onSeekToTimestamp: (timestamp: number) => void;
+  onProgressUpdate?: (data: Chapter) => void;
+  progressData?: Chapter | undefined;
+  showNotes?: boolean;
+  onAddNote?: (timestamp: number, text: string) => void;
+  fetchNotes?: () => void;
 }
 
 function VideoPlayer({
@@ -51,7 +51,9 @@ function VideoPlayer({
   url,
   onProgressUpdate,
   progressData,
+  showNotes = false,
   onAddNote,
+  fetchNotes
 }: VideoPlayerProps) {
 
   const {notes} = useSelector((state: RootState) => state.note);
@@ -148,7 +150,7 @@ function VideoPlayer({
 
   const handleSaveNote = useCallback(() => {
     if (!noteText.trim()) return;
-    onAddNote(playerRef.current?.getCurrentTime() || 0, noteText.trim());
+    onAddNote?.(playerRef.current?.getCurrentTime() || 0, noteText.trim());
     setShowNoteDialog(false);
     setNoteText('');
   }, [noteText, onAddNote]);
@@ -173,7 +175,7 @@ function VideoPlayer({
 
   useEffect(() => {
     if (played === 1) {
-      onProgressUpdate({
+      onProgressUpdate?.({
         ...progressData,
         progressValue: played,
       } as Chapter);
@@ -299,8 +301,8 @@ function VideoPlayer({
           </div>
         )}
       </div>
-        <ShinyButton className="absolute z-1 -bottom-19 right-0 rounded-r-none rounded-bl-none border-r-0" onClick={handleAddNoteClick}>Add Note</ShinyButton>
-        <Dialog
+        {showNotes && <ShinyButton className="absolute z-1 -bottom-19 right-0 rounded-r-none rounded-bl-none border-r-0" onClick={handleAddNoteClick}>Add Note</ShinyButton>}
+        {showNotes && (<Dialog
          open={showNoteDialog} onOpenChange={setShowNoteDialog}>
           <DialogContent className="bg-[#071322f1] backdrop-blur-sm">
             <DialogHeader>
@@ -319,8 +321,8 @@ function VideoPlayer({
               <Button className="hover:text-sky-500" variant={"outline"} onClick={handleSaveNote}>Save Note</Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
-        <QuickNotes handleNoteClick={handleNoteClick}/>
+        </Dialog>)}
+        {showNotes && fetchNotes && <QuickNotes fetchNotes={fetchNotes} handleNoteClick={handleNoteClick}/>}
     </div>
   );
 }

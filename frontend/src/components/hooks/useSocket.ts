@@ -10,10 +10,9 @@
 // }
 
 
+import { SocketEvents } from '@/types/socket.type';
 import { useEffect, useRef } from 'react';
 import { default as io, Socket } from 'socket.io-client';
-import { SocketEvents } from '@/types/chat.type';
-
 export const useSocket = (serverUrl: string, userId?: string) => {
   
   const socketRef = useRef<typeof Socket | null>(null);
