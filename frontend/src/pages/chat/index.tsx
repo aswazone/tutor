@@ -1,29 +1,4 @@
-// import ChatContainer from "@/components/chat/chat-container";
-// import ContactsContainer from "@/components/chat/contacts-container";
-// import EmptyChatContainer from "@/components/chat/empty-chat-container";
-// import { RootState } from "@/store";
-// import { useSelector } from "react-redux";
 
-// const Chat = () => {
-
-//     const {selectedChatData,selectedChatType} = useSelector((state:RootState) => state.chat);
-//     console.log(selectedChatData,selectedChatType);
-
-    
-
-//     return (
-//         <div className="flex h-[43rem] overflow-hidden">
-//             <ContactsContainer />
-//             {
-//                 selectedChatType === undefined 
-//                 ? <EmptyChatContainer />
-//                 : <ChatContainer />
-//             }
-//         </div>
-//     )
-// }
-
-// export default Chat
 
 import React from 'react';
 import { User } from '@/types/chat.type';
@@ -33,15 +8,6 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { UserRole } from '@/types';
 
-// Mock current user - replace this with your Redux auth state
-// const currentUser: User = {
-//   id: 'current-user',
-//   name: 'John Doe',
-//   email: 'john@example.com',
-//   role: 'student',
-//   isOnline: true,
-//   lastSeen: new Date(),
-// };
 
 const Chat: React.FC = () => {
   // TODO: Replace with actual user from Redux store

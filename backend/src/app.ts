@@ -13,6 +13,7 @@ import orderRouter from './routers/order.routes';
 import progressRouter from './routers/courseProgress.routes';
 import insightRouter from './routers/insight.routes';
 import chatRouter from './routers/chat.routes';
+import noteRouter from './routers/note.routes';
 import { initializeCoursePublisher } from './utils/course-schedule-publisher.utils';
 
 const app:Express = express();
@@ -34,5 +35,6 @@ app.use('/api/v1/order', orderRouter);
 app.use('/api/v1/course-progress', progressRouter);
 app.use('/api/v1/insights', insightRouter);
 app.use('/api/v1/chat', chatRouter);
+app.use('/api/v1/notes', noteRouter);
 
 export default app;

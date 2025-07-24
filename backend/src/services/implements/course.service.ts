@@ -70,6 +70,8 @@ export class CourseService implements ICourseService {
   }
 
   checkIfCoursePurchased = async (userId: string, courseId: string): Promise<boolean> => {
+
+    console.log(userId,courseId,'checkIfCoursePurchased');
     if(!Types.ObjectId.isValid(courseId)) throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid course id');
     if(!Types.ObjectId.isValid(userId)) throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid user id');
     const studentCourses = await this._studentCourseRepository.getStudentCourses(userId);
