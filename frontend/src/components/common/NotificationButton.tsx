@@ -1,46 +1,17 @@
-import { RootState } from "@/store";
-import { useSelector } from "react-redux";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 import { Button, buttonVariants } from "../ui/button";
-import { Bell } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useSocket } from "../hooks/useSocket";
+import { Bell, CheckCheck, Trash } from "lucide-react";
 import { env } from "@/config/env.config";
-import { Notification } from "@/types/notification.type";
+import { useSocketNotifications } from "@/hooks/useNotifications";
 
 const NotificationButton = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
-  const { emit, on, off } = useSocket(env.API_URL, user?._id);
-
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0Some of the I just checked on some of my task so due to I can't complete my own data and also related to that some of the areas in my. Prosthetic is still crashing. I want to recover all that, so I'm expecting. It's not a good review. Rajasthan CMS. Monolithic and.);
-
-  console.log(notifications)
-
-  useEffect(() => {
-    if (!user) return;
-
-    emit("getNotifications", user._id);
-
-    const handleNewNotification = (notification: Notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-      setUnreadCount((prev) => prev + 1);
-    };
-
-    const handleExistingNotifications = (existing: Notification[]) => {
-      setNotifications(existing);
-      const unread = existing.filter((n) => !n.isRead).length;
-      setUnreadCount(unread);
-    };
-
-    on("newNotification", handleNewNotification);
-    on("notifications", handleExistingNotifications);
-
-    return () => {
-      off("newNotification", handleNewNotification);
-      off("notifications", handleExistingNotifications);
-    };
-  }, [user?._id]); // Keep deps minimal to avoid resubscription issues
+  const  { 
+    notifications,
+    unReadCount, 
+    handleDeleteNotification,
+    handleMarkAllAsRead,
+    handleMarkAsRead
+   } = useSocketNotifications(env.API_URL);
 
   return (
     <HoverCard openDelay={0} closeDelay={0}>
@@ -50,9 +21,9 @@ const NotificationButton = () => {
             <Bell className="w-5 h-5" />
           </span>
 
-          {unreadCount > 0 && (
+          {unReadCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
-              {unreadCount}
+              {unReadCount}
             </span>
           )}
         </div>
@@ -67,13 +38,7 @@ const NotificationButton = () => {
               variant="ghost"
               size="sm"
               className="text-xs text-muted-foreground hover:text-primary"
-              onClick={() => {
-                emit("markAllNotificationsRead", user?._id);
-                setNotifications((prev) =>
-                  prev.map((n) => ({ ...n, isRead: true }))
-                );
-                setUnreadCount(0);
-              }}
+              onClick={() => handleMarkAllAsRead()}
             >
               Mark all as read
             </Button>
@@ -94,14 +59,21 @@ const NotificationButton = () => {
                     }`}
                   />
                   <div className="flex flex-col gap-1">
-                    <p className="text-sm font-medium leading-none">
-                      {notification.title}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium leading-none">
+                        {notification.title}
+                      </p>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        {!notification.isRead && <div className="p-1 rounded-full border"  onClick={() => handleMarkAsRead(notification._id)}>
+                          <CheckCheck className="h-4 w-4 text-muted-foreground hover:text-primary"/>
+                        </div>}
+                        <div className="p-1 rounded-full border"  onClick={() => handleDeleteNotification(notification._id)}>
+                          <Trash className="h-4 w-4 text-red-500 hover:text-primary"/>
+                        </div>
+                      </div>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       {notification.message}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(notification.createdAt).toLocaleString()}
                     </p>
                   </div>
                 </div>

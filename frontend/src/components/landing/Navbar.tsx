@@ -11,7 +11,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { buttonVariants } from "../ui/button";
 import { Menu, Power } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
@@ -24,7 +23,7 @@ import { AppDispatch, RootState } from "@/store";
 import { logout } from "@/store/auth/authSlice";
 import { GridLineHorizontal } from "../common/GridLines";
 import { useState } from "react";
-import NotificationButton from "../common/Notification";
+import NotificationButton from "../common/NotificationButton";
 
 interface RouteProps {
   href: string;
@@ -137,17 +136,8 @@ export const Navbar = () => {
                       {label}
                     </a>
                   ))}
-                  <a
-                    rel="noreferrer noopener"
-                    href="https://github.com/aswazone"
-                    target="_blank"
-                    className={`w-[110px] border ${buttonVariants({
-                      variant: "ghost",
-                    })}`}
-                  >
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
-                    Github
-                  </a>
+            <NotificationButton/>
+                  
                   <div className="flex">
                     <ModeToggle />
                   </div>

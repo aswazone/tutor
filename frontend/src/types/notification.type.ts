@@ -1,10 +1,20 @@
-export interface Notification {
+export interface NotificationPayload {
   _id: string;
-  userId: string;
   title: string;
   message: string;
-  type: 'course' | 'chat' | 'achievement' | 'system';
+  userId: string;
   isRead: boolean;
-  createdAt: string;
-  relatedId?: string; // Optional: ID of related item (course, chat, etc.)
+  type:
+    | 'REVENUE_EARNED'
+    | 'COURSE_PURCHASED'
+    | 'COURSE_APPROVED'
+    | 'COURSE_DECLINED'
+    | 'COURSE_ENABLED'
+    | 'COURSE_DISABLED'
+    | 'COURSE_CREATION'
+    | 'COURSE_BLOCKED'
+    | 'NEW_MESSAGE';
+  relatedId?: string;
+  courseTitle?: string;
+  amount?: number;
 }

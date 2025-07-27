@@ -1,71 +1,232 @@
-import { useEffect, useState, useCallback } from 'react';
-import { env } from '@/config/env.config';
-import { Notification } from '@/types/notification.type';
-import { toast } from 'sonner';
-import { useSocket } from '@/components/hooks/useSocket';
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useAuth } from "./useAuth";
+import { useSocket } from "@/components/hooks/useSocket";
+import { NotificationPayload } from "@/types/notification.type";
+import axiosInstance from "@/config/axios.config";
 
-export const useNotifications = (userId?: string) => {
-  const { emit, on, off, connected } = useSocket(env.API_URL, userId);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+
+
+
+export const useSocketNotifications = (serverUrl: string) => {
+  const { user } = useAuth();
+  const { on, off } = useSocket(serverUrl, user?._id);
+  const [notifications, setNotifications] = useState<NotificationPayload[]>([]);
+  const [unReadCount, setUnreadCount] = useState(0);
+  const getAllNotifications = async () => {
+    try {
+      const response = await axiosInstance.get('/api/v1/notifications');
+      setNotifications(response.data);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  }
+
+  const getUnreadCount = async () => {
+    try {
+      const response = await axiosInstance.get('/api/v1/notifications/unread-count');
+      setUnreadCount(response.data.count);
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
+  }
+
+  useEffect(()=>{
+    getUnreadCount();
+    getAllNotifications();
+  },[])
 
   useEffect(() => {
-    if (!connected || !userId) return;
 
-    // Listen for new notifications
-    on('newNotification', (notification: Notification) => {
-      setNotifications(prev => [notification, ...prev]);
-      setUnreadCount(prev => prev + 1);
+    const handleNewNotification = (notification: NotificationPayload) => {
+      const type = notification.type;
 
-      toast.info(notification.title, {
-        description: notification.message,
-        duration: 5000,
-      });
-    });
+      console.log('reaching here');
+      if (!type) {
+        console.warn("[Socket] No type in notification", notification);
+        return;
+      }
+      getAllNotifications();
+      getUnreadCount();
 
-    // Fetch existing notifications on connect
-    emit('getNotifications', userId);
-    on('notifications', (existingNotifications: Notification[]) => {
-      setNotifications(existingNotifications);
-      setUnreadCount(
-        existingNotifications.filter(n => !n.isRead).length
-      );
-    });
+      const linkTo = (url: string) => () => (window.location.href = url);
 
-    // Cleanup listeners
-    return () => {
-      off('newNotification');
-      off('notifications');
+      switch (type) {
+        case "REVENUE_EARNED":
+          toast.success("💰 Revenue Earned!", {
+            description: notification.message,
+            action: {
+              label: "View Wallet",
+              onClick: linkTo(
+                user?.role === "ADMIN"
+                  ? "/admin/wallet"
+                  : "/instructor/wallet"
+              ),
+            },
+          });
+          break;
+
+        case "COURSE_PURCHASED":
+          toast.success("🎉 Course Purchased!", {
+            description: notification.message,
+            action: { label: "Start Learning", onClick: linkTo("/my-courses") },
+          });
+
+          break; //tutor only
+
+        case "COURSE_APPROVED":
+          toast.success("✅ Course Approved!", {
+            description: notification.message,
+            action: {
+              label: "View Course",
+              onClick: linkTo(`/profile?notificationId=${notification.relatedId}`),
+            },
+          });
+          break; //tutor only(if drafted)
+
+        case "COURSE_DECLINED":
+          toast.error("❌ Course Declined", {
+            description: notification.message,
+            action: {
+              label: "View Course",
+              onClick: linkTo(`/profile?notificationId=${notification.relatedId}`),
+            },
+          });
+          break; //tutor only
+
+				case "COURSE_ENABLED":
+					toast.success(notification.title, {
+						description: notification.message,
+						duration: 5000,
+						action: {
+							label: "View Course",
+							onClick: () => {
+								if (notification.relatedId) {
+									const coursePath =
+										user?.role === "TUTOR"
+											? `profile?notificationId=${notification.relatedId}`
+											: `/instructor/courses/${notification.relatedId}`;
+									window.location.href = coursePath;
+								}
+							},
+						},
+					});
+          
+					break; //user
+
+        case "COURSE_DISABLED":
+          toast.error(notification.title, {
+            description: notification.message,
+            duration: 5000,
+            action: {
+              label: "View Course",
+              onClick: () => {
+                if (notification.relatedId) {
+                  const coursePath =
+                    user?.role === "TUTOR"
+                      ? `profile?notificationId=${notification.relatedId}`
+                      : `/instructor/courses/${notification.relatedId}`;
+                  window.location.href = coursePath;
+                }
+              },
+            },
+          });
+          break; //user
+
+        case "COURSE_BLOCKED":
+          toast.warning("⚠ Course Disabled", {
+            description: notification.message,
+            duration: 8000,
+            action: {
+              label: "View Course",
+              onClick: () => {
+                if (notification.relatedId) {
+                  const coursePath =
+                    user?.role === "TUTOR"
+                    ? `/profile?notificationId=${notification.relatedId}`
+                    : `/my-courses?notificationId=${notification.relatedId}`;
+                  window.location.href = coursePath;
+                }
+              },
+            },
+          });
+          break; //user and tutor
+
+        case "NEW_MESSAGE":
+          toast.info("💬 New Message", {
+            description: notification.message,
+            action: { label: "View Chat", onClick: linkTo("/chat") },
+          });
+          break;
+
+        // case "TUTOR_APPROVED":
+        //   toast.success("🎉 Instructor Approved!", {
+        //     description: notification.message,
+        //   });
+        //   break;
+
+        // case "TUTOR_DECLINED":
+        //   toast.error("❌ Instructor Declined", {
+        //     description: notification.message,
+        //     action: { label: "Reapply", onClick: linkTo("/instructor/apply") },
+        //   });
+        //   break;
+
+        default:
+          toast.info("🔔 New Notification", {
+            description: notification.message,
+          });
+      }
     };
-  }, [connected, userId, emit, on, off]);
 
-  const handleMarkAllRead = useCallback(() => {
-    if (!userId) return;
-    
-    emit('markAllNotificationsRead', userId);
-    setNotifications(prev => 
-      prev.map(n => ({ ...n, isRead: true }))
-    );
-    setUnreadCount(0);
-  }, [userId, emit]);
+    on("newNotification", handleNewNotification);
+    return () => {
+      off("newNotification", handleNewNotification);
+    };
+  }, [user?.id, user?.role, on, off]);
 
-  const handleMarkAsRead = useCallback((notificationId: string) => {
-    if (!userId) return;
 
-    emit('markNotificationRead', { userId, notificationId });
-    setNotifications(prev =>
-      prev.map(n => 
-        n._id === notificationId ? { ...n, isRead: true } : n
-      )
-    );
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  }, [userId, emit]);
+  const handleMarkAsRead = async (notificationId: string) => {
+    try {
+      const response = await axiosInstance.patch(`/api/v1/notifications/read/${notificationId}`);
+      if(response){
+        getAllNotifications();
+        getUnreadCount();
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
 
-  return {
-    notifications,
-    unreadCount,
-    connected,
-    handleMarkAllRead,
-    handleMarkAsRead
+  const handleMarkAllAsRead = async () => {
+    try {
+      const response = await axiosInstance.patch(`/api/v1/notifications/read-all`);
+      if(response){
+        getAllNotifications();
+        getUnreadCount();
+      }
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+    }
+  };
+
+  const handleDeleteNotification = async (notificationId: string) => {
+    try {
+      const response = await axiosInstance.delete(`/api/v1/notifications/${notificationId}`);
+      if(response){
+        getAllNotifications();
+        getUnreadCount();
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    }
+  };
+
+  return { 
+    notifications, 
+    unReadCount, 
+    handleMarkAsRead, 
+    handleMarkAllAsRead, 
+    handleDeleteNotification 
   };
 };

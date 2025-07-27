@@ -5,8 +5,6 @@ import { socketAuthMiddleware } from '@/middlewares/socketauth.middlewate';
 import { User } from '@/models/implements/user.model';
 import { IUserModel } from '@/models/interface/user.model.interface';
 import { Types } from 'mongoose';
-import { INotificationModel } from '@/models/interface/notification.model.interface';
-import { notificationService } from '@/dependencies/notification.di';
 
 export interface AuthenticatedSocket extends Socket {
   userId: string;
@@ -28,8 +26,8 @@ export const initializeSocket = (io: Server) => {
     const userId = socket.handshake.auth.userId;
     console.log(`👤 User ${socket.handshake.auth.user.name} connected`);
 
-    // setupNotificationHandlers(socket);
-
+    socket.join(userId.toString());
+    
     // Update user online status
     await User.findByIdAndUpdate(userId, { 
       onlineStatus: true,
@@ -186,25 +184,6 @@ export const initializeSocket = (io: Server) => {
         console.error('Error marking message as read:', error);
       }
     });
-    
-      socket.on('getNotifications', async (userId: string) => {
-        // console.log('getNotifications-->', userId);
-        const notifications = await notificationService.getUserNotifications(userId);
-        // console.log('notifications', notifications);
-        socket.emit('notifications', notifications);
-      });
-    
-      socket.on('markNotificationRead', async ({ userId, notificationId }) => {
-        await notificationService.markAsRead(userId, notificationId);
-        socket.emit('notificationRead', notificationId);
-      });
-    
-      socket.on('markAllNotificationsRead', async (userId: string) => {
-        await notificationService.markAllRead(userId);
-        socket.emit('allNotificationsRead', userId);
-      });
-
-
 
     // Handle disconnect
     socket.on('disconnect', async () => {
@@ -219,25 +198,5 @@ export const initializeSocket = (io: Server) => {
       // Broadcast user offline status
       socket.broadcast.emit('user_offline', userId);
     });
-  });
-};
-
-export const emitNotificationToUsers = (userIds: string[], notification: INotificationModel) => {
-  const sockets = Array.from(ioInstance.sockets.sockets.values());
-  
-  console.log('sockets', sockets);
-  console.log('userIds', userIds);
-  
-  userIds.forEach(userId => {
-    const userSocket = sockets.find(
-      (socket: Socket) => (socket as AuthenticatedSocket).userId === userId
-    );
-    
-    console.log('userSocket', userSocket);
-    
-    if (userSocket) {
-      console.log('emittinggggg')
-      userSocket.emit('newNotification', notification);
-    }
   });
 };

@@ -12,7 +12,8 @@ import { IStudentCoursesModel } from '@/models/interface/studentCourses.model.in
 import { sendCourseRejectEmail } from '@/utils/send-email.utils';
 import { IUserRepository } from '@/repositories/interface/user.repository.interface';
 import { INotificationRepository } from '@/repositories/interface/notification.repository.interface';
-import { emitNotificationToUsers } from '@/socket/socketHandler';
+import { sendNotificationToUser, sendNotificationToUsers } from '@/utils/send-notification-to-users';
+import { INotificationModel } from '@/models/interface/notification.model.interface';
 
 export class CourseService implements ICourseService {
   constructor(
@@ -44,39 +45,6 @@ export class CourseService implements ICourseService {
       throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to create course');
     }
     console.log('course after creation:', course);
-
-    if(courseData && courseData?.isPublished === true){
-      
-      const tutorCourses = await this._courseRepository.getByInstructor(userId);
-      if(!tutorCourses) createHttpError(HttpStatus.NOT_FOUND, 'Courses not found');
-
-      const studentIds = tutorCourses?.map((course) => course.students.map((student) => student.studentId.toString()));
-      const uniqueStudentIds = [...new Set(studentIds.flat())];
-
-      console.log('uniqueStudentIds:', uniqueStudentIds, (course._id as string).toString(), course.title);
-
-      const notifications = await Promise.all(
-        uniqueStudentIds.map(async (studentId) => {
-          const notification = await this._notificationRepository.createNotification({
-            userId: studentId,
-            title: 'New Course Available!',
-            message: `${course.title} has been added by your tutor`,
-            type: 'course',
-            isRead: false,
-            relatedId:(course._id as string).toString(),
-            onModel: 'Course'
-          });
-          
-          return notification;
-        })
-      );
-
-      console.log('notifications:', notifications);
-
-      if(!notifications) createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to create notifications');
-      
-      emitNotificationToUsers(uniqueStudentIds, notifications[0]);
-    }
 
     return course;
   }
@@ -125,7 +93,7 @@ export class CourseService implements ICourseService {
 
   getAllCourses = async (query: { filter: QueryFilter; options: QueryOptions }): Promise<{ courses: ICourse[]; count: number }> => {
     const { filter, options } = query;
-    console.log(query);
+    // console.log(query);
     const courses = await this._courseRepository.findAllCourses({ isDeleted: false, isActive: true, isVerified: CourseStatus.VERIFIED, ...filter }, options);
     return { courses: courses.result, count: courses.resultCount };
   }
@@ -136,7 +104,27 @@ export class CourseService implements ICourseService {
   }
 
   toggleCourseStatus = async (courseId: string, status: boolean): Promise<void> => {
-    await this._courseRepository.findByIdAndUpdate(courseId, { isPublished: status });
+    const course = await this._courseRepository.findByIdAndUpdate(courseId, { isPublished: status });
+    
+    if(course){
+
+      const studentIds = course.students.map((student) => student.studentId.toString());
+      const uniqueStudentIds = [...new Set(studentIds.flat())];
+
+      console.log('uniqueStudentIds:', uniqueStudentIds, (course._id as string).toString(), course.title);
+
+      const notificationPayload = {
+        title: status ? 'Course Published' : 'Course Drafted',
+        message: `${course.title} is now ${status ? 'published by your tutor' : 'drafted, contact your tutor'}`,
+        type: status ? 'COURSE_ENABLED' : 'COURSE_DISABLED',
+        isRead: false,
+        relatedId: (course._id as string).toString(),
+        onModel: 'Course',
+      } as INotificationModel;
+
+      await sendNotificationToUsers(uniqueStudentIds, notificationPayload);
+
+    }
   }
 
   updateCourse = async (courseId: string, courseData: Partial<ICreateCourseDTO>): Promise<ICourse> => {
@@ -196,8 +184,40 @@ export class CourseService implements ICourseService {
       { new: true }
     );
 
+    const notificationPayloadForTutor = {
+      title: isVerified === 'verified' ? 'Course Approved' : 'Course Rejected',
+      message: `Your course ${course.title} has been ${isVerified === 'verified' ? 'approved by the admin' : 'rejected, check email for more details'}`,
+      type: isVerified === 'verified' ? 'COURSE_APPROVED' : 'COURSE_REJECTED',
+      isRead: false,
+      relatedId: (course._id as string).toString(),
+      onModel: 'Course',
+    } as INotificationModel;
+
     if (isVerified === 'rejected') {
       await sendCourseRejectEmail(tutorIdentified.userEmail, course.title);
+      await sendNotificationToUser((tutorIdentified._id as string).toString(), notificationPayloadForTutor);
+    }else if (isVerified === 'verified') {
+      if(course?.isPublished === true){
+
+        const tutorCourses = await this._courseRepository.getByInstructor((tutorIdentified._id as string).toString());
+        if(!tutorCourses) createHttpError(HttpStatus.NOT_FOUND, 'Courses not found');
+
+        const studentIds = tutorCourses?.map((course) => course.students.map((student) => student.studentId.toString()));
+        const uniqueStudentIds = [...new Set(studentIds.flat())];
+        
+        const notificationPayloadForStudents = {
+          title: 'New Course Available ✨',
+          message: `A new course ${course.title} has been published by your tutor`,
+          type: 'COURSE_CREATION',
+          isRead: false,
+          relatedId: (course._id as string).toString(),
+          onModel: 'Course',
+        } as INotificationModel;
+  
+        await sendNotificationToUsers(uniqueStudentIds, notificationPayloadForStudents);
+      }
+      await sendNotificationToUser((tutorIdentified._id as string).toString(), notificationPayloadForTutor);
     }
+
   }
 }

@@ -18,7 +18,17 @@ const notificationSchema = new Schema({
   },
   type: {
     type: String,
-    enum: ['course', 'chat', 'achievement', 'system'],
+    enum: [
+      'REVENUE_EARNED',
+      'COURSE_PURCHASED',
+      'COURSE_APPROVED',
+      'COURSE_DECLINED',
+      'COURSE_ENABLED',
+      'COURSE_DISABLED',
+      'COURSE_CREATION',
+      'COURSE_BLOCKED',
+      'NEW_MESSAGE',
+    ],
     required: true
   },
   isRead: {
@@ -38,6 +48,10 @@ const notificationSchema = new Schema({
   isDeleted: {
     type: Boolean,
     default: false
+  },
+  amount: {
+    type: Number,
+    required: false
   }
 }, {timestamps: true});
 

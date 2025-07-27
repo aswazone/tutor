@@ -28,15 +28,15 @@ export class AdminService implements IAdminService {
     getAllTutors = async () => this._adminRepository.findAllUsers(UserRole.TUTOR);
     getAllStudents = async () => this._adminRepository.findAllUsers(UserRole.STUDENT)
     getAllCourses = async () => {
-    const {result:courses} = await this._courseRepository.findAllCourses(
-        { isDeleted: false },
-        { 
-            path: 'tutor',
-            select: 'userName'
-        }
-    );
-    return courses;
-}
+        const {result:courses} = await this._courseRepository.findAllCourses(
+            { isDeleted: false },
+            { 
+                path: 'tutor',
+                select: 'userName'
+            }
+        );
+        return courses;
+    }
     
     toggleUserStatus = async (id:string,status:string) => {
         console.log('----------------------------------------------------',status);

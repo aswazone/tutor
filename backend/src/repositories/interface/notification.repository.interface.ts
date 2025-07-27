@@ -3,7 +3,7 @@ import { INotificationModel } from "@/models/interface/notification.model.interf
 export interface INotificationRepository {
     createNotification: (notification: Partial<INotificationModel>) => Promise<INotificationModel>
     getUserNotifications: (userId: string) => Promise<INotificationModel[]>
-    markAsRead: (userId: string, notificationId: string) => Promise<INotificationModel | null>
+    markAsRead: (notificationId: string) => Promise<INotificationModel | null>
     markAllRead: (userId: string) => Promise<void>
     deleteNotification: (notificationId: string) => Promise<void>
     getUnreadCount: (userId: string) => Promise<number> 
