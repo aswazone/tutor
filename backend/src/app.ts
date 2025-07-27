@@ -15,6 +15,7 @@ import insightRouter from './routers/insight.routes';
 import chatRouter from './routers/chat.routes';
 import noteRouter from './routers/note.routes';
 import { initializeCoursePublisher } from './utils/course-schedule-publisher.utils';
+import notificationRouter from './routers/notification.routes';
 
 const app:Express = express();
 validateEnv();
@@ -36,5 +37,6 @@ app.use('/api/v1/course-progress', progressRouter);
 app.use('/api/v1/insights', insightRouter);
 app.use('/api/v1/chat', chatRouter);
 app.use('/api/v1/notes', noteRouter);
+app.use('/api/v1/notifications', notificationRouter);
 
 export default app;

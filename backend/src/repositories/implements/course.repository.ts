@@ -83,7 +83,7 @@ export class CourseRepository extends BaseRepository<ICourseModel> implements IC
 
           const result = await query.exec();
           const resultCount = await this.model.countDocuments(options);
-          console.log(resultCount, 'resultCount');
+          // console.log(resultCount, 'resultCount');
           return {result, resultCount};
       } catch (error) {
           if (error instanceof HttpError) throw error;

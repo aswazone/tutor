@@ -1,13 +1,13 @@
 import { PAYPAL_BASE_URL, PAYPAL_CLIENT_ID, PAYPAL_REDIRECT_URL, PAYPAL_SECRET_KEY } from '@/config/env.config';
 import { redisClient } from '@/config/redis.config';
-import { approvedPayment } from '@/services/implements/order.service';
+import { approvedPayment } from '@/types/order.type';
 import { IOrderDataDTO } from '@/types/course.type';
 import got from 'got';
 
 export const getPaypalAccessToken = async () => {
         try {
 
-        const checkExistToken = await redisClient.get('paypalAccessToken');
+        const checkExistToken = await redisClient?.get('paypalAccessToken');
         if(checkExistToken){
             console.log(checkExistToken,'checkExistToken');
             return checkExistToken;
@@ -27,7 +27,7 @@ export const getPaypalAccessToken = async () => {
         });
     
         const data = JSON.parse(response.body);
-        await redisClient.setEx('paypalAccessToken',data.expires_in, data.access_token);
+        await redisClient?.setEx('paypalAccessToken',data.expires_in, data.access_token);
         return data.access_token;
 
     } catch (error) {

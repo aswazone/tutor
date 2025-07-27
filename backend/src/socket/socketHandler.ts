@@ -6,12 +6,15 @@ import { User } from '@/models/implements/user.model';
 import { IUserModel } from '@/models/interface/user.model.interface';
 import { Types } from 'mongoose';
 
-interface AuthenticatedSocket extends Socket {
+export interface AuthenticatedSocket extends Socket {
   userId: string;
   user: IUserModel;
 }
 
+export let ioInstance: Server;
+
 export const initializeSocket = (io: Server) => {
+  ioInstance = io;
   // Authentication middleware for socket connections
   io.use(socketAuthMiddleware);
 
@@ -23,6 +26,8 @@ export const initializeSocket = (io: Server) => {
     const userId = socket.handshake.auth.userId;
     console.log(`👤 User ${socket.handshake.auth.user.name} connected`);
 
+    socket.join(userId.toString());
+    
     // Update user online status
     await User.findByIdAndUpdate(userId, { 
       onlineStatus: true,
@@ -31,6 +36,7 @@ export const initializeSocket = (io: Server) => {
 
     // Broadcast user online status
     socket.broadcast.emit('user_online', userId);
+    console.log(`👤 User ${socket.handshake.auth.user.name} is online`);
 
     // Join user to their chat rooms
     const userRooms = await ChatRoom.find({ 

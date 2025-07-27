@@ -1,7 +1,7 @@
 import { createClient, RedisClientType } from "redis";
 import { REDIS_URL } from "./env.config";
 
-let redisClient: RedisClientType;
+let redisClient: RedisClientType | undefined;
 
 async function connectRedis() {
   try {
@@ -22,6 +22,7 @@ async function connectRedis() {
     redisClient.on("error", (err) => console.error("Redis Client Error", err));
 
     await redisClient.connect();
+    return redisClient;
   } catch (error) {
     console.error("Error connecting to Redis:", error);
     throw error;

@@ -13,13 +13,59 @@ export class StudentCoursesRepository extends BaseRepository<IStudentCoursesMode
     }
 
     async getStudentCourses(userId: string): Promise<IStudentCoursesModel | null> {
-        const studentCourses = await this.model.findOne({ studentId: userId });
+        
+        const studentCourses = await this.model.aggregate(
+            [
+                {
+                    $match:{studentId: userId}
+                },
+                { $unwind: '$courses' },
+                {
+                    $addFields: {
+                    courseObjId: { $toObjectId: '$courses.courseId' }
+                    }
+                },
+                {
+                    $lookup: {
+                    from: 'courses',
+                    localField: 'courseObjId',
+                    foreignField: '_id',
+                    as: 'courseDetail'
+                    }
+                },
+                { $unwind: '$courseDetail' },
+                {
+                    $match: {
+                    'courseDetail.isPublished': true,
+                    'courseDetail.isDeleted': false,
+                    'courseDetail.isActive': true,
+                    'courseDetail.isVerified': 'verified'
+                    }
+                },
+                {
+                    $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: ['$courses', '$courseDetail']
+                    }
+                    }
+                },
+                {$sort: {
+                    dateOfPurchase: -1
+                }}
+                ,
+                {
+                    $group: {
+                    _id: '$studentId',
+                    courses: {
+                        $push: '$$ROOT'
+                    }
+                    }
+                }
+            ]
+        ) as IStudentCoursesModel[];
+        
         if (!studentCourses) return null;
     
-        studentCourses.courses.sort(
-            (a, b) => new Date(b.dateOfPurchase).getTime() - new Date(a.dateOfPurchase).getTime()
-        );
-    
-        return studentCourses;
+        return studentCourses[0];
     }
 }

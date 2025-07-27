@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -12,7 +11,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { buttonVariants } from "../ui/button";
 import { Menu, Power } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
@@ -24,6 +22,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { logout } from "@/store/auth/authSlice";
 import { GridLineHorizontal } from "../common/GridLines";
+import { useState } from "react";
+import NotificationButton from "../common/NotificationButton";
 
 interface RouteProps {
   href: string;
@@ -49,11 +49,15 @@ const routeList: RouteProps[] = [
   },
 ];
 
+
+
+
+
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const {user, isAuthenticated} = useSelector((state:RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
-  
+
     const handleLogout = () =>{
       localStorage.removeItem('accessToken');
       dispatch(logout());
@@ -132,17 +136,8 @@ export const Navbar = () => {
                       {label}
                     </a>
                   ))}
-                  <a
-                    rel="noreferrer noopener"
-                    href="https://github.com/aswazone"
-                    target="_blank"
-                    className={`w-[110px] border ${buttonVariants({
-                      variant: "ghost",
-                    })}`}
-                  >
-                    <GitHubLogoIcon className="mr-2 w-5 h-5" />
-                    Github
-                  </a>
+            <NotificationButton/>
+                  
                   <div className="flex">
                     <ModeToggle />
                   </div>
@@ -168,15 +163,7 @@ export const Navbar = () => {
           </nav>
 
           <div className="relative hidden md:flex gap-2">
-            <a
-              rel="noreferrer noopener"
-              href="https://github.com/aswazone"
-              target="_blank"
-              className={`border ${buttonVariants({ variant: "outline" })}`}
-            >
-              <GitHubLogoIcon className="" />
-            </a>
-
+            <NotificationButton/>
             <ModeToggle />
             <NavMenu />
             {isAuthenticated && user?.role !== 'admin' && <HoldToConfirmButton onConfirm={handleLogout}><Power className="text-red-500" size={18}/></HoldToConfirmButton>}
