@@ -110,7 +110,7 @@ const ReviewDialog = ({ courseId, tutorId, isOpen, setIsOpen }: { courseId: stri
                   className="rounded-tl-none"
                   variant="outline"
                   onClick={submitTutorReview}
-                  disabled={tutorStars === 0}
+                  disabled={!tutorStars || !tutorReview}
                 >
                 <div className="flex items-center justify-center">
                     <span className="mr-2">Submit</span>
@@ -150,7 +150,7 @@ const ReviewDialog = ({ courseId, tutorId, isOpen, setIsOpen }: { courseId: stri
                   className="rounded-tl-none"
                   variant="outline"
                   onClick={submitCourseReview}
-                  disabled={courseStars === 0}
+                  disabled={!courseStars || !courseReview}
                 >
                 <div className="flex items-center justify-center">
                     <span className="mr-2">Submit</span>
