@@ -29,6 +29,7 @@ export class CourseController implements ICourseController {
         res.status(401).json({ message: 'Unauthorized' });
         return;
       }
+            const {page,limit,search} = req.query;
             let { id } = req.query;
             const userId = req.user?.id;
 
@@ -37,9 +38,9 @@ export class CourseController implements ICourseController {
             }
 
             const lastId = id || userId;
-            console.log('check is it undefined', lastId);
+            console.log('check is it undefined', lastId,page,limit,search);
 
-      const courses = await this._courseService.getCoursesByInstructor(lastId as string);
+      const courses = await this._courseService.getCoursesByInstructor(lastId as string,Number(page),Number(limit),search as string);
       res.json(courses);
     } catch (error) {
       next(error);
@@ -53,7 +54,9 @@ export class CourseController implements ICourseController {
         return;
       }
 
-      const courses = await this._courseService.getCoursesByStudent(req.user.id);
+
+      const {page,limit,search} = req.query;
+      const courses = await this._courseService.getCoursesByStudent(req.user.id,Number(page),Number(limit),search as string);
       res.json(courses);
     } catch (error) {
       next(error);

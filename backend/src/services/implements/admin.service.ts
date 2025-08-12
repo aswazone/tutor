@@ -6,6 +6,7 @@ import { ICourseRepository } from "@/repositories/interface/course.repository.in
 import { IOrderRepository } from "@/repositories/interface/order.repository.interface";
 import { HttpError } from "@/utils/http-error.utils";
 import { HttpStatus } from "@/constants/status.constant";
+import { toAdminCourseDTOs, toAdminUserDTOs } from "@/mapper/admin.mapper";
 
 export interface RevenueData {
   courseTitle: string
@@ -25,17 +26,17 @@ export class AdminService implements IAdminService {
         private readonly _orderRepository:IOrderRepository
     ) {}
 
-    getAllTutors = async () => this._adminRepository.findAllUsers(UserRole.TUTOR);
-    getAllStudents = async () => this._adminRepository.findAllUsers(UserRole.STUDENT)
-    getAllCourses = async () => {
-        const {result:courses} = await this._courseRepository.findAllCourses(
-            { isDeleted: false },
-            { 
-                path: 'tutor',
-                select: 'userName'
-            }
-        );
-        return courses;
+    getAllTutors = async (page: number, limit: number,search: string, tab: string) => {
+        const { data , total} = await this._adminRepository.findTutorsForAdmin(page, limit,search, tab);
+        return {data:toAdminUserDTOs(data), total};
+    }
+    getAllStudents = async (page: number, limit: number,search: string) => {
+        const { data , total} = await this._adminRepository.findStudentsForAdmin(page, limit,search);
+        return {data:toAdminUserDTOs(data), total};
+    }
+    getAllCourses = async (page: number, limit: number,search: string, tab: string) => {
+        const { data, total } =  await this._courseRepository.findCoursesForAdmin(page, limit, search, tab);
+        return { data:toAdminCourseDTOs(data), total };
     }
     
     toggleUserStatus = async (id:string,status:string) => {
@@ -51,7 +52,6 @@ export class AdminService implements IAdminService {
     }
 
     getRevenue = async (page: number, limit: number): Promise<RevenueData[]> => {
-
 
         const orders = await this._orderRepository.findAllOrders(page, limit);
         const tutors = await this._adminRepository.findAllUsers(UserRole.TUTOR);

@@ -2,12 +2,10 @@ export interface ICategory {
   _id: string;
   name: string;
   isListed: boolean;
-  coursesCount: number;
   subCategories: Array<{
     _id: string;
     name: string;
     isListed: boolean;
-    coursesCount: number;
     parentId: string;
     createdAt: string;
     updatedAt: string;

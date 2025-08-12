@@ -27,19 +27,19 @@ export const Cards = () => {
 
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [latestThreeCourses, setLatestThreeCourses] = useState<ICourse[]>([]);
+  const [latestFourCourses, setLatestFourCourses] = useState<ICourse[]>([]);
 
   useEffect(() => {
     const fetchCoursesAsync = async () => {
       setIsLoading(true);
-      const result = await courseService.fetchCourses("newest", 3, 1);
-      if (result) setLatestThreeCourses(result);
+      const result = await courseService.fetchCourses("newest", 4, 1);
+      if (result) setLatestFourCourses(result);
       setIsLoading(false);
     };
     fetchCoursesAsync();
   }, []);
 
-  console.log(latestThreeCourses, "latestThreeCourses");
+  console.log(latestFourCourses, "latestThreeCourses");
 
   return (
     <section id="courses" className="container py-15 md:px-20 sm:px-3 sm:py-32 space-y-5">
@@ -60,7 +60,7 @@ export const Cards = () => {
       {
         isLoading 
         ? <div className="flex h-[200px] items-center justify-center"><Loader /> Please Wait..</div> 
-        : latestThreeCourses && latestThreeCourses.length > 0 &&
+        : latestFourCourses && latestFourCourses.length > 0 &&
         <>
           <motion.div 
             initial={{ opacity: 0 }}
@@ -83,8 +83,8 @@ export const Cards = () => {
               </motion.div>
             ))}
           </motion.div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          { latestThreeCourses?.map(({_id: id, title, subtitle, thumbnailKey, pricing, category, rating, students }: ICourse, index) => (
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {  latestFourCourses?.map(({_id: id, title, subtitle, thumbnailKey, pricing, category, rating, students }: ICourse, index) => (
             <motion.div
               key={title}
               initial={{ opacity: 0, y: 20 }}

@@ -8,6 +8,7 @@ import { StudentCourses } from "@/schema/studentCourses.schema";
 import { ICourseRepository } from "@/repositories/interface/course.repository.interface";
 import { IOrderModel } from "@/models/interface/order.model.interface";
 import { approvedPayment, IOrderDTO, OnApproveData } from "@/types/order.type";
+import { IOrderForUsersDTO, toOrderDTOs } from "@/mapper/order.mapper";
 
 
 export class OrderService implements IOrderService {
@@ -17,7 +18,10 @@ export class OrderService implements IOrderService {
         private readonly _studentCourseRepository: IStudentCoursesRepository,
         private readonly _courseRepository: ICourseRepository
     ){}
-    findAllOrders = async (page: number, limit: number,userId?: string): Promise<IOrderModel[]> => this._orderRepository.findAllOrders(page,limit,userId);
+    findAllOrders = async (page: number, limit: number,userId?: string): Promise<{data: IOrderForUsersDTO[], total: number}> => {
+        const {data, total} = await this._orderRepository.findAllOrders(page, limit, userId);
+        return {data:toOrderDTOs(data), total};
+    }
 
     createOrder = async (userId: string, orderData: IOrderDataDTO): Promise<{paypalId: string, orderId: string}> => {
 

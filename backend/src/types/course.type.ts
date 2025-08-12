@@ -1,3 +1,5 @@
+import { ICourseModel } from '@/models/interface/course.model.interface';
+import { IStudentCoursesModel } from '@/models/interface/studentCourses.model.interface';
 import { Document, Types} from 'mongoose';
 
 export interface ITutor {
@@ -109,4 +111,27 @@ export interface ICourseInsights {
         module: string;
         completion: number;
     }[];
+}
+
+export interface FindCoursesByInstructorResult {
+  data: ICourseModel[],
+  total: number
+}
+export interface FindCoursesByStudentResult {
+  data: IStudentCoursesModel[],
+  total: number
+}
+
+export interface IStudentCoursesAfterAggregation {
+  courseId: string;
+  title: string;
+  tutorId: string;
+  tutorName: string;
+  dateOfPurchase: Date;
+  courseImage: string;
+}
+
+export interface FindCoursesByStudentResultAfterAggregation  {
+  data: IStudentCoursesAfterAggregation[],
+  total: number
 }

@@ -4,9 +4,17 @@ import { ICategory, ICategoryCreateDTO, ISubCategoryCreateDTO } from "@/types/se
 
 
 class CategoryService {
-  async getAllCategories() {
-    const response = await axiosInstance.get<ICategory[]>('/api/v1/category');
-    return response.data;
+  async getAllCategories(page: number, pageSize: number, search: string) {
+    const response = await axiosInstance.get('/api/v1/category/admin',{
+      params:{page,limit:pageSize,search}
+    });
+    const {data,total} = response.data
+    return {data,total};
+  }
+
+  async listAllCategoriesOnUserSide(){
+    const response = await axiosInstance.get('/api/v1/category');
+    return response.data
   }
 
   async getCategoryById(id: string) {

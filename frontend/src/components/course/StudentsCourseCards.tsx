@@ -96,7 +96,7 @@ export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleW
                 >
                     {isInWishlist ? <Heart fill='white' size={15} /> : <Heart size={15} />}
                 </motion.div>   
-              <Card className="pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-800/50 transition-all duration-300">
+              <Card className="pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-800/50 transition-all duration-300 md:h-[400px]">
                 <div className="relative aspect-video overflow-hidden">
                                
                   <img
@@ -125,7 +125,7 @@ export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleW
                     </div>
                     <div className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
-                      <span>42 Students</span>
+                      <span>{course.students?.length} Students</span>
                     </div>
                     <div className="flex items-center gap-1">
                       {Array.from({ length: 5 }).map((_, i) => (

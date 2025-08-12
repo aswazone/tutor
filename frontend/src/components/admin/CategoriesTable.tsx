@@ -1,19 +1,18 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, Check, ChevronRight, Loader2, X } from "lucide-react"
+import { ArrowUpDown, Check, ChevronRight, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/common/DataTable"
-import { Badge } from "@/components/ui/badge"
+import { CustomDataTable } from "@/components/common/CustomDataTable"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { AddCategoryDrawer } from "./AddCategoryDrawer"
-import { ICategory, categoryService} from "@/services/category.service"
+import { categoryService} from "@/services/category.service"
 import { toast } from "sonner"
+import { ICategory } from "@/types/category.type"
 
 type TableCategory = {
   _id: string;
   name: string;
   isListed: boolean;
-  coursesCount: number;
   parentId?: string;
   depth: number;
   type: 'category' | 'subcategory';
@@ -21,7 +20,6 @@ type TableCategory = {
 
 interface Props {
   categories: ICategory[];
-  loading: boolean;
   onCategoryAdded: (category: ICategory) => void;
   onCategoryUpdated: (category: ICategory) => void;
   onCategoryDeleted: (id: string) => void;
@@ -75,22 +73,10 @@ const columns: ColumnDef<TableCategory>[] = [
       </div>
     ),
   },
-  {
-    accessorKey: "coursesCount",
-    header: "Courses",
-    cell: ({ row }) => {
-      return (
-        <Badge variant="secondary" className="w-full justify-center">
-          {row.getValue("coursesCount")}
-        </Badge>
-      )
-    },
-  },
 ]
 
 export function CategoriesTable({
   categories,
-  loading,
   onCategoryAdded,
   onCategoryUpdated,
   onCategoryDeleted,
@@ -107,7 +93,6 @@ export function CategoriesTable({
       _id: category._id,
       name: category.name,
       isListed: category.isListed,
-      coursesCount: category.coursesCount,
       type: 'category',
       depth: 0
     });
@@ -117,7 +102,6 @@ export function CategoriesTable({
         _id: sub._id,
         name: sub.name,
         isListed: sub.isListed,
-        coursesCount: sub.coursesCount,
         parentId: category._id,
         type: 'subcategory',
         depth: 1
@@ -210,7 +194,6 @@ export function CategoriesTable({
             _id: item._id,
             name: item.name,
             isListed: item.isListed,
-            coursesCount: item.coursesCount,
             subCategories: [],
             createdAt: "",
             updatedAt: ""
@@ -256,25 +239,20 @@ export function CategoriesTable({
 
   return (
     <div className="space-y-4">
-      {loading ? (
-        <div className="flex items-center justify-center h-32">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : (
-        <>
-          <div className="flex justify-end">
+
+          <div className="flex justify-end font-bold">
             <Button 
               onClick={() => setOpenNewCategory(true)}
-              variant="outline"
+              variant="ghost"
             >
-              Add Category
+             + Add Category
             </Button>
           </div>
-          <DataTable
+          <CustomDataTable
             data={flattenedData}
             columns={columns}
-            filterColumn="name"
-            filterPlaceholder="Filter categories..."
+            isHierarchical={true}
+            getRowType={(row) => row.type === "category" ? "parent" : "child"}
             actionItems={[
               { label: "Edit", action: "edit" },
               { label: "List/Unlist", action: "list" },
@@ -343,8 +321,6 @@ export function CategoriesTable({
               isListed: selectedSubcategory.isListed
             } : undefined}
           />
-        </>
-      )}
     </div>
   )
 }

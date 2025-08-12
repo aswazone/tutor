@@ -9,11 +9,12 @@ export interface ISubCategoryModel extends Document {
   updatedAt: Date;
 }
 
-export interface CategoryDocument extends Document {
+export interface ICategoryModel extends Document {
   name: string;
   isListed: boolean;
   coursesCount: number;
   subCategories: Array<{
+    _id:Document['_id']
     name: string;
     isListed: boolean;
     coursesCount: number;

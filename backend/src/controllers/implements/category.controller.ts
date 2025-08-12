@@ -28,7 +28,16 @@ export class CategoryController implements ICategoryController {
 
   getAllCategories = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const categories = await this._categoryService.getAllCategories();
+      const { page, limit, search } = req.query;
+      const categories = await this._categoryService.getAllCategories(Number(page),Number(limit),search as string);
+      res.json(categories);
+    } catch (error) {
+      next(error);
+    }
+  };
+  listAllCategoriesOnUserSide = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const categories = await this._categoryService.listAllCategoriesOnUserSide();
       res.json(categories);
     } catch (error) {
       next(error);

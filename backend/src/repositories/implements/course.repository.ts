@@ -4,12 +4,38 @@ import { ICourseRepository } from '../interface/course.repository.interface';
 import { CourseModel } from '@/models/implements/course.model';
 import { HttpError } from '@/utils/http-error.utils';
 import { HttpStatus } from '@/constants/status.constant';
-import { PopulateOptions, Types } from 'mongoose';
+import { FilterQuery, PopulateOptions, Types } from 'mongoose';
 import { QueryOptions } from '@/utils/queryToFilter.utils';
+import { FindCoursesForAdminResult } from '@/types/admin.type';
+import { FindCoursesByInstructorResult } from '@/types/course.type';
 
 export class CourseRepository extends BaseRepository<ICourseModel> implements ICourseRepository {
   constructor() {
     super(CourseModel);
+  }
+
+  async getInstructorCoursesWithFilter(instructorId: string, page=1, limit=6, search=""): Promise<FindCoursesByInstructorResult> {
+
+    if (!Types.ObjectId.isValid(instructorId)) {
+        throw new HttpError(HttpStatus.BAD_REQUEST, 'Invalid instructor ID');
+    }
+    const filter: FilterQuery<ICourseModel> = { tutor: new Types.ObjectId(instructorId), isDeleted: false };
+
+    if(search) {
+        filter.$or = [
+            { title: { $regex: search, $options: 'i' } },
+            { category: { $regex: search, $options: 'i' } },
+        ];
+    }
+
+    try {
+      const data: ICourseModel[] = await this.model.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit);
+      const total: number = await this.model.countDocuments(filter);
+      return { data, total };
+    } catch (error) {
+      if (error instanceof HttpError) throw error;
+      throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch instructor courses');
+    }
   }
 
   async getByInstructor(instructorId: string): Promise<ICourseModel[]> {
@@ -91,12 +117,44 @@ export class CourseRepository extends BaseRepository<ICourseModel> implements IC
       }
       
   }
-      async getAllCoursesWishlist(): Promise<ICourseModel[]> {
-          try {
-              return await this.find({ isDeleted: false, isPublished: true });
-          } catch (error) {
-              if (error instanceof HttpError) throw error;
-              throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');
-          }
+
+
+  async findCoursesForAdmin(page: number, limit: number,search: string, tab: string): Promise<FindCoursesForAdminResult> {
+      try {
+        console.log('reaching here');
+
+        const filter: FilterQuery<ICourseModel> = {isDeleted: false};
+        
+        if(tab === 'approved'){
+            filter.isVerified = 'verified';
+        } else {
+            filter.isVerified = { $ne: 'verified' };
+        }
+
+        if (search) {
+            filter.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } },
+                { 'tutor.userName': { $regex: search, $options: 'i' } },
+            ];
+        }
+        const data:ICourseModel[] = await this.model.find(filter).populate({path: 'tutor', select: 'userName'}).skip((page - 1) * limit).limit(limit).sort({ createdAt: -1 });
+        const total: number = await this.model.countDocuments(filter);
+
+        console.log(data);
+        return {data, total};
+      } catch (error) {
+          if (error instanceof HttpError) throw error;
+          throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');
       }
+  }
+
+  async getAllCoursesWishlist(): Promise<ICourseModel[]> {
+      try {
+          return await this.find({ isDeleted: false, isPublished: true });
+      } catch (error) {
+          if (error instanceof HttpError) throw error;
+          throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch courses');
+      }
+  }
 }

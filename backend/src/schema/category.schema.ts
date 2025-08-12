@@ -1,4 +1,4 @@
-import { CategoryDocument } from '@/models/interface/category.model.interface';
+import { ICategoryModel } from '@/models/interface/category.model.interface';
 import { Schema, model } from 'mongoose';
 
 const SubCategorySchema = new Schema({
@@ -24,7 +24,7 @@ const SubCategorySchema = new Schema({
     {timestamps: true}
 );
 
-const CategorySchema = new Schema<CategoryDocument>({
+const CategorySchema = new Schema<ICategoryModel>({
         name: {
             type: String,
             required: true,
@@ -46,5 +46,4 @@ const CategorySchema = new Schema<CategoryDocument>({
 
 
 
-export const Category = model<CategoryDocument>('Category', CategorySchema);
-export const SubCategory = model('SubCategory', SubCategorySchema);
+export const Category = model<ICategoryModel>('Category', CategorySchema);

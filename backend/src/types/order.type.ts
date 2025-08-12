@@ -1,3 +1,5 @@
+import { IOrderModel } from "@/models/interface/order.model.interface";
+
 export interface ICreateOrderDTO{
     userId: string,
     userName: string,
@@ -27,3 +29,8 @@ export type OnApproveData = {
     payerID?: string | null;
     paymentID?: string | null;
 };
+
+export interface FindOrdersForUser {
+    data:IOrderModel[],
+    total:number
+}

@@ -1,21 +1,32 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs"
-import { DataTable } from "@/components/common/DataTable"
+import { CustomDataTable } from "@/components/common/CustomDataTable"
 import { Button } from "@/components/ui/button"
-import { ArrowUpDown, Check, FileText, X } from "lucide-react"
+import { ArrowUpDown, Check, FileText, Loader, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ColumnDef } from "@tanstack/react-table"
 import axiosInstance from "@/config/axios.config"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, ChangeEvent } from "react"
 import { toast } from "sonner"
 import { TutorDetailsDialog } from "@/components/admin/TutorDetailsDialog"
 import { Tutor } from "@/types/admin.type"
+import { Input } from "@/components/ui/input"
+import { Pagination } from "@/components/ui/pagination"
+import { useSearchParams } from "react-router-dom"
 
 const Tutors = () => {
-  const [selectedTab, setSelectedTab] = useState('approved');
+  
+  const [searchParams,setSearchParams] = useSearchParams();
+  const [selectedTab, setSelectedTab] = useState(searchParams.get('tab') || 'approved');
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [isLoading, setIsLoading] = useState(true);
+  
+  const [page, setPage] = useState(Number(searchParams.get('page') || 1));
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const pageSize = 4;
 
   const columns: ColumnDef<Tutor>[] = [
     {
@@ -89,30 +100,26 @@ const Tutors = () => {
     },
   ];
 
-  const fetchTutors = useCallback(async () => {
+  const fetchTutors = useCallback(async (pageNum = page, size = pageSize, search ='') => {
     try {
       setIsLoading(true);
-      const response = await axiosInstance.get('/api/v1/admin/tutors');
-      setTutors(response.data);
+      const response = await axiosInstance.get('/api/v1/admin/tutors',{
+        params: { page: pageNum, limit:size, tab: selectedTab, search }
+      });
+      console.log(response.data, 'tutors');
+      const {data, total } = response.data;
+      setTutors(data);
+      setTotalItems(total);
+      const tp = Math.ceil(total/size) || 1;
+      setTotalPages(tp);
     } catch (error) {
       console.error('Error fetching tutors:', error);
       toast.error('Failed to fetch tutors');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [page, pageSize, selectedTab]);
 
-  useEffect(() => {
-    fetchTutors();
-  }, [fetchTutors]);
-
-  const approvedTutors = tutors.filter(tutor => 
-    tutor.isVerified === 'verified'
-  );
-
-  const pendingTutors = tutors.filter(tutor => 
-    tutor.isVerified === 'pending' || tutor.isVerified === 'rejected'
-  );
 
   const handleTutorVerified = () => {
     fetchTutors();
@@ -149,14 +156,57 @@ const Tutors = () => {
       }
     }
 
+    const handleTabSelect = (tab: string) => {
+      setSelectedTab(tab);
+      setPage(1);
+      setSearchParams({
+        tab,
+        page: '1',
+        search: '',
+      })
+    };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+    const onPageChange = (newPage: number) => {
+      setPage(newPage);
+      setSearchParams({
+        tab: selectedTab,
+        page: String(newPage),
+        search: searchTerm
+      });
+    };
+
+    const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value;
+      setSearchTerm(val);
+      setPage(1);
+      setSearchParams({
+        tab: selectedTab,
+        page: "1",
+        search: val
+      });
+    };
+
+  useEffect(() => {
+    const urlTab = searchParams.get("tab") || "approved";
+    const urlPage = Number(searchParams.get("page")) || 1;
+    const urlSearch = searchParams.get("search") || "";
+
+    setSelectedTab(urlTab);
+    setPage(urlPage);
+    setSearchTerm(urlSearch);
+    
+  }, [searchParams]);
+
+
+  useEffect(() => {
+    fetchTutors(page, pageSize, searchTerm);
+  }, [fetchTutors, page, pageSize, selectedTab, searchTerm]);
+
+
 
   return (
     <>
-      <Tabs defaultValue="approved" onValueChange={setSelectedTab} className="border-none">
+      <Tabs defaultValue={selectedTab} onValueChange={setSelectedTab} className="border-none">
         <TabsList>
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-between">
@@ -164,39 +214,48 @@ const Tutors = () => {
               <span className={selectedTab === 'approved' ? 'text-sky-500/80 font-bold text-xs uppercase' : 'text-amber-400/80 font-bold text-xs uppercase'}>~{selectedTab}</span>
             </div>
             <div className="grid w-[350px] grid-cols-2 gap-2 mt-3 text-sm font-bold">
-              <TabsTrigger className="border rounded py-1 text-sky-500/80 hover:border-sky-500/40 hover:scale-103" value="approved">
+              <TabsTrigger onClick={() => handleTabSelect('approved')} className="border rounded py-1 text-sky-500/80 hover:border-sky-500/40 hover:scale-103" value="approved">
                 Approved
               </TabsTrigger>
-              <TabsTrigger className="border rounded py-1 text-amber-300/80 hover:border-amber-500/40 hover:scale-103" value="pending">
+              <TabsTrigger onClick={() => handleTabSelect('pending')} className="border rounded py-1 text-amber-300/80 hover:border-amber-500/40 hover:scale-103" value="pending">
                 Pending
               </TabsTrigger>
             </div>
           </div>
         </TabsList>
-        
-        <TabsContent value="approved">
-            <DataTable 
-              filterColumn="userName"
-              filterPlaceholder="Search by username"
-              columns={columns} 
-              data={approvedTutors}
-              onSelectionChange={(selectedTutors) => {
-                console.log("Selected tutors:", selectedTutors)
-              }}
-              actionItems={[
-                { label: "Block/Unblock", action: "status" },
-              ]}
-              onRowActionSelect={handleAction}
+        <TabsContent className="relative" value={selectedTab}>
+          <div className="absolute top-4 left-0">
+            <Input value={searchTerm} onChange={onSearchChange} placeholder="Search Tutors..." className="w-full" />  
+          </div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-full">
+              <Loader className="animate-spin" />
+              <span className="ml-2">Loading courses...</span>
+            </div>
+          )
+          :(
+            <>
+            <CustomDataTable 
+                data={tutors} 
+                columns={columns} 
+                onRowActionSelect={handleAction}
+                actionItems={
+                  selectedTab === 'approved' ? [
+                    { label: "Activate/Deactivate", action: "status" },
+                  ] : []
+                }
             />
-        </TabsContent>
-        
-        <TabsContent value="pending">
-            <DataTable 
-              filterColumn="userName"
-              filterPlaceholder="Search by username"
-              columns={columns} 
-              data={pendingTutors}
-            />
+                <Pagination 
+                  className="mt-4 justify-end"
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                  showTotal
+                  totalItems={totalItems}
+                  itemsPerPage={pageSize}
+                />
+            </>
+              )}
         </TabsContent>
       </Tabs>
 

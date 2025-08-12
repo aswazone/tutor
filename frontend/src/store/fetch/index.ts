@@ -45,12 +45,26 @@ export const fetchCourse = createAsyncThunk(
 export const fetchTutorCourses = createAsyncThunk(
 
   'courses/fetchTutorItems',
-  async (id: string, { rejectWithValue }) => {
+  async (
+    params: { 
+      id: string, 
+      page?: number, 
+      limit?: number, 
+      search?: string 
+    }, 
+    { rejectWithValue }
+  ) => {
     try {
-    console.log('fetching tutor courses');
-
-      const response = await axiosInstance.get(`/api/v1/courses/tutor?id=${id}`);
+      console.log('fetching tutor courses');
+      const response = await axiosInstance.get(`/api/v1/courses/tutor?id=${params.id}`, {
+        params: {
+          page: params.page,
+          limit: params.limit,
+          search: params.search
+        }
+      });
       return response.data;
+      console.log(response.data, 'response-courses');
     } catch (err) {
       return rejectWithValue(axiosErrorMessage(err));
     }
@@ -117,7 +131,7 @@ const fetchSlice = createSlice({
       })
       .addCase(fetchTutorCourses.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.items = action.payload;
+        state.items = action.payload.data;
       })
       .addCase(fetchTutorCourses.rejected, (state, action) => {
         state.isLoading = false;

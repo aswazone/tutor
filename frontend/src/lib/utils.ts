@@ -10,7 +10,9 @@ export function cn(...inputs: ClassValue[]) {
 
   export const flattenCategories = async () => {
       try {
-        const data = await categoryService.getAllCategories();
+        const data = await categoryService.listAllCategoriesOnUserSide();
+
+        console.log(data, 'categories-utils');
 
         if (data) {
           const mapCategoryToDTO = (category: ICategory): CategoryDTO => ({
@@ -24,7 +26,7 @@ export function cn(...inputs: ClassValue[]) {
               }))
           });
 
-          const categories: CategoryDTO[] = data.filter((category) => category.isListed).map(mapCategoryToDTO);
+          const categories: CategoryDTO[] = data.filter((category: ICategory) => category.isListed).map(mapCategoryToDTO);
           return categories;
 
         }

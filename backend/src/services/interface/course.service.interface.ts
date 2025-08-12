@@ -1,12 +1,12 @@
+import { IInstructorCourseDTO, IStudentCourseDTO } from "@/mapper/course.mapper";
 import { CourseStatus } from "@/models/interface/course.model.interface";
-import { IStudentCoursesModel } from "@/models/interface/studentCourses.model.interface";
 import { ICreateCourseDTO, ICourse } from "@/types/course.type";
 import { QueryFilter, QueryOptions } from "@/utils/queryToFilter.utils";
 
 export interface ICourseService {
   createCourse(userId: string, courseData: ICreateCourseDTO): Promise<ICourse>;
-  getCoursesByInstructor(userId: string): Promise<ICourse[]>;
-  getCoursesByStudent(userId: string): Promise<IStudentCoursesModel>;
+  getCoursesByInstructor(userId: string,page: number, limit: number, search: string): Promise<{ data: IInstructorCourseDTO[]; total: number }>;
+  getCoursesByStudent(userId: string, page: number, limit: number, search: string): Promise<{ data: IStudentCourseDTO[]; total: number }>;
   getCourseById(courseId: string): Promise<ICourse>;
   checkIfCoursePurchased(userId: string, courseId: string): Promise<boolean>;
   getAllCourses(query: {

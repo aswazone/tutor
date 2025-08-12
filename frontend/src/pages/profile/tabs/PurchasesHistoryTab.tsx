@@ -1,30 +1,56 @@
+import { Pagination } from "@/components/ui/pagination";
 import axiosInstance from "@/config/axios.config";
 import { env } from "@/config/env.config";
 import { RootState } from "@/store"
-import { useEffect, useState } from "react";
+import { IOrders } from "@/types/order.type";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux"
+import { useSearchParams } from "react-router-dom";
 
 const PurchasesHistoryTab = () => {
   const { user } = useSelector((state: RootState) => state.auth)
   const [isLoading, setIsLoading] = useState(false);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<IOrders[]>([]);
+  
+  const [searchParams,setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get('page') || 1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const pageSize = 4;
+
+
+  const fetchOrdersData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await axiosInstance.get('/api/v1/order',{
+        params: { page, limit: pageSize }
+      });
+
+      const { data, total } = response.data;
+
+      setOrders(data);
+      setTotalPages(Math.ceil(total / pageSize));
+      setTotalItems(total);
+
+    } catch (error) {
+      console.log(error)
+      setOrders([]);
+    }
+    setIsLoading(false);
+  },[page]);
+
+  const onPageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', String(newPage));
+    setSearchParams(params);
+  };
 
   useEffect(() => {
-    const fetchOrdersData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axiosInstance.get('/api/v1/order');
-        setOrders(response.data);
-      } catch (error) {
-        console.log(error)
-        setOrders([]);
-      }
-      setIsLoading(false);
-    }
     if (user) {
       fetchOrdersData();
     }
-  }, [user])
+  }, [user, fetchOrdersData]);
+
 
   return (
     <div className="overflow-x-auto">
@@ -64,6 +90,15 @@ const PurchasesHistoryTab = () => {
           </tbody>
         </table>
       )}
+        <Pagination 
+          className="mt-4 justify-end"
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+          showTotal
+          totalItems={totalItems}
+          itemsPerPage={pageSize}
+        />
     </div>
   )
 }

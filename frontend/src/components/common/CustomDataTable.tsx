@@ -14,7 +14,6 @@ import {
 import {  ChevronDown, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -24,7 +23,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -37,31 +35,26 @@ import {
 interface DataTableProps<TData> {
   data: TData[]
   columns: ColumnDef<TData>[]
-  filterColumn?: string
-  filterPlaceholder?: string
   onRowActionSelect?: (action: string, item: TData) => void
   actionItems?: {
     label: string
     action: string
   }[]
-  showSelection?: boolean
-  onSelectionChange?: (selectedItems: TData[]) => void
+  isHierarchical?: boolean
+  getRowType?: (item: TData) => 'parent' | 'child'
 }
 
-export function DataTable<TData>({
+export function CustomDataTable<TData>({
   data,
   columns: userColumns,
-  filterColumn,
-  filterPlaceholder = "Filter...",
   onRowActionSelect,
+  isHierarchical = false,
+  getRowType,
   actionItems = [],
-  showSelection = false,
-  onSelectionChange,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
 
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -73,32 +66,32 @@ export function DataTable<TData>({
     const serialNumberColumn: ColumnDef<TData> = {
       id: "serialNumber",
       header: "S.No",
-      cell: ({ row }) => {
-        return <div className="text-center">{row.index +1}</div>;
+      cell: ({ row, table }) => {
+        // Handle hierarchical numbering
+        if (isHierarchical && getRowType) {
+          const rowType = getRowType(row.original);
+          if (rowType === 'child') return null;
+
+          // Get all parent rows
+          const parentRows = table.getFilteredRowModel().rows.filter(
+            r => getRowType(r.original) === 'parent'
+          );
+
+          // Find index of current parent row
+          const parentIndex = parentRows.findIndex(
+            r => r.original === row.original
+          );
+
+          return <div className="text-center">{parentIndex + 1}</div>;
+        }
+
+        // Default numbering
+        return <div className="text-center">{row.index + 1}</div>;
       },
       enableSorting: false,
       enableHiding: false,
     };
 
-    const selectionColumn: ColumnDef<TData> = {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    }
 
     // Add actions column if actionItems are provided
     const actionsColumn: ColumnDef<TData> = {
@@ -134,15 +127,12 @@ export function DataTable<TData>({
     }
 
     const finalColumns: ColumnDef<TData>[] = [serialNumberColumn]
-    if (showSelection) {
-      finalColumns.push(selectionColumn)
-    }
     finalColumns.push(...userColumns)
     if (actionItems.length > 0) {
       finalColumns.push(actionsColumn)
     }
     return finalColumns
-  }, [userColumns, showSelection, actionItems, onRowActionSelect])
+  }, [userColumns, actionItems, onRowActionSelect, isHierarchical, getRowType])
 
   const table = useReactTable({
     data,
@@ -154,40 +144,19 @@ export function DataTable<TData>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
       pagination,
     },
   })
 
-  // Update parent component when selection changes
-  React.useEffect(() => {
-    if (onSelectionChange) {
-      const selectedRows = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original)
-      onSelectionChange(selectedRows)
-    }
-  }, [rowSelection, table, onSelectionChange])
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        {filterColumn && (
-          <Input
-            placeholder={filterPlaceholder}
-            value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(filterColumn)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
-        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -263,32 +232,6 @@ export function DataTable<TData>({
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        {showSelection && (
-          <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
-        )}
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
       </div>
     </div>
   )

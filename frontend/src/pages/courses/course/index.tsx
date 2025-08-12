@@ -17,6 +17,7 @@ import { Alert } from "@/components/ui/alert";
 import axiosInstance from "@/config/axios.config";
 import { toastAuthCheck } from "@/utils/check-auth.utils";
 import { toast } from "sonner";
+import { CourseReviews } from "@/components/course/CourseReview";
 
 const CourseDetailsPage = () => {
 
@@ -238,6 +239,9 @@ const CourseDetailsPage = () => {
                                         </motion.div>
                                    
                                 </AnimatePresence>
+                            </div>
+                            <div className="border rounded-br-xl rounded-tl-xl p-3 bg-sky-950/30 border-white/10">
+                                <CourseReviews courseId={courses[0]?._id} />
                             </div>
                         </div>
                     </aside>

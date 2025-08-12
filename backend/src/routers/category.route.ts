@@ -6,7 +6,8 @@ import { checkRole } from '@/middlewares/checkrole.middleware';
 const router = Router();
 
 // Public routes
-router.get('/', categoryController.getAllCategories);
+router.get('/admin', categoryController.getAllCategories);
+router.get('/', categoryController.listAllCategoriesOnUserSide);
 router.get('/:id', categoryController.getCategoryById);
 
 // Protected routes - Admin only

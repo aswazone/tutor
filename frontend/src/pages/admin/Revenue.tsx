@@ -296,7 +296,7 @@ const Revenue = () => {
                 </td>
                 <td className="p-4 align-middle font-semibold">₹{item.amount}</td>
                 <td className="p-4 align-middle font-semibold text-green-400">⤉ ₹{item.adminShare}</td>
-                <td className="p-4 align-middle">{item.paymentDate}</td>
+                <td className="p-4 align-middle">{new Date(item.paymentDate).toLocaleString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' }).replace(/ /g, '/')}</td>
                 <td className="p-4 align-middle">
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
                     ${item.status === 'completed' ? 'bg-green-100/10 text-green-500' :

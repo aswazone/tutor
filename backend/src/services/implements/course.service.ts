@@ -8,12 +8,12 @@ import { HttpStatus } from '@/constants/status.constant';
 import { CourseStatus } from '@/models/interface/course.model.interface';
 import { QueryFilter, QueryOptions } from '@/utils/queryToFilter.utils';
 import { IStudentCoursesRepository } from '@/repositories/interface/studentCourses.repository.interface';
-import { IStudentCoursesModel } from '@/models/interface/studentCourses.model.interface';
 import { sendCourseRejectEmail } from '@/utils/send-email.utils';
 import { IUserRepository } from '@/repositories/interface/user.repository.interface';
 import { INotificationRepository } from '@/repositories/interface/notification.repository.interface';
 import { sendNotificationToUser, sendNotificationToUsers } from '@/utils/send-notification-to-users';
 import { INotificationModel } from '@/models/interface/notification.model.interface';
+import { IInstructorCourseDTO, IStudentCourseDTO, toInstructorCourseDTOs, toStudentCourseDTOs } from '@/mapper/course.mapper';
 
 export class CourseService implements ICourseService {
   constructor(
@@ -49,20 +49,18 @@ export class CourseService implements ICourseService {
     return course;
   }
 
-  getCoursesByInstructor = async (userId: string): Promise<ICourse[]> => {
+  getCoursesByInstructor = async (userId: string, page: number, limit: number, search: string): Promise<{ data: IInstructorCourseDTO[], total: number }> => {
 
-    const courses = await this._courseRepository.getByInstructor(userId);
-    if (!courses) throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch instructor courses');
+    const {data,total} = await this._courseRepository.getInstructorCoursesWithFilter(userId, page, limit, search);
+    return {data:toInstructorCourseDTOs(data),total};
 
-    return courses;
   }
 
-  getCoursesByStudent = async (userId: string): Promise<IStudentCoursesModel> => {
+  getCoursesByStudent = async (userId: string, page: number, limit: number, search: string): Promise<{ data: IStudentCourseDTO[], total: number }> => {
 
-    const courses = await this._studentCourseRepository.getStudentCourses(userId);
-    if (!courses) throw new HttpError(HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to fetch student courses');
-
-    return courses;
+    const {data, total} = await this._studentCourseRepository.getStudentOwnedCourses(userId, page, limit, search);
+    console.log(data,'backend-student-courses');
+    return {data:toStudentCourseDTOs(data),total};
   }
 
   getCourseById = async (courseId: string): Promise<ICourse> => {
@@ -93,7 +91,7 @@ export class CourseService implements ICourseService {
 
   getAllCourses = async (query: { filter: QueryFilter; options: QueryOptions }): Promise<{ courses: ICourse[]; count: number }> => {
     const { filter, options } = query;
-    // console.log(query);
+    console.log(query);
     const courses = await this._courseRepository.findAllCourses({ isDeleted: false, isActive: true, isVerified: CourseStatus.VERIFIED, ...filter }, options);
     return { courses: courses.result, count: courses.resultCount };
   }

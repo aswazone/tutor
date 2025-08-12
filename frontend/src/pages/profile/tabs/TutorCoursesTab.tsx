@@ -1,19 +1,18 @@
 import { motion } from 'framer-motion';
-import { StarIcon, Clock, Users, Trash, Edit, FileCheck2, FileClock, ShieldAlert, BarChart} from 'lucide-react';
+import { StarIcon, Clock, Users, Trash, Edit, FileCheck2, FileClock, ShieldAlert, BarChart, Search} from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {  useCallback, useEffect, useState} from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import {  ChangeEvent, useCallback, useEffect, useState} from 'react';
 import { setActiveTab } from '@/store/auth/authSlice';
 import CardSkeleton from '@/components/common/CardSkeleton';
 import Loader from '@/components/ui/loader';
 import { toast } from 'sonner';
 import { env } from '@/config/env.config';
 import { deleteCourse, fetchTutorCourses, toggleCourseStatus } from '@/store/fetch';
-import { DeleteConfirmDialog } from '@/components/common/DeleteConfirmDialog';
 import { setEditMode } from '@/store/course';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import CustomAlert from '@/components/common/CustomAlert';
@@ -21,43 +20,75 @@ import axiosInstance from '@/config/axios.config';
 import { format } from 'date-fns';
 import CourseInsightsModal from '@/components/course/CourseInsightModal';
 import { ICourseInsights } from '@/types/course.type';
+import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 
 
 
 
 export const TutorCoursesTab = () => {
+  const [searchParams,setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get('page') || 1);
+  const searchTerm = searchParams.get('search') || '';
+  const id = searchParams.get('id');
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const pageSize = 3;
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [toggleLoading, setToggleLoading] = useState<string>('');
-  const [openDailog, setOpenDailog] = useState(false);
   const [tooltipStates, setTooltipStates] = useState<{ [key: string]: boolean }>({});
   const [courseInsight, setCourseInsight] = useState<ICourseInsights | null>(null);
   const [isDataFetching, setIsDataFetching] = useState(false);
   const [isPeek, setIsPeek] = useState(false);
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const id = queryParams.get('id');
-
   useEffect(() => {
+
     if(id !== null && id !== user?._id){
       setIsPeek(true);
     }
-    dispatch(fetchTutorCourses(id ?? '')).unwrap();
-  }, [dispatch,id,user]);
+
+    const payload = {
+      id: id || user?._id || '',
+      page,
+      limit: pageSize,
+      search: searchTerm
+    }
+    
+    const result = dispatch(fetchTutorCourses(payload)).unwrap();
+      result.then(({total}) => {
+        setTotalPages(Math.ceil(total/pageSize))
+        setTotalItems(total)
+      })
+  }, [dispatch,id,user,searchTerm,page]);
+
+  const onPageChange = (newPage: number) => {
+      const params = new URLSearchParams(searchParams);
+      params.set('page', String(newPage));
+      if (id) params.set('id', id); 
+      setSearchParams(params);
+  };
+
+  const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value;
+      const params = new URLSearchParams(searchParams);
+      params.set('search', val);
+      params.set('page', '1'); 
+      if (id) params.set('id', id); 
+      setSearchParams(params);
+  };
+
 
   const getAllStudentsProgress = async (courseId: string, tutorId: string) => {
-    
-    console.log(tutorId, courseId, 'modal-onclick');
-    // return
-    try {
-        const response = await axiosInstance.get(`/api/v1/insights/${tutorId}/${courseId}`);
-        return response.data;
-    } catch (error) {
-        console.log(error);
-    }
-};
+      try {
+          const response = await axiosInstance.get(`/api/v1/insights/${tutorId}/${courseId}`);
+          return response.data;
+      } catch (error) {
+          console.log(error);
+      }
+  };
 
   const { items: courses, isLoading } = useSelector((state:RootState ) => state.fetch);
   const handleToggleStatus = useCallback(async (courseId: string, currentStatus: boolean) => {
@@ -65,7 +96,7 @@ export const TutorCoursesTab = () => {
       setToggleLoading(courseId);
     
       await dispatch(toggleCourseStatus({ courseId, status: !currentStatus })).unwrap();
-      await dispatch(fetchTutorCourses('')).unwrap();
+      await dispatch(fetchTutorCourses({id:'',page:page,limit:pageSize,search:searchTerm})).unwrap();
       
       toast.success(`Course ${!currentStatus ? 'published' : 'drafted'} successfully`);
     } catch (error) {
@@ -75,15 +106,23 @@ export const TutorCoursesTab = () => {
     } finally {
       setToggleLoading('');
     }
-  }, [dispatch]);
+  }, [dispatch,page,searchTerm]);
+
   const handleDelete = useCallback(async (courseId: string) => {
     try {
       setToggleLoading(courseId);
-    
-      await dispatch(deleteCourse(courseId)).unwrap();
-      await dispatch(fetchTutorCourses('')).unwrap();
-      
-      toast.success(`Course deleted successfully`);
+      toast("Are you sure you want to delete this course ?",{
+          position: "top-right",
+          className: "mt-10",
+          action: {
+              label: "Delete",
+              onClick: async () => {
+                  await dispatch(deleteCourse(courseId)).unwrap();
+                  await dispatch(fetchTutorCourses({id:''})).unwrap();
+                  toast.success('Course deleted successfully');
+              }
+          }
+      });
     } catch (error) {
 
       toast.error('Failed to update course status');
@@ -92,8 +131,8 @@ export const TutorCoursesTab = () => {
       setToggleLoading('');
     }
   }, [dispatch]);
+
   const handleEditCourse = (courseId: string) => {
-    // toast(`Editing course with ID: ${courseId}`);
     dispatch(setActiveTab('create-course'));
     dispatch(setEditMode({status:true,courseId:courseId}));
   }
@@ -127,7 +166,7 @@ export const TutorCoursesTab = () => {
     try {
       toast('Requested..');
       await axiosInstance.patch(`/api/v1/courses/${courseId}/verify/${isVerified}`, { rejectReason });
-      await dispatch(fetchTutorCourses('')).unwrap();
+      await dispatch(fetchTutorCourses({id:''})).unwrap();
     } catch (error) {
       toast.error('Failed to update course status');
       console.error('Toggle status error:', error);
@@ -135,12 +174,16 @@ export const TutorCoursesTab = () => {
 
   }
 
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
+  return (
+  <div>
+    <div className="flex absolute -top-35 right-5">
+      <Input value={searchTerm} onChange={onSearchChange} placeholder="Search Courses..." className="w-full" /> 
+      <Search className="text-sky-400/50 h-4 w-4 absolute cursor-pointer right-2 top-1/2 transform -translate-y-1/2" /> 
+    </div>
+    {isLoading ? 
+      (<div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
+         {[...Array(3)].map((_, i) => (
             <CardSkeleton key={i} />
           ))}
         </div>
@@ -149,26 +192,9 @@ export const TutorCoursesTab = () => {
           Loading courses...
         </div>
       </div>
-    );
-  }
-
-  if (!courses?.length) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[200px] text-muted-foreground">
-        <p>No courses found</p>
-        <Button 
-          variant="link" 
-          onClick={() => dispatch(setActiveTab("public-course"))}
-          className="mt-2"
-        >
-          Go and Explore !!
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <motion.div
+    )
+    :
+    (<motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
@@ -179,11 +205,31 @@ export const TutorCoursesTab = () => {
         </div>
       </div>}
       <div className="relative grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {courses.map((course) => {
-                   
+      {(() => {
+        const filteredCourses = courses.filter(course => 
+          !isPeek || (isPeek && course.isPublished && course.isVerified === 'verified')
+        );
+
+        if (filteredCourses.length === 0) {
           return (
+            <div className="col-span-full flex flex-col items-center justify-center min-h-[200px] text-muted-foreground">
+              <p>No {isPeek ? 'published' : ''} courses available</p>
+              {!isPeek && (
+                <Button 
+                  variant="link" 
+                  onClick={() => dispatch(setActiveTab("create-course"))}
+                  className="mt-2"
+                >
+                  Create Your First Course
+                </Button>
+              )}
+            </div>
+          );
+        }
+
+        return filteredCourses.map((course) => (
+          console.log(course.title),
             <motion.div
-              
               whileHover={{ y: -6 }}
               key={course._id}
               initial={{ opacity: 0, y: 20 }}
@@ -236,13 +282,6 @@ export const TutorCoursesTab = () => {
                 course.isVerified === 'verified' && course.isActive
                 ? `pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-500/20 transition-all duration-300`
                 : 'grayscale-50 opacity-50 pt-0 overflow-hidden border-border/60 bg-card/50 backdrop-blur-xl hover:bg-card/80 hover:border-sky-500/20 transition-all duration-300'}>
-                <DeleteConfirmDialog  
-                    title="Delete course"
-                    description="Are you sure you want to delete this course?" 
-                    onConfirm={() => handleDelete(course._id)}
-                    open={openDailog}
-                    onClose={() => setOpenDailog(false)}
-                />
                 <div className="relative aspect-video overflow-hidden">
                   {!isPeek && course?.isScheduled && course?.publishDate && (
                     <div className='flex items-center justify-between absolute z-20 top-23 left-16 bg-black/50 text-white text-[10px] px-2 py-1 rounded gap-3'>
@@ -295,10 +334,7 @@ export const TutorCoursesTab = () => {
                   {!isPeek && !course.isActive && <Badge variant={'destructive'} className='absolute z-20 top-20 left-23 bg-black/50 text-white'>Blocked</Badge>}
                   {!isPeek && course.isVerified !== 'pending' && 
                   <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenDailog(true);
-                    }}
+                    onClick={() => handleDelete(course._id)}
 
                     className="absolute z-20 top-7 right-2 w-8 h-8 p-0 bg-black/50 rounded-full hover:bg-red-900/50"
                     variant="ghost"
@@ -388,11 +424,21 @@ export const TutorCoursesTab = () => {
                 </div>
               </Card>
             </motion.div>
-          );
-        })}
+          ))
+        })()}
       </div>
       {courseInsight && <CourseInsightsModal open={courseInsight ? true : false} onClose={() => setCourseInsight(null)} insights={courseInsight!} />}
-    </motion.div>
+    </motion.div>)}
+    <Pagination 
+      className="mt-4 justify-end"
+      currentPage={page}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      showTotal
+      totalItems={totalItems}
+      itemsPerPage={pageSize}
+    />
+    </div>
   );
 
 

@@ -28,6 +28,7 @@ import Certificate from "@/components/course/Certificate";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { setNotes } from "@/store/note";
+import ReviewDialog from "@/components/course/ReviewDialog";
 
 const CourseProgressPage = () => {
 
@@ -47,6 +48,7 @@ const CourseProgressPage = () => {
   const [isCertificateOpen, setIsCertificateOpen] = useState(false);
   const [tab, setTab] = useState('modules');
   const [botNotification, setBotNotification] = useState({show: false, message: ''});
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
   
 
   const getLastViewedModuleAndChapter = useCallback((courseProgress: IProgressData['progress']) => {
@@ -265,6 +267,7 @@ const CourseProgressPage = () => {
     }
   }
 
+
   return (
     <div className="relative flex flex-col h-full bg-[#0a0f1d] text-white overflow-y-scroll">  
     {botNotification.show && <motion.div
@@ -409,7 +412,7 @@ const CourseProgressPage = () => {
       
       <Dialog open={showCourseCompleteDialog ? isCertificateOpen ? false : true : false}>
         <DialogContent className="p-0 w-full max-w-lg overflow-hidden">
-          <BlurFade delay={3}>
+          <BlurFade delay={1}>
             <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
               
               {/* Background Image with Mask */}
@@ -519,12 +522,18 @@ const CourseProgressPage = () => {
                         </div>
                       </ShinyButton>
                     </div>
-                    <ShinyButton
-                      onClick={handleNavigateToCourses}
-                      className="w-full"
-                    >
-                      My Courses
-                    </ShinyButton>
+                    <div className="grid grid-cols-2 gap-3">
+                      <ShinyButton
+                        onClick={handleNavigateToCourses}
+                      >
+                        My Courses
+                      </ShinyButton>
+                      <ShinyButton
+                        onClick={() => setIsReviewOpen(true)}
+                      >
+                        Give Review
+                      </ShinyButton>
+                    </div>
                   </div>
 
                 {/* Decorative Elements */}
@@ -539,6 +548,12 @@ const CourseProgressPage = () => {
           </BlurFade>
         </DialogContent>
     </Dialog>
+    <ReviewDialog
+      courseId={courseDetails?._id ?? ''}
+      tutorId={courseDetails?.tutor._id ?? ''}
+      isOpen={isReviewOpen}
+      setIsOpen={setIsReviewOpen}
+    />
     <PopperConfetti showConfetti={showConfetti} />
     {isCertificateOpen && <Certificate course={courseDetails?.title} name={user?.name} onClose={handleCertificate}/>}
     </div>
