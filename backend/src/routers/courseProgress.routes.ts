@@ -7,5 +7,6 @@ const courseProgressRouter = Router();
 courseProgressRouter.get("/:userId/:courseId", courseProgressController.getCurrentCourseProgress);
 courseProgressRouter.post("/mark-as-viewed", courseProgressController.markCurrentChapterAsViewed);
 courseProgressRouter.post("/reset-progress", courseProgressController.resetCurrentCourseProgress);
+courseProgressRouter.patch("/stage-update/:userId/:courseId", courseProgressController.updateStageAndProgress);
 
 export default courseProgressRouter

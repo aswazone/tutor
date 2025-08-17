@@ -23,4 +23,10 @@ export class CourseProgressRepository extends BaseRepository<ICourseProgressMode
     async getAllCourseProgress(): Promise<ICourseProgressModel[]> {
         return this.model.find().populate('courseId').exec();
     }
+
+    async updateStageAndProgress(userId: string, courseId: string, data:Partial<ICourseProgressModel>): Promise<ICourseProgressModel | null> {
+        const update = { ...data, quizCompleted: data?.quizScore && data?.quizScore >= 50 ? true : false };
+        console.log(update,'repo-stage')
+        return await this.model.findOneAndUpdate({ studentId: userId, courseId }, update, { new: true }).populate('courseId').exec();
+    }
 }

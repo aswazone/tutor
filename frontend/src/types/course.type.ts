@@ -45,6 +45,7 @@ export interface ICourse {
   students?: IStudent[];
   publishDate?: Date;
   isActive?: boolean;
+  hasQuiz?: boolean;
   isPublished: boolean;
   createdAt: string;
   updatedAt: string;

@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import axiosInstance from "@/config/axios.config";
 
-const ReviewDialog = ({ courseId, tutorId, isOpen, setIsOpen }: { courseId: string, tutorId: string, isOpen: boolean, setIsOpen: (open: boolean) => void }) => {
+const ReviewDialog = ({ courseId, tutorId, isOpen, setIsOpen,onSubmit }: { courseId: string, tutorId: string, isOpen: boolean, setIsOpen: (open: boolean) => void ,onSubmit: () => void}) => {
   // Tutor Review State
   const [tutorStars, setTutorStars] = useState(0);
   const [tutorReview, setTutorReview] = useState("");
@@ -15,7 +15,6 @@ const ReviewDialog = ({ courseId, tutorId, isOpen, setIsOpen }: { courseId: stri
   const [courseStars, setCourseStars] = useState(0);
   const [courseReview, setCourseReview] = useState("");
 
-  // Submit Tutor Review to Backend
   const submitTutorReview = async () => {
     try {
       const response = await axiosInstance.post(`/api/v1/reviews/create`, {
@@ -25,6 +24,7 @@ const ReviewDialog = ({ courseId, tutorId, isOpen, setIsOpen }: { courseId: stri
         review: tutorReview
       })
       if(response.status === 201) {
+        onSubmit();
         toast.success("Tutor review submitted")
       }
       setTutorStars(0);
@@ -45,6 +45,7 @@ const ReviewDialog = ({ courseId, tutorId, isOpen, setIsOpen }: { courseId: stri
         review: courseReview
       })
       if(response.status === 201) {
+        onSubmit();
         toast.success("Course review submitted")
       }
       setCourseStars(0);

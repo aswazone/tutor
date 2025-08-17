@@ -7,8 +7,9 @@ import { Types } from "mongoose";
 import { ICourseRepository } from "@/repositories/interface/course.repository.interface";
 import { ICourseProgressResponse, IIntialCourseProgressResponse } from "@/types/courseProgress.type";
 import { CourseProgressModel } from "@/models/implements/courseProgress.model";
+import { ICourseProgressModel } from "@/models/interface/courseProgress.model.interface";
 
-export class CourseProgressService implements ICourseProgressService{
+export class CourseProgressService implements ICourseProgressService {
 
     constructor(
         private readonly _courseRepository: ICourseRepository,
@@ -212,5 +213,9 @@ export class CourseProgressService implements ICourseProgressService{
 
 
         return resetData;
+    }
+
+    updateStageAndProgress = async(userId: string, courseId: string, data:Partial<ICourseProgressModel>): Promise<ICourseProgressModel | null> => {
+        return await this._courseProgressRepository.updateStageAndProgress(userId, courseId, data);
     }
 }

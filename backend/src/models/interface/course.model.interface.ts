@@ -51,6 +51,7 @@ export interface ICourseModel extends Document {
     isActive: boolean;
     isVerified: CourseStatus;
     rejectReason?: string;
+    hasQuiz: boolean;
     createdAt: Date;
     updatedAt: Date;
 }

@@ -62,6 +62,7 @@ export interface ICreateCourseDTO {
   isPublished: boolean;
   publishDate?: Date;
   isScheduled?: boolean;
+  hasQuiz?: boolean;
   modules: IModule[];
 }
 

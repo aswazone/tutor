@@ -9,4 +9,5 @@ export interface ICourseProgressRepository {
     getCurrentUserCourseProgress(userId: string, courseId: string): Promise<ICourseProgressModel | null>;
     createProgress(data: Partial<ICourseProgressModel>): Promise<ICourseProgressModel>;
     resetProgress(courseProgressId: string): Promise<void>;
+    updateStageAndProgress(userId: string, courseId: string, data:Partial<ICourseProgressModel>): Promise<ICourseProgressModel | null>;
 }

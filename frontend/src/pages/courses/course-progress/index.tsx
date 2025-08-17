@@ -18,7 +18,7 @@ import axiosInstance from "@/config/axios.config";
 import { env } from "@/config/env.config";
 import { RootState } from "@/store";
 import { Chapter, ICourse, IProgressData, Module } from "@/types/course.type";
-import { Award, BookOpen, Calendar, ChevronsUpDown, Download, GripIcon, Sparkles, Star, Trophy, UserRound } from "lucide-react"
+import { Award, Calendar, ChevronsUpDown, GripIcon, Sparkles, Star, Trophy, UserRound } from "lucide-react"
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -29,6 +29,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { setNotes } from "@/store/note";
 import ReviewDialog from "@/components/course/ReviewDialog";
+import { Quiz } from "@/types/quiz.type";
+import { QuizModal } from "@/components/profile/QuizModal";
 
 const CourseProgressPage = () => {
 
@@ -49,6 +51,9 @@ const CourseProgressPage = () => {
   const [tab, setTab] = useState('modules');
   const [botNotification, setBotNotification] = useState({show: false, message: ''});
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [stage, setStage] = useState<'review'|'quiz'|'certificate'>('review');
+  const [quizData, setQuizData] = useState<Quiz | null>(null);
+  const [showQuizModal, setShowQuizModal] = useState(false);
   
 
   const getLastViewedModuleAndChapter = useCallback((courseProgress: IProgressData['progress']) => {
@@ -75,6 +80,8 @@ const CourseProgressPage = () => {
   
     return { lastViewedModule, lastViewedChapter, moduleIndex, chapterIndex };
   },[])
+
+  console.log(stage, 'stage');
   
 
   const fetchProgress = useCallback(async () => {
@@ -91,10 +98,21 @@ const CourseProgressPage = () => {
                 if(response?.data?.progress?.completed){
                   setCurrentModule(response?.data?.courseDetails?.modules[0]);
                   setCurrentChapter(response?.data?.courseDetails?.modules[0].chapters[0]);
-                  console.log(response.data, 'response-after-completion');  
+                  // console.log(response.data, 'response-after-completion');  
                   setShowCourseCompleteDialog(true);
                   setShowConfetti(true);
-                  setBotNotification({show: true, message: 'Rewatch it !'});
+                  if (response?.data?.progress?.stage) {
+                    setStage(response.data?.progress?.stage);
+                    if(response?.data?.progress?.stage === 'review'){
+                      setBotNotification({show: true, message:'Contratz !, You should give feedBack !'})
+                    }else if(response?.data?.progress?.stage === 'quiz'){
+                      setBotNotification({show: true, message: 'Attend Quiz !, Unlock the certificate !!'})
+                    }else{
+                      setBotNotification({show: true, message: 'You could download the certificate now !'})
+                    }
+                  } else {
+                    setStage('review');
+                  }
                   return
                 }
 
@@ -141,15 +159,15 @@ const CourseProgressPage = () => {
 
   const fetchNotes = useCallback(async () => {
     try {
-      console.log('Fetching notes...');
+      // console.log('Fetching notes...');
       const response = await axiosInstance.get(`/api/v1/notes/${id}/${currentChapter?.id}`);
-      console.log(response.data, 'response-notes');
+      // console.log(response.data, 'response-notes');
       dispatch(setNotes(response.data));
       
     }catch (error) {
       console.error('Error fetching notes:', error);
     }
-  },[currentChapter?.id,id,dispatch]);    
+  },[currentChapter?.id,id,dispatch]);   
 
   useEffect(()=>{
     if(user && id){
@@ -194,13 +212,13 @@ const CourseProgressPage = () => {
   // console.log(currentChapter,'currentChapter');
 
   const handleCertificate = () => {
-    console.log("Downloading certificate...");
+    // console.log("Downloading certificate...");
     setIsCertificateOpen(!isCertificateOpen);
     handleBotMessageVisibility(true);
   };
 
   const handleNavigateToCourses = () => {
-    console.log("Navigating to courses...");
+    // console.log("Navigating to courses...");
     navigate("/my-courses");
   };
 
@@ -246,7 +264,7 @@ const CourseProgressPage = () => {
 
   const handleAddNote = async (timestamp: number, text: string) => {
     try {
-      console.log(timestamp, text);
+      // console.log(timestamp, text);
       toast("Note adding..");
       const response = await axiosInstance.post(`/api/v1/notes`, {
         userId: user?._id,
@@ -255,7 +273,7 @@ const CourseProgressPage = () => {
         timestamp,
         text
       })
-      console.log(response.data, 'note-added-response');
+      // console.log(response.data, 'note-added-response');
 
       if(response?.data){
         toast("Note added successfully");
@@ -267,6 +285,28 @@ const CourseProgressPage = () => {
     }
   }
 
+  const handleAttendQuiz = async () => {
+    try {
+      const res = await axiosInstance.get(`/api/v1/quizzes/${id}`);
+      setQuizData(res.data);
+      setShowQuizModal(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Unable to load quiz for this course.");
+    }
+  };
+
+  const courseProgressStageUpdate = async () => {
+    try {
+      await axiosInstance.patch(`/api/v1/course-progress/stage-update/${user?._id}/${id}/`, { stage: courseDetails?.hasQuiz ? "quiz" : "certificate" });
+      fetchProgress();
+    } catch (err) {
+      console.error(err);
+      toast.error("Error updating course stage");
+    }
+  }
+
+
 
   return (
     <div className="relative flex flex-col h-full bg-[#0a0f1d] text-white overflow-y-scroll">  
@@ -274,7 +314,7 @@ const CourseProgressPage = () => {
       initial={{ opacity: 0, x: 10, y: 20 }}
       animate={{ opacity: 1, x: -30, y: 20 }}
       transition={{ duration: 0.3 }}
-      className="fixed bottom-[22%] right-[9%] z-60 px-2 border rounded-2xl rounded-br-none border-sky-600/30 hover:border-sky-600/80 flex items-center gap-1"
+      className="fixed backdrop-blur-sm bottom-[22%] right-[9%] z-60 px-2 border rounded-2xl rounded-br-none border-sky-600/30 hover:border-sky-600/80 flex items-center gap-1"
     >
       <span className="max-w-[300px] animate-fade-in text-sm font-semibold p-2 text-sky-300/80">{botNotification.message || "Hi! How can I help you today?"}</span>
     </motion.div>}
@@ -359,7 +399,7 @@ const CourseProgressPage = () => {
                           <div key={chapter.id} className="flex flex-col">
                             <div className="p-2 bg-gradient-to-r from-transparent to-white/10 rounded-lg">
                               <div className="flex items-center gap-2 mb-1">
-                                <ChevronsUpDown className="h-3 w-3 text-sky-400/30" />
+                                <ChevronsUpDown className="h-3 w-3 text-sky-400/25" />
                                 <span className="text-sm text-sky-300/80">{chapter.title}</span>
                               </div>
                               <div className="flex items-center gap-2 ml-6">
@@ -467,7 +507,7 @@ const CourseProgressPage = () => {
                     <DialogDescription className="text-sm text-white/90 mb-2">
                       You have completed
                     </DialogDescription>
-                    <div className="text-xl font-semibold text-[#0c7ea9] mb-4">
+                    <div className="wc-certificate-font text-2xl font-semibold text-[#0c7ea9] mb-4">
                       {courseDetails?.title ?? "Your Course"}
                     </div>
                     
@@ -483,13 +523,13 @@ const CourseProgressPage = () => {
                       <div className="text-2xl font-bold text-[#79c6e2]">{courseDetails?.modules.length}</div>
                       <div className="text-xs text-white/70">Modules</div>
                     </div>
-                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border-x-3 border-sky-400/30 flex flex-col items-center justify-center text-center">
+                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border-x-3 border-sky-400/25 flex flex-col items-center justify-center text-center">
                       <Calendar size={16} className="text-[#a1d9f8] mx-auto mb-1" />
                       <div className="text-xs text-white/70">{courseDetails?.title.length}</div>
                     </div>
                     <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border-x-3 border-sky-400/15 flex flex-col items-center justify-center text-center">
                       <UserRound size={16} className="text-[#a1d9f8] mx-auto mb-1" />
-                      <div className="text-xs text-white/70">Tutor: {courseDetails?.tutor?.userName}</div>
+                      <div className="text-xs text-white/70">Tutor: {courseDetails?.tutor?.userName && courseDetails?.tutor?.userName?.charAt(0).toUpperCase() + courseDetails?.tutor?.userName?.slice(1)}</div>
                     </div>
                   </div>
                 
@@ -503,38 +543,53 @@ const CourseProgressPage = () => {
                   <div className="flex flex-col gap-3">
                     <div className="grid grid-cols-2 gap-3">
                       <ShinyButton
-                        onClick={()=>{
-                          handleCertificate();
-                          handleBotMessageVisibility(false);
-                        }}
-                      >
-                        <div className="flex items-center justify-center">
-                          <Download size={18} className="inline" />
-                          <span className="ml-2">Certificate</span>
-                        </div>
-                      </ShinyButton>
-                      <ShinyButton
-                        onClick={handleRewatch}
-                      >
-                        <div className="flex items-center justify-center">
-                          <BookOpen size={18} className="inline" />
-                          <span className="ml-2">Rewatch</span>
-                        </div>
-                      </ShinyButton>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <ShinyButton
+                        size="xs"
+                        className={`bg-emerald-900/30 border-emerald-400/25 rounded-none rounded-tl-xl rounded-br-xl`}
                         onClick={handleNavigateToCourses}
                       >
                         My Courses
                       </ShinyButton>
                       <ShinyButton
-                        onClick={() => setIsReviewOpen(true)}
+                        size="xs"
+                        className={`${stage === 'certificate' && 'bg-emerald-900/30 border-emerald-400/25'} rounded-none rounded-bl-xl rounded-tr-xl`}
+                        onClick={handleRewatch}
+                        disabled={stage !== 'certificate'}
                       >
-                        Give Review
+                        <div className="flex items-center justify-center">
+                          <span className="ml-1">Rewatch</span>
+                        </div>
+                      </ShinyButton>
+                    </div>
+                    <div className={`grid ${courseDetails?.hasQuiz ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
+                      <ShinyButton
+                        size="xs"
+                        className={`${stage !== 'quiz' && 'bg-sky-900/30 border-sky-400/25' } rounded-none rounded-tr-xl rounded-bl-xl`}
+                        onClick={() => setIsReviewOpen(true)}
+                        disabled={stage !== 'review'}
+                      >
+                        Feedback
+                      </ShinyButton>
+                      {courseDetails?.hasQuiz && <ShinyButton
+                        size="xs"
+                        className={`${stage === 'quiz' && 'bg-sky-900/30 border-sky-400/25'} rounded-none rounded-t-xl`}
+                        onClick={handleAttendQuiz}
+                        disabled={stage !== 'quiz'}
+                      >
+                        Attend Quiz
+                      </ShinyButton>}
+                      <ShinyButton
+                        size="xs"
+                        className={`${stage === 'certificate' && 'bg-sky-900/30 border-sky-400/25'} rounded-none rounded-tl-xl rounded-br-xl`}
+                        onClick={() => { handleCertificate(); handleBotMessageVisibility(false); }}
+                        disabled={stage !== 'certificate'}
+                      >
+                        <div className="flex items-center justify-center">
+                          <span className="ml-1">Certificate</span>
+                        </div>
                       </ShinyButton>
                     </div>
                   </div>
+
 
                 {/* Decorative Elements */}
                 <div className="absolute top-6 right-6 w-24 h-24 bg-gradient-to-r from-[#0c7ea9]/20 to-[#a1d9f8]/20 rounded-full blur-2xl pointer-events-none" />
@@ -549,10 +604,24 @@ const CourseProgressPage = () => {
         </DialogContent>
     </Dialog>
     <ReviewDialog
+      onSubmit={courseProgressStageUpdate}
       courseId={courseDetails?._id ?? ''}
       tutorId={courseDetails?.tutor._id ?? ''}
       isOpen={isReviewOpen}
       setIsOpen={setIsReviewOpen}
+    />
+    <QuizModal
+      onSubmit={fetchProgress}
+      courseId={courseDetails?._id ?? ''}
+      open={showQuizModal}
+      onClose={()=> {
+        setShowQuizModal(false)
+        setQuizData(null)
+      }}
+      isTest={false}
+      userId={user?._id}
+      questions={quizData?.questions ?? []}
+      quizTitle={quizData?.courseId?.title ?? ''}
     />
     <PopperConfetti showConfetti={showConfetti} />
     {isCertificateOpen && <Certificate course={courseDetails?.title} name={user?.name} onClose={handleCertificate}/>}

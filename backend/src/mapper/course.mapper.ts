@@ -34,6 +34,7 @@ export interface IInstructorCourseDTO {
     isActive: boolean;
     isVerified: CourseStatus;
     rejectReason?: string;
+    hasQuiz: boolean;
     createdAt: Date;
 }
 
@@ -55,6 +56,7 @@ export const toInstructorCourseDTO = (course: ICourseModel): IInstructorCourseDT
         isActive: course.isActive,
         isVerified: course.isVerified,
         rejectReason: course.rejectReason,
+        hasQuiz: course.hasQuiz,
         createdAt: course.createdAt
     }
 }

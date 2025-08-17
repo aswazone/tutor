@@ -107,6 +107,10 @@ const CourseSchema = new Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  hasQuiz: {
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
 

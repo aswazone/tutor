@@ -1,23 +1,6 @@
 import { Document } from "mongoose";
 
-// export interface ICourseProgressModel extends Document {
-//     studentId: string;
-//     courseId: string;
-//     completed: boolean;
-//     completionDate: Date;
-//     moduleProgress: {
-//         moduleId: string;
-//         viewed: boolean;
-//         dateViewed: Date;
-//         chapterProgress: {
-//             chapterId: string;
-//             viewed: boolean;
-//             dateViewed: Date;
-//         }[];
-//     }[];
-// }
-
-
+export type ProgressStage = 'review'|'quiz'|'certificate'|'final';
 export interface IChapterProgressModel {
     chapterId: string;
     viewed: boolean;
@@ -38,6 +21,10 @@ export interface ICourseProgressModel extends Document {
     courseId: string;
     completed: boolean;
     completionDate?: Date;
+    stage: ProgressStage;
+    quizScore: number;
+    quizCompleted: boolean;
+    certificate: { _id: string; url: string };
     lastAccessed: Date;
     moduleProgress: IModuleProgressModel[];
     getProgressPercentage(): number;

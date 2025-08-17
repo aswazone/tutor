@@ -19,6 +19,7 @@ import { TeachersOverviewTab } from './tabs/TeachersOverviewTab'
 import { StudentsOverviewTab } from './tabs/StudentsOverviewTab'
 import { TeachersSettingsTab } from './tabs/TeachersSettingsTab'
 import { StudentsSettingsTab } from './tabs/StudentsSettingsTab'
+import { QuizManageTab } from './tabs/QuizManageTab'
 import { CreateCourseTab } from './tabs/CreateCourseTab'
 import { setActiveTab } from '@/store/auth/authSlice'
 import { WishlistTab } from './tabs/WishlistTab'
@@ -31,7 +32,7 @@ import Loader from '@/components/ui/loader'
 import { useCallback, useEffect, useState } from 'react'
 import axiosInstance from '@/config/axios.config'
 import CustomAlert from '@/components/common/CustomAlert'
-import { Check, LightbulbIcon, MessageCircleMore, Plus, X } from 'lucide-react'
+import { Check, LightbulbIcon, MessageCircleMore, Plus, Sheet, X } from 'lucide-react'
 import { User } from '@/types/profile.type'
 import { GridLineHorizontal, GridLineVertical } from '@/components/common/GridLines'
 import PurchasesHistoryTab from './tabs/PurchasesHistoryTab'
@@ -48,7 +49,7 @@ const getTabs = (role: UserRole) => {
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: TeachersOverviewTab },
         { id: 'courses', name: 'Courses', icon: <BookOpenIcon className="h-5 w-5 md:hidden" />, component: TutorCoursesTab },
         { id: 'create-course', name: 'Manage Course', icon: <PlusIcon className="h-5 w-5 md:hidden" />, component: CreateCourseTab },
-        // { id: 'students', name: 'My Students', icon: <UserGroupIcon className="h-5 w-5 md:hidden" />, component: StudentsTab },
+        { id: 'quiz', name: 'Manage Quiz', icon: <Sheet className="h-5 w-5 md:hidden" />, component: QuizManageTab },
         { id: 'reviews', name: 'Reviews', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: ReviewsTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: TeachersSettingsTab },
       ]

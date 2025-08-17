@@ -1,6 +1,7 @@
 
 import { ICourseProgressModel } from "@/models/interface/courseProgress.model.interface";
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
+
 
 const ChapterProgressSchema = new Schema({
     chapterId: { type: String, required: true },
@@ -22,6 +23,13 @@ const CourseProgressSchema = new Schema({
     courseId: { type: String, required: true },
     completed: { type: Boolean, default: false },
     completionDate: Date,
+    stage: { type: String, default: 'review' },
+    quizScore: { type: Number, default: 0 },
+    quizCompleted: { type: Boolean, default: false },
+    certificate: {
+        _id: Types.ObjectId,
+        url: String
+    },
     lastAccessed: { type: Date, default: Date.now },
     moduleProgress: [ModuleProgressSchema]
 }, {

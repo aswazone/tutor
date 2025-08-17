@@ -37,4 +37,15 @@ export class CourseProgressController implements ICourseProgressController {
             next(error);
         }
      }
+
+    updateStageAndProgress = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+        try {
+            const {userId,courseId} = req.params;
+            console.log(req.body,userId,courseId,'controller-stage-update');
+            const courseProgress = await this._courseProgressService.updateStageAndProgress(userId,courseId,req.body);
+            res.json(courseProgress);
+        } catch (error) {
+            next(error);
+        }
+     }
 }
