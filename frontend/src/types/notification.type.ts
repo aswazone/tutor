@@ -13,6 +13,7 @@ export interface NotificationPayload {
     | 'COURSE_DISABLED'
     | 'COURSE_CREATION'
     | 'COURSE_BLOCKED'
+    | 'INTERVIEW_CREATION'
     | 'NEW_MESSAGE';
   relatedId?: string;
   courseTitle?: string;

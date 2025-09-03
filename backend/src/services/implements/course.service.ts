@@ -10,7 +10,7 @@ import { QueryFilter, QueryOptions } from '@/utils/queryToFilter.utils';
 import { IStudentCoursesRepository } from '@/repositories/interface/studentCourses.repository.interface';
 import { sendCourseRejectEmail } from '@/utils/send-email.utils';
 import { IUserRepository } from '@/repositories/interface/user.repository.interface';
-import { INotificationRepository } from '@/repositories/interface/notification.repository.interface';
+// import { INotificationRepository } from '@/repositories/interface/notification.repository.interface';
 import { sendNotificationToUser, sendNotificationToUsers } from '@/utils/send-notification-to-users';
 import { INotificationModel } from '@/models/interface/notification.model.interface';
 import { IInstructorCourseDTO, IStudentCourseDTO, toInstructorCourseDTOs, toStudentCourseDTOs } from '@/mapper/course.mapper';
@@ -20,7 +20,6 @@ export class CourseService implements ICourseService {
     private readonly _courseRepository: ICourseRepository,
     private readonly _userRepository: IUserRepository,
     private readonly _studentCourseRepository: IStudentCoursesRepository,
-    private readonly _notificationRepository: INotificationRepository
   ) { }
 
   createCourse = async (userId: string, courseData: ICreateCourseDTO): Promise<ICourse> => {

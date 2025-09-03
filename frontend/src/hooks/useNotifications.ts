@@ -152,6 +152,22 @@ export const useSocketNotifications = (serverUrl: string) => {
           });
           break; //user and tutor
 
+        case 'INTERVIEW_CREATION':
+          toast.success(notification.title, {
+            description: notification.message,
+            duration: 5000,
+            action: {
+              label: "Try Now",
+              onClick: () => {
+                if (notification.relatedId) {
+                  const interviewPath = `/interviews/${notification.relatedId}`;
+                  window.location.href = interviewPath;
+                }
+              },
+            },
+          });
+          break; //user
+
         case "NEW_MESSAGE":
           toast.info("💬 New Message", {
             description: notification.message,

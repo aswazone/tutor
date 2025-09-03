@@ -12,10 +12,11 @@ export interface INotificationModel extends Document {
     | 'COURSE_ENABLED'
     | 'COURSE_DISABLED'
     | 'COURSE_CREATION'
+    | 'INTERVIEW_CREATION'
     | 'NEW_MESSAGE';
   isRead: boolean;
   relatedId?: string;
-  onModel?: 'Course' | 'ChatRoom';
+  onModel?: 'Course' | 'ChatRoom' | 'Interview';
   amount?: number;
   isDeleted: boolean;
   createdAt: Date;

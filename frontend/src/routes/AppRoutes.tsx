@@ -27,6 +27,9 @@ import MyCourses from "@/pages/courses/my-courses";
 import CourseProgressPage from "@/pages/courses/course-progress";
 import Revenue from "@/pages/admin/Revenue";
 import Chat from "@/pages/chat";
+import Interview from "@/pages/interview";
+import StartInterview from "@/pages/interview/StartInterview";
+// import InterviewManageTab from "@/pages/profile/tabs/InterviewManageTab";
 
 
 export const router = createBrowserRouter([
@@ -70,6 +73,12 @@ export const router = createBrowserRouter([
             },
             {
                 path: "chat", element: <ProtectedRoutes><Chat /></ProtectedRoutes>
+            },
+            {
+                path: "interview/:id", element: <ProtectedRoutes><Interview /></ProtectedRoutes >
+            },
+            {
+                path: "interview/start/:id", element: <ProtectedRoutes><StartInterview /></ProtectedRoutes >
             },
         ]
     },

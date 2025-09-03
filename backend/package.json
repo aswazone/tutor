@@ -38,6 +38,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.810.0",
     "@aws-sdk/s3-request-presigner": "^3.810.0",
+    "@google/genai": "^1.15.0",
     "@types/got": "^9.6.12",
     "axios": "^1.9.0",
     "bcryptjs": "^3.0.2",
@@ -53,6 +54,7 @@
     "nanoid": "^5.1.5",
     "node-cron": "^4.1.0",
     "nodemailer": "^7.0.2",
+    "openai": "^5.15.0",
     "redis": "^5.0.1",
     "socket.io": "^4.8.1",
     "tsx": "^4.19.3",

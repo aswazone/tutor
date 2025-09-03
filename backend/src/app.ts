@@ -18,6 +18,7 @@ import { initializeCoursePublisher } from './utils/course-schedule-publisher.uti
 import notificationRouter from './routers/notification.routes';
 import reviewRouter from './routers/review.routes';
 import quizRouter from './routers/quiz.routes';
+import interviewRouter from './routers/interview.routes';
 
 const app:Express = express();
 validateEnv();
@@ -42,5 +43,8 @@ app.use('/api/v1/notes', noteRouter);
 app.use('/api/v1/notifications', notificationRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/quizzes', quizRouter);
+app.use('/api/v1/interview', interviewRouter);
+
+
 
 export default app;

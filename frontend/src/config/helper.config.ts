@@ -234,3 +234,43 @@ export const filterOptions: IfilterOptions = {
     level: courseLevelOptions,
     primaryLanguage: languageOptions,
 };
+
+export const interviewDuration: ICommonOptions[] = [
+  { id: "15minutes", label: "15 minutes" },
+  { id: "30minutes", label: "30 minutes" },
+  { id: "45minutes", label: "45 minutes" },
+  { id: "60minutes", label: "60 minutes" },
+];
+
+export interface IInterviewModalFormControls {
+    name: string;
+    label: string;
+    componentType: string;
+    type?: string;
+    placeholder: string;
+    options?: ICommonOptions[];
+}
+
+
+export const interviewModalFormControls: IInterviewModalFormControls[] = [
+  {
+    name: "domain",
+    label: "Domain/Stack",
+    componentType: "input",
+    type: "text",
+    placeholder: "e.g. Senior Frontend Developer",
+  },
+  {
+    name: "description",
+    label: "Description",
+    componentType: "textarea",
+    placeholder: "Enter detailed description...",
+  },
+  {
+    name: "duration",
+    label: "Interview Duration",
+    componentType: "select",
+    options: interviewDuration,
+    placeholder: "Select duration",
+  },
+]

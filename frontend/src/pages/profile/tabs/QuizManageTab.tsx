@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { fetchTutorCourses } from "@/store/fetch";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { Loader } from "lucide-react";
+import { Loader, SquarePen } from "lucide-react";
 import { QuizModal } from "@/components/profile/QuizModal";
 import { useSearchParams } from "react-router-dom";
 import { Pagination } from "@/components/ui/pagination";
@@ -65,6 +65,7 @@ export const QuizManageTab = () => {
       setTotalPages(Math.ceil(total/pageSize));
       setTotalItems(total);
       setQuizzes(data);
+      console.log(data,'tutor quizzes');
     } catch (err) {
       console.error(err);
     }
@@ -280,9 +281,9 @@ export const QuizManageTab = () => {
                       {new Date(quiz.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex">
                     <Button variant={'outline'} className="text-sky-600 hover:text-sky-500 cursor-pointer rounded-tl-none rounded-r-none border-r-0" size="sm" onClick={() => setCheckQuiz(quiz)}>Check</Button>
-                    <Button variant={'outline'} className="text-sky-300 hover:text-sky-200 cursor-pointer rounded-none border-x-0" size="sm" onClick={() => handleEditQuiz(quiz._id)}>Edit</Button>
+                    <Button variant={'outline'} className="text-sky-300 hover:text-sky-200 cursor-pointer rounded-none border-x-0" size="sm" onClick={() => handleEditQuiz(quiz._id)}><SquarePen className="h-4 w-4" /></Button>
                     <Button 
                       size="sm"
                       variant="outline"
@@ -365,6 +366,7 @@ export const QuizManageTab = () => {
       </Dialog>
       {checkQuiz && (
         <QuizModal
+          onSubmit={() => toast.success("Quiz Ok !")}
           courseId={checkQuiz.courseId._id}
           userId={user?._id}
           isTest={true}

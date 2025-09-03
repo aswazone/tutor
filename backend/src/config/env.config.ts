@@ -40,6 +40,8 @@ export const {
     PAYPAL_SECRET_KEY,
     PAYPAL_BASE_URL,
     PAYPAL_REDIRECT_URL,
+    OPENROUTER_API_KEY,
+    GEMINI_API_KEY
 
 } = process.env
 

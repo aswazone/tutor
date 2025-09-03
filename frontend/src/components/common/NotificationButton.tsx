@@ -3,6 +3,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { Bell, CheckCheck, Trash } from "lucide-react";
 import { env } from "@/config/env.config";
 import { useSocketNotifications } from "@/hooks/useNotifications";
+import { NotificationPayload } from "@/types/notification.type";
 
 const NotificationButton = () => {
   const  { 
@@ -12,6 +13,50 @@ const NotificationButton = () => {
     handleMarkAllAsRead,
     handleMarkAsRead
    } = useSocketNotifications(env.API_URL);
+
+   const notificationType = (type: NotificationPayload['type']) => {
+     switch (type) {
+       case 'REVENUE_EARNED':
+         return 'Revenue Earned';
+       case 'COURSE_PURCHASED':
+         return 'Course Purchased';
+       case 'COURSE_APPROVED':
+         return 'Check Now';
+       case 'COURSE_DECLINED':
+         return 'Course Declined';
+       case 'COURSE_ENABLED':
+         return 'Check Now';
+       case 'COURSE_DISABLED':
+         return 'Ask Tutor';
+       case 'COURSE_CREATION':
+         return 'Check Now';
+       case 'COURSE_BLOCKED':
+         return 'Ask Tutor';
+       case 'INTERVIEW_CREATION':
+         return 'Try Now';
+       case 'NEW_MESSAGE':
+         return 'Check it';
+     }
+   }
+
+   const notificationLink = (type: NotificationPayload['type'], relatedId: string) => {
+     switch (type) {
+       case 'COURSE_APPROVED':
+         return `/profile`;
+       case 'COURSE_DECLINED':
+         return `/course/${relatedId}`;
+       case 'COURSE_ENABLED':
+         return `/course/${relatedId}`;
+       case 'COURSE_DISABLED':
+         return `/chat`;
+       case 'COURSE_CREATION':
+         return `/courses`;
+       case 'COURSE_BLOCKED':
+         return `/chat`;
+       case 'INTERVIEW_CREATION':
+         return `/interview/${relatedId}`;
+     }
+   }
 
   return (
     <HoverCard openDelay={0} closeDelay={0}>
@@ -75,6 +120,9 @@ const NotificationButton = () => {
                     <p className="text-sm text-muted-foreground">
                       {notification.message}
                     </p>
+                    <div>
+                      <a href={notificationLink(notification.type, notification.relatedId as string)} className="bg-muted px-2 py-1 text-xs rounded hover:text-sky-500">{notificationType(notification.type)}</a>
+                    </div>
                   </div>
                 </div>
               ))

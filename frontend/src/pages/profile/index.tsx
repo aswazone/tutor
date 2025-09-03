@@ -41,6 +41,7 @@ import { Input } from '@/components/ui/input'
 import { uploadSingleImageFile } from '@/store/course'
 import { toast } from 'sonner'
 import { env } from '@/config/env.config'
+import InterviewManageTab from './tabs/InterviewManageTab'
 
 const getTabs = (role: UserRole) => {
   switch (role) {
@@ -49,7 +50,8 @@ const getTabs = (role: UserRole) => {
         { id: 'overview', name: 'Overview', icon: <HomeIcon className="h-5 w-5 md:hidden" />, component: TeachersOverviewTab },
         { id: 'courses', name: 'Courses', icon: <BookOpenIcon className="h-5 w-5 md:hidden" />, component: TutorCoursesTab },
         { id: 'create-course', name: 'Manage Course', icon: <PlusIcon className="h-5 w-5 md:hidden" />, component: CreateCourseTab },
-        { id: 'quiz', name: 'Manage Quiz', icon: <Sheet className="h-5 w-5 md:hidden" />, component: QuizManageTab },
+        { id: 'quiz', name: 'Quiz', icon: <Sheet className="h-5 w-5 md:hidden" />, component: QuizManageTab },
+        { id: 'interview', name: 'Interview', icon: <LightbulbIcon className="h-5 w-5 md:hidden" />, component: InterviewManageTab },
         { id: 'reviews', name: 'Reviews', icon: <StarIcon className="h-5 w-5 md:hidden" />, component: ReviewsTab },
         { id: 'settings', name: 'Settings', icon: <Cog6ToothIcon className="h-5 w-5 md:hidden" />, component: TeachersSettingsTab },
       ]

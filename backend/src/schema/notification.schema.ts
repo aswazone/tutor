@@ -27,6 +27,7 @@ const notificationSchema = new Schema({
       'COURSE_DISABLED',
       'COURSE_CREATION',
       'COURSE_BLOCKED',
+      'INTERVIEW_CREATION',
       'NEW_MESSAGE',
     ],
     required: true
@@ -42,7 +43,7 @@ const notificationSchema = new Schema({
   },
   onModel: {
     type: String,
-    enum: ['Course', 'ChatRoom'],
+    enum: ['Course', 'ChatRoom', 'Interview'],
     required: false
   },
   isDeleted: {

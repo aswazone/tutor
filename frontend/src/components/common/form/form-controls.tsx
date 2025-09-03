@@ -51,9 +51,11 @@ const FormControls = ({ formControls }: { formControls: IFormControl[] }) => {
                     } else if (options) {
                       return (
                         <Select onValueChange={field.onChange} value={field.value}>
-                          <SelectTrigger>
-                            <SelectValue placeholder={placeholder || `Select ${label}`} />
-                          </SelectTrigger>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={placeholder || `Select ${label}`} />
+                            </SelectTrigger>
+                          </FormControl>
                           <SelectContent>
                             {options.map((option) => (
                               <SelectItem key={option.id} value={option.id}>
