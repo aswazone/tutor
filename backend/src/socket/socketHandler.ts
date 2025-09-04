@@ -185,6 +185,42 @@ export const initializeSocket = (io: Server) => {
       }
     });
 
+
+    socket.on("join-video-room", (chatId: string) => {
+      socket.join(chatId);
+      console.log(`Socket joined video room: ${chatId}`);
+    });
+
+    socket.on("webrtc-offer", ({ chatId, offer, senderId,callName, receiverId }) => {
+      socket.to(receiverId).emit("incoming-call", {
+        chatId,
+        callName,
+        callerId: senderId,
+        receiverId,
+      });
+
+      console.log("chatId", chatId);
+      console.log("receiver", receiverId);
+
+      socket.to(chatId).emit("webrtc-offer", { offer, senderId });
+    });
+
+    socket.on("call-rejected", ({  chatId }) => {
+      socket.to(chatId).emit("end-call");
+    });
+
+    socket.on("webrtc-answer", ({ chatId, answer, senderId }) => {
+      socket.to(chatId).emit("webrtc-answer", { answer, senderId });
+    });
+
+    socket.on("ice-candidate", ({ chatId, candidate, senderId }) => {
+      socket.to(chatId).emit("ice-candidate", { candidate, senderId });
+    });
+
+    socket.on("end-call", ({ chatId }) => {
+      socket.to(chatId).emit("end-call");
+    });
+
     // Handle disconnect
     socket.on('disconnect', async () => {
       console.log(`👤 User ${userName} disconnected`);

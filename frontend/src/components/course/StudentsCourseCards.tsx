@@ -148,7 +148,7 @@ export const StudentsCourseCards = ({ isLoading, courses, wishlistItems, handleW
                   </div>
                   <div className="flex justify-between items-center">                    
                     <span className="font-semibold">₹ {course.pricing}</span>
-                    <Button size='sm' className="opacity-0 group-hover:opacity-100 transition-opacity" variant={'outline'} onClick={(e) => {
+                    <Button size='sm' className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" variant={'outline'} onClick={(e) => {
                       e.stopPropagation();
                       handleNavigation(course._id);
                     }}>

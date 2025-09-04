@@ -1,8 +1,11 @@
 import React from 'react';
-import { Phone, Video, MoreVertical, ArrowLeft, Users } from 'lucide-react';
+import { Video, MoreVertical, ArrowLeft, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { ChatRoom, User } from '@/types/chat.type';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { useCallContext } from '@/contexts/CallContext';
 
 interface ChatHeaderProps {
   room: ChatRoom;
@@ -15,12 +18,30 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   currentUser,
   onBack,
 }) => {
-
-  
+  const navigate = useNavigate();
+  const { incomingCall } = useCallContext();
 
   const otherParticipant = room.type === 'direct' 
     ? room.participants.find(p => p._id !== currentUser._id)
     : null;
+
+  const handleVideoCall = () => {
+
+    if (incomingCall) {
+      toast.info('Please handle the incoming call first');
+      return;
+    }
+
+
+    if (room.type === 'direct' && otherParticipant) {
+      // Navigate to video call with required parameters
+      navigate(`/video-call/${room._id}?target=${otherParticipant._id}&callName=${otherParticipant.name}`);
+    } else if (room.type === 'group') {
+      // Handle group video call - you might want to show a participant selection modal
+      // or implement group calling differently
+      console.log('Group video calls not implemented yet');
+    }
+  };
 
   const getStatusText = () => {
     if (room.type === 'group') {
@@ -33,7 +54,13 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       return 'Online';
     }
     
-    return `Last seen ${new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(otherParticipant.lastSeen))}`;
+    return `Last seen ${new Intl.DateTimeFormat('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    }).format(new Date(otherParticipant.lastSeen))}`;
   };
 
   return (
@@ -72,7 +99,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 (<span className='text-xs text-sky-400/70'>Typing...</span>)
                 :
                 (<p className="text-xs text-chat-text-muted">{getStatusText()}</p>) 
-              }</div>
+              }
+            </div>
           </div>
         </div>
 
@@ -80,14 +108,10 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="text-chat-text hover:bg-chat-message-bg"
-          >
-            <Phone className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-chat-text hover:bg-chat-message-bg"
+            onClick={handleVideoCall}
+            disabled={!!incomingCall || room.type === 'group'}
+            className="text-chat-text hover:bg-chat-message-bg disabled:opacity-50"
+            title={incomingCall ? 'Handle incoming call first' : 'Start video call'}
           >
             <Video className="h-5 w-5" />
           </Button>

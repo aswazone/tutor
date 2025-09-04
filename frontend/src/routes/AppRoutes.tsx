@@ -29,6 +29,7 @@ import Revenue from "@/pages/admin/Revenue";
 import Chat from "@/pages/chat";
 import Interview from "@/pages/interview";
 import StartInterview from "@/pages/interview/StartInterview";
+import VideoCallWrapper from "@/components/call/VideoCallWrapper";
 // import InterviewManageTab from "@/pages/profile/tabs/InterviewManageTab";
 
 
@@ -73,6 +74,9 @@ export const router = createBrowserRouter([
             },
             {
                 path: "chat", element: <ProtectedRoutes><Chat /></ProtectedRoutes>
+            },
+            {
+                path: "video-call/:chatId", element: <ProtectedRoutes><VideoCallWrapper /></ProtectedRoutes>
             },
             {
                 path: "interview/:id", element: <ProtectedRoutes><Interview /></ProtectedRoutes >
